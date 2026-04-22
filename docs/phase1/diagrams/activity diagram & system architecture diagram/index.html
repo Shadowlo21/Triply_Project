@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>Triply - Pro Architecture & Activity</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none; /* عشان وإنت بتسحب الصورة الكلام ميتحددش */
+        }
+        .sidebar {
+            width: 340px;
+            background-color: #2d2d30;
+            padding: 20px;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.8);
+            overflow-y: auto;
+            z-index: 10;
+        }
+        .sidebar h2 {
+            color: #007acc;
+            text-align: center;
+            border-bottom: 2px solid #3e3e42;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .menu-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background-color: #3e3e42;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-align: left;
+            direction: ltr;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .menu-btn:hover { background-color: #005f9e; }
+        .menu-btn.active { background-color: #007acc; transform: translateX(-5px); box-shadow: 2px 2px 8px rgba(0,0,0,0.3); }
+        
+        .main-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #121212;
+            position: relative;
+            overflow: hidden; /* عشان الصورة متطلعش برا الشاشة */
+        }
+        
+        /* صندوق الـ FRs */
+        .header-area {
+            background-color: #1e1e1e;
+            padding: 15px 25px;
+            border-bottom: 1px solid #333;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 5;
+            min-height: 80px;
+        }
+        .header-area h1 {
+            color: #007acc;
+            margin: 0 0 10px 0;
+            font-size: 22px;
+            direction: ltr;
+            text-align: left;
+        }
+        .fr-box {
+            background-color: #252526;
+            border-left: 4px solid #007acc;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #d4d4d4;
+            direction: ltr;
+            text-align: left;
+            display: none;
+        }
+        .fr-box strong { color: #569cd6; font-size: 15px;}
+
+        /* منطقة الصورة الاحترافية (بدون سكرول بار) */
+        .image-wrapper {
+            flex-grow: 1;
+            overflow: hidden; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: linear-gradient(#1a1a1a 1px, transparent 1px), linear-gradient(90deg, #1a1a1a 1px, transparent 1px);
+            background-size: 25px 25px;
+            cursor: grab; /* علامة الإيد للسحب */
+            position: relative;
+        }
+        .image-wrapper:active { cursor: grabbing; }
+
+        #viewer {
+            position: absolute;
+            max-width: 85%;
+            max-height: 85%;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border-radius: 4px;
+            transform-origin: 0 0; /* ضروري لزوم الماوس الدقيق */
+            pointer-events: none; /* عشان الماوس يمسك الخلفية */
+        }
+
+        /* أزرار التحكم */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(45, 45, 48, 0.9);
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 20;
+        }
+        .controls button {
+            background-color: #3e3e42;
+            color: white;
+            border: 1px solid #555;
+            border-radius: 4px;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .controls button:hover { background-color: #007acc; border-color: #007acc; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2>Triply SRS Docs</h2>
+        <button class="menu-btn active" onclick="showDiagram('System Archticture diagram.jpg', 'System Architecture', this)">🏗️ System Architecture</button>
+        <button class="menu-btn" onclick="showDiagram('FR1.jpg', 'FR1: Conflict Detection', this)">⚠️ FR1 Diagram</button>
+        <button class="menu-btn" onclick="showDiagram('FR2.jpg', 'FR2: Route Optimizer', this)">🗺️ FR2 Diagram</button>
+        <button class="menu-btn" onclick="showDiagram('FR8.jpg', 'FR8: Routing Logic', this)">🧭 FR8 Diagram</button>
+        <button class="menu-btn" onclick="showDiagram('FR9.jpg', 'FR9: RSVP & Attendance', this)">✅ FR9 Diagram</button>
+        <button class="menu-btn" onclick="showDiagram('FR10.jpg', 'FR10: Currency Converter', this)">💱 FR10 Diagram</button>
+        <button class="menu-btn" onclick="showDiagram('FR12.jpg', 'FR12: Budget Alerts', this)">📉 FR12 Diagram</button>
+        <button class="menu-btn" onclick="showDiagram('FR13.jpg', 'FR13: Financial Settlement', this)">💰 FR13 Diagram</button>
+        <button class="menu-btn" onclick="showDiagram('FR(17+14).jpg', 'FR(17+14): Voting & Deadlines', this)">🗳️ FR(17+14) Diagram</button>
+        <button class="menu-btn" onclick="showDiagram('FR(5+28).jpg', 'FR(5+28): Activity State', this)">🔄 FR(5+28) Diagram</button>
+    </div>
+
+    <div class="main-area">
+        <div class="header-area">
+            <h1 id="diagram-title">System Architecture</h1>
+            <div id="fr-text" class="fr-box"></div>
+        </div>
+        
+        <div class="image-wrapper" id="img-container">
+            <img id="viewer" src="System%20Archticture%20diagram.jpg" alt="Diagram Viewer">
+        </div>
+
+        <div class="controls">
+            <button onclick="zoomOutBtn()" title="تصغير">➖</button>
+            <button onclick="resetZoom()" title="الوضع الافتراضي">🔄</button>
+            <button onclick="zoomInBtn()" title="تكبير">➕</button>
+        </div>
+    </div>
+
+    <script>
+        const frData = {
+            'System Archticture diagram.jpg': '',
+            'FR1.jpg': '<strong>FR-01:</strong> The system shall identify and flag scheduling conflicts including overlapping activity and conflicting travel times between locations whenever a trip member adds or modifies an activity in the itinerary.',
+            'FR2.jpg': '<strong>FR-02:</strong> The system shall suggest and display the most logical order of activities in itinerary based on the physical proximity of their locations when a trip member requests route optimization.',
+            'FR8.jpg': '<strong>FR-08:</strong> The system shall automatically insert a travel time between activities based on the estimated distance between their locations and mode of transport. [Should Have]',
+            'FR9.jpg': '<strong>FR-09:</strong> The system shall allow members to opt-in or out of specific activities and track the attendance count for each activity. [Must Have]',
+            'FR10.jpg': '<strong>FR-10:</strong> The system shall handle multi-currency conversions and updates. (Currency Converter)',
+            'FR12.jpg': '<strong>FR-12:</strong> The system shall monitor the total trip expenses and notify all members when the predefined budget threshold is exceeded. [Must Have]',
+            'FR13.jpg': '<strong>FR-13:</strong> The system shall require all involved members to review and approve the final expense settlement before marking the trip as "Settled." [Should Have]',
+            'FR(17+14).jpg': '<strong>FR-(17+14):</strong> The system shall allow users to participate in voting polls, monitor deadlines, automatically close polls when deadlines are reached, and determine the final decision based on vote counts and tie-breaking rules. [Should Have] <br><br> The system shall allow weighted voting where certain members (e.g., the trip organizer) have higher voting power or tie-breaking authority. [Should Have]',
+            'FR(5+28).jpg': '<strong>FR-(5+28):</strong> The system shall mark any activity proposed by a member as "Draft" by default, and allow the trip leader to confirm or reject it, changing its status to "Confirmed" or removing it. <br><br> The system shall allow members to add proposed activities to a queue, and allow the trip leader to approve or reject each one before it is added to the itinerary.'
+        };
+
+        const imgElement = document.getElementById('viewer');
+        const container = document.getElementById('img-container');
+        const frBox = document.getElementById('fr-text');
+
+        // --- نظام السحب والزوم الاحترافي ---
+        let scale = 1;
+        let pointX = 0;
+        let pointY = 0;
+        let start = { x: 0, y: 0 };
+        let panning = false;
+
+        function setTransform() {
+            imgElement.style.transform = `translate(${pointX}px, ${pointY}px) scale(${scale})`;
+        }
+
+        // السحب بالماوس
+        container.onmousedown = function (e) {
+            e.preventDefault();
+            start = { x: e.clientX - pointX, y: e.clientY - pointY };
+            panning = true;
+        }
+        container.onmouseup = function () { panning = false; }
+        container.onmouseleave = function () { panning = false; }
+        container.onmousemove = function (e) {
+            e.preventDefault();
+            if (!panning) return;
+            pointX = (e.clientX - start.x);
+            pointY = (e.clientY - start.y);
+            setTransform();
+        }
+
+        // زوم البكرة الذكي
+        container.onwheel = function (e) {
+            e.preventDefault();
+            let xs = (e.clientX - pointX) / scale;
+            let ys = (e.clientY - pointY) / scale;
+            let delta = (e.wheelDelta ? e.wheelDelta : -e.deltaY);
+            
+            (delta > 0) ? (scale *= 1.2) : (scale /= 1.2);
+            
+            if (scale > 10) scale = 10;
+            if (scale < 0.2) scale = 0.2;
+
+            pointX = e.clientX - xs * scale;
+            pointY = e.clientY - ys * scale;
+            setTransform();
+        }
+
+        function zoomInBtn() { scale *= 1.2; centerImage(); }
+        function zoomOutBtn() { scale /= 1.2; centerImage(); }
+        function resetZoom() {
+            scale = 1;
+            centerImage();
+        }
+
+        function centerImage() {
+            let containerRect = container.getBoundingClientRect();
+            let imgRect = imgElement.getBoundingClientRect();
+            // سنترة بناءً على الحجم الحالي
+            pointX = (containerRect.width - (imgElement.offsetWidth * scale)) / 2;
+            pointY = (containerRect.height - (imgElement.offsetHeight * scale)) / 2;
+            setTransform();
+        }
+
+        // تحديث الكود اللي إنت متأكد إنه شغال (Encoding)
+        function showDiagram(imgSrc, title, btnElement) {
+            imgElement.style.opacity = 0;
+            setTimeout(() => {
+                let safeSrc = encodeURI(imgSrc).replace(/\+/g, '%2B');
+                imgElement.src = safeSrc;
+                
+                // أول ما الصورة تحمل، تتسنتر لوحدها
+                imgElement.onload = resetZoom;
+                imgElement.style.opacity = 1;
+            }, 200);
+            
+            document.getElementById('diagram-title').innerText = title;
+
+            if (frData[imgSrc] && frData[imgSrc].trim() !== '') {
+                frBox.innerHTML = frData[imgSrc];
+                frBox.style.display = 'block';
+            } else {
+                frBox.style.display = 'none';
+            }
+
+            let buttons = document.getElementsByClassName('menu-btn');
+            for(let i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove('active');
+            }
+            btnElement.classList.add('active');
+        }
+
+        // سنترة أول ما الصفحة تفتح أو لو كبرت الشاشة
+        window.onload = function() {
+            setTimeout(resetZoom, 100);
+        };
+        window.onresize = resetZoom;
+
+    </script>
+</body>
+</html>

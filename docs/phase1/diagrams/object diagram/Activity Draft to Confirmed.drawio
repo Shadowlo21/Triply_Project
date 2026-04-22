@@ -1,0 +1,85 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6">
+  <diagram name="Page-1" id="ZFUCVxkSnaAUSkfOBe9R">
+    <mxGraphModel dx="-329" dy="815" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="light-dark(#FFFFFF,#FFFFFF)" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="KuhKRb_QidbdM1ArAosf-18" parent="1" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=200;tabHeight=60;tabPosition=left;html=1;whiteSpace=wrap;rounded=0;labelBorderColor=none;strokeColor=#9673A6;strokeWidth=1;labelBackgroundColor=none;fillColor=light-dark(#FFFFFF,#FFFFFF);gradientColor=none;perimeterSpacing=0;" value="" vertex="1">
+          <mxGeometry height="460" width="500" x="2352" y="177" as="geometry" />
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-19" parent="1" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=none;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;strokeWidth=2;fillColor=light-dark(#FFFFFF,#9577A3);labelBackgroundColor=none;gradientColor=none;" value="" vertex="1">
+          <mxGeometry height="60" width="201" x="2349" y="115" as="geometry" />
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-21" parent="1" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=240;tabHeight=60;tabPosition=left;html=1;whiteSpace=wrap;rounded=0;strokeWidth=1;labelBackgroundColor=none;strokeColor=#C1D5FC;" value="&lt;span style=&quot;font-family: monospace; font-size: 0px; font-weight: 400; text-align: start; text-wrap-mode: nowrap;&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20parent%3D%221%22%20style%3D%22text%3Balign%3Dcenter%3BfontStyle%3D1%3BverticalAlign%3Dmiddle%3BspacingLeft%3D3%3BspacingRight%3D3%3BstrokeColor%3D%239673a6%3Brotatable%3D0%3Bpoints%3D%5B%5B0%2C0.5%5D%2C%5B1%2C0.5%5D%5D%3BportConstraint%3Deastwest%3Bhtml%3D1%3BstrokeWidth%3D2%3BfillColor%3D%23e1d5e7%3B%22%20value%3D%22%26lt%3Bspan%20style%3D%26quot%3Bfont-weight%3A%20400%3B%20text-wrap-mode%3A%20wrap%3B%26quot%3B%26gt%3B%26lt%3Bfont%20style%3D%26quot%3Bfont-size%3A%2016px%3B%26quot%3B%26gt%3BPRECONDITION%26lt%3B%2Ffont%26gt%3B%26lt%3B%2Fspan%26gt%3B%22%20vertex%3D%221%22%3E%3CmxGeometry%20height%3D%2260%22%20width%3D%22230%22%20x%3D%22850%22%20y%3D%22260%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3E&lt;/span&gt;&lt;font face=&quot;monospace&quot;&gt;&lt;span style=&quot;font-size: 0px; font-weight: 400; text-wrap-mode: nowrap;&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20parent%3D%221%22%20style%3D%22text%3Balign%3Dcenter%3BfontStyle%3D1%3BverticalAlign%3Dmiddle%3BspacingLeft%3D3%3BspacingRight%3D3%3BstrokeColor%3D%239673a6%3Brotatable%3D0%3Bpoints%3D%5B%5B0%2C0.5%5D%2C%5B1%2C0.5%5D%5D%3BportConstraint%3Deastwest%3Bhtml%3D1%3BstrokeWidth%3D2%3BfillColor%3D%23e1d5e7%3B%22%20value%3D%22%26lt%3Bspan%20style%3D%26quot%3Bfont-weight%3A%20400%3B%20text-wrap-mode%3A%20wrap%3B%26quot%3B%26gt%3B%26lt%3Bfont%20style%3D%26quot%3Bfont-size%3A%2016px%3B%26quot%3B%26gt%3BPRECONDITION%26lt%3B%2Ffont%26gt%3B%26lt%3B%2Fspan%26gt%3B%22%20vertex%3D%221%22%3E%3CmxGeometry%20height%3D%2260%22%20width%3D%22230%22%20x%3D%22850%22%20y%3D%22260%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3E&lt;/span&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="440" width="680" x="2973" y="197" as="geometry" />
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-22" parent="1" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=none;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;fillColor=light-dark(#C1D5FC,#4A70A1);labelBackgroundColor=none;fontColor=light-dark(#000000,#000000);strokeWidth=2;" value="&lt;span style=&quot;font-size: 16px;&quot;&gt;POSTCONDITION&lt;/span&gt;" vertex="1">
+          <mxGeometry height="58" width="239" x="2974" y="198" as="geometry" />
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-36" edge="1" parent="1" source="KuhKRb_QidbdM1ArAosf-23" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=light-dark(#000000,#000000);strokeWidth=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.75;exitY=1;exitDx=0;exitDy=0;" target="KuhKRb_QidbdM1ArAosf-35" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-23" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=light-dark(#FFF2CC,#D49F00);strokeColor=#d6b656;labelBackgroundColor=none;gradientColor=none;strokeWidth=2;fontSize=12;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;font style=&quot;color: light-dark(rgb(0, 0, 0), rgb(0, 0, 0));&quot;&gt;&lt;u style=&quot;&quot;&gt;itinerary1 : Itinerary&lt;/u&gt;&lt;/font&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&lt;font style=&quot;color: light-dark(rgb(0, 0, 0), rgb(0, 0, 0));&quot;&gt;&amp;nbsp;&lt;span&gt;itineraryID = 1&lt;/span&gt;&lt;/font&gt;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&lt;font style=&quot;color: light-dark(rgb(0, 0, 0), rgb(0, 0, 0));&quot;&gt;&amp;nbsp;tripID = 1&lt;/font&gt;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&lt;font style=&quot;color: light-dark(rgb(0, 0, 0), rgb(0, 0, 0));&quot;&gt;&amp;nbsp;activities = [eiffelTower]&lt;/font&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="90" width="160" x="2542" y="258" as="geometry" />
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-24" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=light-dark(#DAE8FC,#4B6B99);strokeColor=light-dark(#6C8EBF,#384963);labelBackgroundColor=none;strokeWidth=1;fontColor=light-dark(#000000,#000000);" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;eiffelTower : Activity&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;activityID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;itineraryID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;name = &quot;Eiffel Tower Visit&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;location = &quot;Paris&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;dateTime = &quot;2026-04-11 10:00&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;duration = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;status = &quot;Draft&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;modeOfTransport = &quot;Metro&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="160" width="200" x="2394" y="427" as="geometry" />
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-25" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=light-dark(#FFF2CC,#B88300);strokeColor=#d6b656;labelBackgroundColor=none;fontColor=light-dark(#000000,#000000);" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;itinerary1 : Itinerary&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;&lt;span style=&quot;&quot;&gt;itineraryID = 1&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;tripID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;activities = [eiffelTower, louvreMuseum]&lt;/p&gt;" vertex="1">
+          <mxGeometry height="90" width="242.5" x="3191.75" y="297" as="geometry" />
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-26" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=light-dark(#DAE8FC,#486C99);strokeColor=#6c8ebf;labelBackgroundColor=none;fontColor=light-dark(#000000,#000000);" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;eiffelTower : Activity&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;activityID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;itineraryID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;name = &quot;Eiffel Tower Visit&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;location = &quot;Paris&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;dateTime = &quot;2026-04-11 10:00&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;duration = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;status = &quot;Confirmed&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;modeOfTransport = &quot;Metro&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="160" width="200" x="3053" y="437" as="geometry" />
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-27" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=light-dark(#DAE8FC,#486796);strokeColor=#6c8ebf;labelBackgroundColor=none;fontColor=light-dark(#000000,#000000);" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;louvreMuseum : Activity&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;activityID = 2&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;itineraryID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;name = &quot;Louvre Museum&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;location = &quot;Paris&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;dateTime = &quot;2026-04-12 14:00&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;duration = 2&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;status = &quot;Confirmed&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;modeOfTransport = &quot;Walk&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="160" width="200" x="3388" y="427" as="geometry" />
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-28" edge="1" parent="1" source="KuhKRb_QidbdM1ArAosf-23" style="endArrow=classic;html=1;rounded=0;labelBackgroundColor=none;strokeWidth=1;strokeColor=light-dark(#000000,#000000);entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" target="KuhKRb_QidbdM1ArAosf-24" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="2594.5" y="365" as="sourcePoint" />
+            <mxPoint x="2594.5" y="445" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-29" connectable="0" parent="KuhKRb_QidbdM1ArAosf-28" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=light-dark(#000000,#000000);" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.2301" y="-4" as="geometry">
+            <mxPoint x="-9" y="-4" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-30" edge="1" parent="1" source="KuhKRb_QidbdM1ArAosf-25" style="endArrow=classic;html=1;rounded=0;exitX=0.15;exitY=1.012;exitDx=0;exitDy=0;exitPerimeter=0;labelBackgroundColor=none;fontColor=light-dark(#000000,#000000);strokeWidth=1;strokeColor=light-dark(#000000,#000000);" target="KuhKRb_QidbdM1ArAosf-26" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="3023" y="277" as="sourcePoint" />
+            <mxPoint x="3073" y="227" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-31" connectable="0" parent="KuhKRb_QidbdM1ArAosf-30" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=light-dark(#000000,#000000);" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1097" y="1" as="geometry">
+            <mxPoint x="13" y="3" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-32" edge="1" parent="1" source="KuhKRb_QidbdM1ArAosf-25" style="endArrow=classic;html=1;rounded=0;exitX=0.75;exitY=1;exitDx=0;exitDy=0;labelBackgroundColor=none;fontColor=light-dark(#000000,#000000);strokeWidth=1;strokeColor=light-dark(#000000,#000000);" target="KuhKRb_QidbdM1ArAosf-27" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="3421" y="407" as="sourcePoint" />
+            <mxPoint x="3393" y="456" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-33" connectable="0" parent="KuhKRb_QidbdM1ArAosf-32" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=light-dark(#000000,#000000);" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1418" y="-4" as="geometry">
+            <mxPoint x="16" y="-6" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-34" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;labelBackgroundColor=none;fontColor=light-dark(#000000,#000000);fontSize=20;fontStyle=1" value="&lt;span&gt;Activity Draft to Confirmed&lt;/span&gt;" vertex="1">
+          <mxGeometry height="30" width="160" x="2796" y="121" as="geometry" />
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-35" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;fillColor=light-dark(#DAE8FC,#4B6B99);strokeColor=light-dark(#6C8EBF,#384963);labelBackgroundColor=none;strokeWidth=1;fontColor=light-dark(#000000,#000000);" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;louvreMuseum: Activity&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;activityID = 2&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;itineraryID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;name = &quot;Louvre Museum&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;location = &quot;Paris&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;dateTime = &quot;2026-04-12 14:00&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;duration = 2&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;status = &quot;Draft&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;&amp;nbsp;modeOfTransport = &quot;Walk&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="160" width="200" x="2624" y="427" as="geometry" />
+        </mxCell>
+        <mxCell id="KuhKRb_QidbdM1ArAosf-37" connectable="0" parent="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;fontColor=light-dark(#000000,#000000);" value="has" vertex="1">
+          <mxGeometry x="2691" y="366" as="geometry" />
+        </mxCell>
+        <mxCell id="4br1v62_uxcx9lJHHJ7w-1" parent="1" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=#9673a6;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;fillColor=#e1d5e7;labelBackgroundColor=none;strokeWidth=2;" value="&lt;span style=&quot;font-size: 16px;&quot;&gt;PRECONDITION&lt;/span&gt;" vertex="1">
+          <mxGeometry height="62" width="238" x="2350" y="177" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

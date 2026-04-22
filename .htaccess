@@ -1,0 +1,19 @@
+Options -Indexes
+
+# Deny direct access to sensitive directories
+<FilesMatch "\.(env|db|sql|sqlite|json|md)$">
+    Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Allow direct access to existing files and directories
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Route everything else through index.php except api/
+    RewriteCond %{REQUEST_URI} !^/api/
+    RewriteRule ^(.*)$ index.php?page=$1 [L,QSA]
+</IfModule>

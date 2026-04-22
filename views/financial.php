@@ -1,0 +1,169 @@
+<?php require_once __DIR__ . '/layout.php'; start_layout('Financial'); ?>
+
+<div id="alert-box"></div>
+
+<div class="flex-between mb-4">
+  <div class="form-group" style="margin:0;min-width:220px">
+    <select id="trip-select" class="form-control" onchange="loadFinancial()">
+      <option value="">— Select Trip —</option>
+    </select>
+  </div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-secondary btn-sm" onclick="loadSettlement()">Settlement</button>
+    <button class="btn btn-primary" onclick="openModal('modal-add-expense')">+ Add Expense</button>
+  </div>
+</div>
+
+<div class="grid-3 mb-4" id="fin-stats" style="display:none">
+  <div class="card"><div class="stat-value" id="stat-total">0</div><div class="stat-label">Total Spent</div></div>
+  <div class="card"><div class="stat-value" id="stat-budget">—</div><div class="stat-label">Budget Limit</div></div>
+  <div class="card">
+    <div class="stat-value" id="stat-pct">0%</div>
+    <div class="stat-label">Budget Used</div>
+    <div style="height:6px;background:var(--border);border-radius:3px;margin-top:8px">
+      <div id="budget-bar" style="height:100%;background:var(--primary);border-radius:3px;width:0%;transition:width .4s"></div>
+    </div>
+  </div>
+</div>
+
+<div id="expenses-wrap"></div>
+
+<div id="settlement-wrap" style="display:none" class="mt-4"></div>
+
+<div class="modal-overlay hidden" id="modal-add-expense">
+  <div class="modal">
+    <div class="modal-header"><h3>Add Expense</h3><button class="modal-close" onclick="closeModal('modal-add-expense')">×</button></div>
+    <div class="modal-body">
+      <div id="exp-alert"></div>
+      <form id="form-add-expense">
+        <div class="form-group"><label>Title</label><input type="text" name="title" class="form-control" required></div>
+        <div class="grid-2">
+          <div class="form-group"><label>Amount</label><input type="number" name="amount" class="form-control" step="0.01" min="0.01" required></div>
+          <div class="form-group">
+            <label>Currency</label>
+            <select name="currency" class="form-control">
+              <option value="EGP">EGP</option><option value="USD">USD</option>
+              <option value="EUR">EUR</option><option value="GBP">GBP</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Type</label>
+          <select name="type" class="form-control">
+            <option value="general">General</option><option value="food">Food</option>
+            <option value="transport">Transport</option><option value="accommodation">Accommodation</option>
+            <option value="activity">Activity</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Split</label>
+          <select name="split_type" class="form-control">
+            <option value="equal">Equal (all members)</option>
+            <option value="custom">Custom amounts</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="btn-add-exp">Add Expense</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+async function loadTrips() {
+  const res = await API.get('trips', { action: 'list' });
+  const sel = document.getElementById('trip-select');
+  (res.data || []).forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t.id; opt.textContent = t.title;
+    sel.appendChild(opt);
+  });
+  if (sel.options.length > 1) { sel.selectedIndex = 1; loadFinancial(); }
+}
+
+async function loadFinancial() {
+  const tripId = document.getElementById('trip-select').value;
+  if (!tripId) return;
+  document.getElementById('settlement-wrap').style.display = 'none';
+  const res = await API.get('financial', { action: 'list', trip_id: tripId });
+  if (!res.success) return;
+  const { expenses, total_spent, budget_limit, currency } = res.data;
+
+  document.getElementById('fin-stats').style.display = 'grid';
+  document.getElementById('stat-total').textContent = (total_spent || 0).toFixed(2) + ' ' + currency;
+  document.getElementById('stat-budget').textContent = budget_limit ? budget_limit.toFixed(2) + ' ' + currency : 'Not set';
+  if (budget_limit) {
+    const pct = Math.min(100, ((total_spent / budget_limit) * 100)).toFixed(1);
+    document.getElementById('stat-pct').textContent = pct + '%';
+    const bar = document.getElementById('budget-bar');
+    bar.style.width = pct + '%';
+    bar.style.background = pct > 90 ? 'var(--danger)' : pct > 70 ? 'var(--warning)' : 'var(--primary)';
+  }
+
+  const wrap = document.getElementById('expenses-wrap');
+  if (!expenses.length) {
+    wrap.innerHTML = '<div class="card empty-state"><div class="icon">💰</div>No expenses yet.</div>';
+    return;
+  }
+  wrap.innerHTML = `<div class="card"><div class="card-header"><h3>Expenses</h3></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Title</th><th>Amount</th><th>Type</th><th>Paid By</th><th>Splits</th><th>Date</th></tr></thead>
+      <tbody>${expenses.map(e => `
+        <tr>
+          <td><strong>${escHtml(e.title)}</strong></td>
+          <td>${(e.converted_amount || e.amount).toFixed(2)} ${escHtml(currency)}</td>
+          <td><span class="badge badge-blue">${escHtml(e.type)}</span></td>
+          <td class="text-sm">${escHtml(e.paid_by_email)}</td>
+          <td class="text-sm">${(e.splits || []).map(s => escHtml(s.email) + ': ' + (s.amount||0).toFixed(2)).join(', ')}</td>
+          <td class="text-sm">${fmtDate(e.created_at)}</td>
+        </tr>`).join('')}
+      </tbody></table></div></div>`;
+}
+
+async function loadSettlement() {
+  const tripId = document.getElementById('trip-select').value;
+  if (!tripId) { showAlert('#alert-box', 'Select a trip first.'); return; }
+  const res = await API.get('financial', { action: 'settlement', trip_id: tripId });
+  const wrap = document.getElementById('settlement-wrap');
+  wrap.style.display = 'block';
+  if (!res.success) { wrap.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`; return; }
+  const { transactions, currency } = res.data;
+  if (!transactions.length) {
+    wrap.innerHTML = '<div class="card empty-state"><div class="icon">✅</div>All settled! No transactions needed.</div>';
+    return;
+  }
+  wrap.innerHTML = `<div class="card">
+    <div class="card-header"><h3>Settlement Transactions</h3></div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>From</th><th>To</th><th>Amount</th></tr></thead>
+      <tbody>${transactions.map(t => `
+        <tr>
+          <td>${escHtml(t.from_email || t.from)}</td>
+          <td>${escHtml(t.to_email || t.to)}</td>
+          <td><strong>${(+t.amount).toFixed(2)} ${escHtml(currency)}</strong></td>
+        </tr>`).join('')}
+      </tbody></table></div></div>`;
+  wrap.scrollIntoView({ behavior: 'smooth' });
+}
+
+document.getElementById('form-add-expense').addEventListener('submit', async e => {
+  e.preventDefault();
+  const tripId = document.getElementById('trip-select').value;
+  if (!tripId) { showAlert('#exp-alert', 'Select a trip first.'); return; }
+  const btn = document.getElementById('btn-add-exp');
+  setLoading(btn, true);
+  const fd = new FormData(e.target);
+  const res = await API.post('financial', {
+    action: 'add', trip_id: tripId,
+    title: fd.get('title'), amount: fd.get('amount'),
+    currency: fd.get('currency'), type: fd.get('type'),
+    split_type: fd.get('split_type'),
+  });
+  setLoading(btn, false);
+  if (res.success) { closeModal('modal-add-expense'); e.target.reset(); loadFinancial(); }
+  else showAlert('#exp-alert', res.message);
+});
+
+loadTrips();
+</script>
+
+<?php end_layout(); ?>

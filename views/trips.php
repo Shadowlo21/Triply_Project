@@ -1,0 +1,181 @@
+<?php require_once __DIR__ . '/layout.php'; start_layout('Trips'); ?>
+
+<div id="alert-box"></div>
+
+<div class="flex-between mb-4">
+  <div></div>
+  <button class="btn btn-primary" onclick="openModal('modal-create-trip')">+ New Trip</button>
+</div>
+
+<div id="trips-list"></div>
+
+<div id="trip-detail" style="display:none" class="mt-4">
+  <div class="card">
+    <div class="card-header">
+      <h3 id="detail-title">Trip Details</h3>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary btn-sm" onclick="openModal('modal-invite')">Invite Member</button>
+        <button class="btn btn-secondary btn-sm" id="btn-budget" onclick="openModal('modal-budget')">Set Budget</button>
+      </div>
+    </div>
+    <div id="detail-body"></div>
+    <div class="mt-4">
+      <h4 class="mb-2">Members</h4>
+      <div id="members-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modal-create-trip">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Create New Trip</h3>
+      <button class="modal-close" onclick="closeModal('modal-create-trip')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="create-alert"></div>
+      <form id="form-create-trip">
+        <div class="form-group"><label>Title</label><input type="text" name="title" class="form-control" required></div>
+        <div class="form-group"><label>Destination</label><input type="text" name="destination" class="form-control" required></div>
+        <div class="grid-2">
+          <div class="form-group"><label>Start Date</label><input type="date" name="start_date" class="form-control" required></div>
+          <div class="form-group"><label>End Date</label><input type="date" name="end_date" class="form-control" required></div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Currency</label>
+            <select name="base_currency" class="form-control">
+              <option value="EGP">EGP</option><option value="USD">USD</option>
+              <option value="EUR">EUR</option><option value="GBP">GBP</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Budget Limit (optional)</label><input type="number" name="budget_limit" class="form-control" min="0" step="0.01"></div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="btn-create">Create Trip</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modal-invite">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Invite Member</h3>
+      <button class="modal-close" onclick="closeModal('modal-invite')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="invite-alert"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="invite-email" class="form-control" required></div>
+      <button class="btn btn-primary btn-block" onclick="sendInvite()">Send Invite</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modal-budget">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Set Budget Limit</h3>
+      <button class="modal-close" onclick="closeModal('modal-budget')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="budget-alert"></div>
+      <div class="form-group"><label>Budget Limit</label><input type="number" id="budget-amount" class="form-control" min="0" step="0.01"></div>
+      <button class="btn btn-primary btn-block" onclick="saveBudget()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentTripId = null;
+
+async function loadTrips() {
+  const res = await API.get('trips', { action: 'list' });
+  const el = document.getElementById('trips-list');
+  if (!res.success || !res.data.length) {
+    el.innerHTML = '<div class="card empty-state"><div class="icon">🗺</div>No trips yet. Create one to get started!</div>';
+    return;
+  }
+  el.innerHTML = `<div class="card"><div class="table-wrap"><table>
+    <thead><tr><th>Trip</th><th>Destination</th><th>Dates</th><th>Role</th><th>Status</th><th></th></tr></thead>
+    <tbody>${res.data.map(t => `
+      <tr>
+        <td><strong>${escHtml(t.title)}</strong></td>
+        <td>${escHtml(t.destination)}</td>
+        <td class="text-sm">${fmtDate(t.start_date)} – ${fmtDate(t.end_date)}</td>
+        <td><span class="badge ${t.my_role === 'leader' ? 'badge-blue' : 'badge-gray'}">${escHtml(t.my_role)}</span></td>
+        <td><span class="badge ${t.status === 'active' ? 'badge-green' : 'badge-gray'}">${escHtml(t.status)}</span></td>
+        <td><button class="btn btn-secondary btn-sm" onclick="showTrip(${t.id}, '${escHtml(t.title).replace(/'/g,"\\'")}', '${t.my_role}')">Open</button></td>
+      </tr>`).join('')}
+    </tbody>
+  </table></div></div>`;
+}
+
+async function showTrip(id, title, role) {
+  currentTripId = id;
+  document.getElementById('detail-title').textContent = title;
+  document.getElementById('trip-detail').style.display = 'block';
+  document.getElementById('btn-budget').style.display = role === 'leader' ? 'inline-flex' : 'none';
+
+  const res = await API.get('trips', { action: 'get', trip_id: id });
+  if (res.success) {
+    const t = res.data;
+    document.getElementById('detail-body').innerHTML = `
+      <div class="grid-3 mt-2">
+        <div><div class="text-muted text-sm">Destination</div><strong>${escHtml(t.destination)}</strong></div>
+        <div><div class="text-muted text-sm">Dates</div><strong>${fmtDate(t.start_date)} – ${fmtDate(t.end_date)}</strong></div>
+        <div><div class="text-muted text-sm">Budget</div><strong>${t.budget_limit ? t.budget_limit + ' ' + t.base_currency : 'Not set'}</strong></div>
+      </div>`;
+  }
+
+  const mRes = await API.get('trips', { action: 'members', trip_id: id });
+  if (mRes.success) {
+    document.getElementById('members-list').innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Email</th><th>Role</th><th>Can Edit</th></tr></thead>
+      <tbody>${(mRes.data || []).map(m => `
+        <tr>
+          <td>${escHtml(m.email)}</td>
+          <td><span class="badge ${m.role === 'leader' ? 'badge-blue' : 'badge-gray'}">${escHtml(m.role)}</span></td>
+          <td>${m.can_edit ? '✅' : '—'}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+  }
+
+  document.getElementById('trip-detail').scrollIntoView({ behavior: 'smooth' });
+}
+
+document.getElementById('form-create-trip').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('btn-create');
+  setLoading(btn, true);
+  const fd = new FormData(e.target);
+  const res = await API.post('trips', {
+    action: 'create',
+    title: fd.get('title'), destination: fd.get('destination'),
+    start_date: fd.get('start_date'), end_date: fd.get('end_date'),
+    base_currency: fd.get('base_currency'), budget_limit: fd.get('budget_limit'),
+  });
+  setLoading(btn, false);
+  if (res.success) { closeModal('modal-create-trip'); e.target.reset(); loadTrips(); }
+  else showAlert('#create-alert', res.message, 'error');
+});
+
+async function sendInvite() {
+  const email = document.getElementById('invite-email').value.trim();
+  if (!email || !currentTripId) return;
+  const res = await API.post('trips', { action: 'invite', trip_id: currentTripId, email });
+  showAlert('#invite-alert', res.message, res.success ? 'success' : 'error');
+  if (res.success) showTrip(currentTripId, document.getElementById('detail-title').textContent, 'leader');
+}
+
+async function saveBudget() {
+  const amt = document.getElementById('budget-amount').value;
+  if (!amt || !currentTripId) return;
+  const res = await API.post('trips', { action: 'set_budget', trip_id: currentTripId, budget_limit: amt });
+  showAlert('#budget-alert', res.message, res.success ? 'success' : 'error');
+}
+
+loadTrips();
+</script>
+
+<?php end_layout(); ?>

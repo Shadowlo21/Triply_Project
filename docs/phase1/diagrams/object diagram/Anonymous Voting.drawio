@@ -1,0 +1,213 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.6 Chrome/144.0.7559.236 Electron/40.8.4 Safari/537.36" version="29.6.6">
+  <diagram name="Page-1" id="hUEWnhfE2efAtytxHv_7">
+    <mxGraphModel dx="2284" dy="1358" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;labelBorderColor=none;dashed=1;" value="&lt;font style=&quot;font-size: 22px;&quot;&gt;Anonymous Voting&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="260" x="1105" y="96" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-2" parent="1" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=200;tabHeight=60;tabPosition=left;html=1;whiteSpace=wrap;rounded=0;labelBorderColor=none;strokeColor=#9673A6;strokeWidth=1;" value="" vertex="1">
+          <mxGeometry height="650" width="676" x="489" y="276" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-3" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;poll1 : Poll&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;pollID = 305&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 33&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;question = &quot;Should we go to the Pyramids?&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;options = [&quot;Yes&quot;, &quot;No&quot;]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;isAnonymous = true&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;deadline = 2026-04-15&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;status = &quot;Open&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;type = &quot;standard&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="160" width="290" x="526" y="628" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-14" parent="1" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=#9673A6;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;strokeWidth=1;fillColor=#e1d5e7;" value="" vertex="1">
+          <mxGeometry height="60" width="250" x="490" y="276" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-15" parent="1" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=none;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;PRECONDITION&lt;/font&gt;" vertex="1">
+          <mxGeometry height="26" width="80" x="575" y="293" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-16" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;dinnerPoll : Poll&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;pollID = 305&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 6002&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;question = &quot;What do you want for dinner tonight?&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;options = [&quot;Grilled Chicken&quot;, &quot;Fish&quot;, &quot;Vegan Pasta&quot;]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;isAnonymous = false&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;deadline = 2026-12-21&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;status = &quot;Closed&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;type = &quot;Food Preference&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;winnerOption = &quot;Grilled Chicken&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="180" width="300" x="1465" y="376.0000000000001" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-17" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;vote1 : Vote&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;voteID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;pollID = 305&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;userID = 1122&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;selectedOption = &quot;Grilled Chicken&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="100" width="200" x="1305" y="606.0000000000001" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-18" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;vote2 : Vote&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;voteID = 2&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;pollID = 305&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;userID = 1128&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;selectedOption = &quot;Fish&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="100" width="170" x="1532.5" y="606.0000000000001" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-19" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;vote3 : Vote&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;voteID = 3&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;pollID = 305&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;userID = 1132&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;selectedOption = &quot;Grilled Chicken&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="105" width="200" x="1735" y="603.5000000000001" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-20" edge="1" parent="1" style="endArrow=classic;html=1;rounded=1;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1715" y="560.0000000000001" as="sourcePoint" />
+            <mxPoint x="1718" y="776" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-21" connectable="0" parent="Wtv9fFIo1mN5SgH-3e_P-20" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="generates" vertex="1">
+          <mxGeometry relative="1" x="0.6223" y="-3" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-22" edge="1" parent="1" source="Wtv9fFIo1mN5SgH-3e_P-16" style="endArrow=classic;html=1;rounded=1;exitX=0.043;exitY=0.966;exitDx=0;exitDy=0;exitPerimeter=0;" target="Wtv9fFIo1mN5SgH-3e_P-17" value="has">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1795" y="716" as="sourcePoint" />
+            <mxPoint x="1845" y="666.0000000000001" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-23" connectable="0" parent="Wtv9fFIo1mN5SgH-3e_P-22" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="&lt;span style=&quot;color: rgba(0, 0, 0, 0); font-family: monospace; font-size: 0px; text-align: start; background-color: rgb(236, 236, 236);&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20connectable%3D%220%22%20parent%3D%221%22%20style%3D%22edgeLabel%3Bhtml%3D1%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bresizable%3D0%3Bpoints%3D%5B%5D%3Brounded%3D1%3B%22%20value%3D%22has%22%20vertex%3D%221%22%3E%3CmxGeometry%20x%3D%22317.06037327408467%22%20y%3D%22557.4066480070737%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3Eh&lt;/span&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.042" y="2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-24" edge="1" parent="1" source="Wtv9fFIo1mN5SgH-3e_P-16" style="endArrow=classic;html=1;rounded=1;exitX=0.528;exitY=0.995;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.54;entryY=0.032;entryDx=0;entryDy=0;entryPerimeter=0;" target="Wtv9fFIo1mN5SgH-3e_P-18" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1654" y="576.0000000000001" as="sourcePoint" />
+            <mxPoint x="1615" y="632.0000000000001" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-25" connectable="0" parent="Wtv9fFIo1mN5SgH-3e_P-24" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="&lt;span style=&quot;color: rgba(0, 0, 0, 0); font-family: monospace; font-size: 0px; text-align: start; background-color: rgb(236, 236, 236);&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20connectable%3D%220%22%20parent%3D%221%22%20style%3D%22edgeLabel%3Bhtml%3D1%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bresizable%3D0%3Bpoints%3D%5B%5D%3Brounded%3D1%3B%22%20value%3D%22has%22%20vertex%3D%221%22%3E%3CmxGeometry%20x%3D%22317.06037327408467%22%20y%3D%22557.4066480070737%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3Eh&lt;/span&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.042" y="2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-26" edge="1" parent="1" source="Wtv9fFIo1mN5SgH-3e_P-16" style="endArrow=classic;html=1;rounded=1;entryX=0.327;entryY=0.026;entryDx=0;entryDy=0;entryPerimeter=0;" target="Wtv9fFIo1mN5SgH-3e_P-19" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1834" y="586.0000000000001" as="sourcePoint" />
+            <mxPoint x="1795" y="642.0000000000001" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-27" connectable="0" parent="Wtv9fFIo1mN5SgH-3e_P-26" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="&lt;span style=&quot;color: rgba(0, 0, 0, 0); font-family: monospace; font-size: 0px; text-align: start; background-color: rgb(236, 236, 236);&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20connectable%3D%220%22%20parent%3D%221%22%20style%3D%22edgeLabel%3Bhtml%3D1%3Balign%3Dcenter%3BverticalAlign%3Dmiddle%3Bresizable%3D0%3Bpoints%3D%5B%5D%3Brounded%3D1%3B%22%20value%3D%22has%22%20vertex%3D%221%22%3E%3CmxGeometry%20x%3D%22317.06037327408467%22%20y%3D%22557.4066480070737%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3Eh&lt;/span&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.042" y="2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-28" edge="1" parent="1" style="endArrow=classic;html=1;rounded=1;entryX=0.346;entryY=1.021;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.75;exitY=0;exitDx=0;exitDy=0;" target="Wtv9fFIo1mN5SgH-3e_P-17" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1448" y="795" as="sourcePoint" />
+            <mxPoint x="1395" y="736" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-29" connectable="0" parent="Wtv9fFIo1mN5SgH-3e_P-28" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="casts" vertex="1">
+          <mxGeometry relative="1" x="-0.1894" y="2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-30" parent="1" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=240;tabHeight=60;tabPosition=left;html=1;whiteSpace=wrap;rounded=0;strokeWidth=1;strokeColor=#6C8EBF;" value="&lt;span style=&quot;color: rgba(0, 0, 0, 0); font-family: monospace; font-size: 0px; font-weight: 400; text-align: start; text-wrap-mode: nowrap;&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20parent%3D%221%22%20style%3D%22text%3Balign%3Dcenter%3BfontStyle%3D1%3BverticalAlign%3Dmiddle%3BspacingLeft%3D3%3BspacingRight%3D3%3BstrokeColor%3D%239673a6%3Brotatable%3D0%3Bpoints%3D%5B%5B0%2C0.5%5D%2C%5B1%2C0.5%5D%5D%3BportConstraint%3Deastwest%3Bhtml%3D1%3BstrokeWidth%3D2%3BfillColor%3D%23e1d5e7%3B%22%20value%3D%22%26lt%3Bspan%20style%3D%26quot%3Bfont-weight%3A%20400%3B%20text-wrap-mode%3A%20wrap%3B%26quot%3B%26gt%3B%26lt%3Bfont%20style%3D%26quot%3Bfont-size%3A%2016px%3B%26quot%3B%26gt%3BPRECONDITION%26lt%3B%2Ffont%26gt%3B%26lt%3B%2Fspan%26gt%3B%22%20vertex%3D%221%22%3E%3CmxGeometry%20height%3D%2260%22%20width%3D%22230%22%20x%3D%22850%22%20y%3D%22260%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3E&lt;/span&gt;&lt;font color=&quot;rgba(0, 0, 0, 0)&quot; face=&quot;monospace&quot;&gt;&lt;span style=&quot;font-size: 0px; font-weight: 400; text-wrap-mode: nowrap;&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20parent%3D%221%22%20style%3D%22text%3Balign%3Dcenter%3BfontStyle%3D1%3BverticalAlign%3Dmiddle%3BspacingLeft%3D3%3BspacingRight%3D3%3BstrokeColor%3D%239673a6%3Brotatable%3D0%3Bpoints%3D%5B%5B0%2C0.5%5D%2C%5B1%2C0.5%5D%5D%3BportConstraint%3Deastwest%3Bhtml%3D1%3BstrokeWidth%3D2%3BfillColor%3D%23e1d5e7%3B%22%20value%3D%22%26lt%3Bspan%20style%3D%26quot%3Bfont-weight%3A%20400%3B%20text-wrap-mode%3A%20wrap%3B%26quot%3B%26gt%3B%26lt%3Bfont%20style%3D%26quot%3Bfont-size%3A%2016px%3B%26quot%3B%26gt%3BPRECONDITION%26lt%3B%2Ffont%26gt%3B%26lt%3B%2Fspan%26gt%3B%22%20vertex%3D%221%22%3E%3CmxGeometry%20height%3D%2260%22%20width%3D%22230%22%20x%3D%22850%22%20y%3D%22260%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3E&lt;/span&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="650" width="930" x="1275" y="276" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-32" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;vote1 : Vote&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;voteID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;pollID = 305&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;userID = 1233&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;selectedOption = &quot;Yes&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="91" width="158" x="1327" y="752" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-33" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;vote2 : Vote&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;voteID = 2&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;pollID = 305&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;userID = 1244&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;selectedOption = &quot;No&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="100" width="139" x="1510" y="747.5" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-49" parent="1" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=#6C8EBF;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;fillColor=#dae8fc;" value="&lt;span style=&quot;font-size: 16px;&quot;&gt;POSTCONDITION&lt;/span&gt;" vertex="1">
+          <mxGeometry height="60" width="240" x="1275" y="276" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-50" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;trip1: Trip&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 33&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;destination = &quot;Giza&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;startDate = &quot;2026-04-10&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;endDate = &quot;2026-04-20&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;status = &quot;Active&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;baseCurrency = &quot;EGP&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;budgetLimit = 5000.0&lt;/p&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="290" x="673" y="376" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-52" edge="1" parent="1" source="Wtv9fFIo1mN5SgH-3e_P-50" style="endArrow=classic;html=1;rounded=1;entryX=0.516;entryY=0.021;entryDx=0;entryDy=0;entryPerimeter=0;" target="Wtv9fFIo1mN5SgH-3e_P-3" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="834" y="585" as="sourcePoint" />
+            <mxPoint x="1058" y="679" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-53" connectable="0" parent="Wtv9fFIo1mN5SgH-3e_P-52" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint x="13" y="-9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-54" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;poll1: Poll&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;pollID = 305&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 33&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;question = &quot;Should we go to the Pyramids?&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;options = [&quot;Yes&quot;, &quot;No&quot;]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;isAnonymous = true&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;deadline = 2026-04-15&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;status = &quot;Open&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;type = &quot;standard&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="156" width="290" x="1359" y="556" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-55" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;trip1: Trip&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 33&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;destination = &quot;Giza&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;startDate = &quot;2026-04-10&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;endDate = &quot;2026-04-20&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;status = &quot;Active&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;baseCurrency = &quot;EGP&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;budgetLimit = 5000.0&lt;/p&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="290" x="1559" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-56" edge="1" parent="1" source="Wtv9fFIo1mN5SgH-3e_P-55" style="endArrow=classic;html=1;rounded=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.617;entryY=0.016;entryDx=0;entryDy=0;entryPerimeter=0;" target="Wtv9fFIo1mN5SgH-3e_P-54" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1741" y="590" as="sourcePoint" />
+            <mxPoint x="1965" y="684" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-57" connectable="0" parent="Wtv9fFIo1mN5SgH-3e_P-56" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint x="16" y="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-58" edge="1" parent="1" source="Wtv9fFIo1mN5SgH-3e_P-54" style="endArrow=classic;html=1;rounded=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1654" y="628" as="sourcePoint" />
+            <mxPoint x="1412" y="747" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-59" connectable="0" parent="Wtv9fFIo1mN5SgH-3e_P-58" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint x="16" y="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-60" edge="1" parent="1" source="Wtv9fFIo1mN5SgH-3e_P-54" style="endArrow=classic;html=1;rounded=1;exitX=0.625;exitY=0.995;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitPerimeter=0;" target="Wtv9fFIo1mN5SgH-3e_P-33" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1697" y="743" as="sourcePoint" />
+            <mxPoint x="1597" y="805" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Wtv9fFIo1mN5SgH-3e_P-61" connectable="0" parent="Wtv9fFIo1mN5SgH-3e_P-60" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint x="16" y="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="i8OxNtJEtIe_rFLIWsNu-1" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;poll2 : Poll&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;pollID = 306&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 33&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;question = &quot;Should we go to the resturant now?&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;options = [&quot;Yes&quot;, &quot;No&quot;]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;isAnonymous = true&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;deadline = 2026-04-15&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;status = &quot;Open&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;type = &quot;standard&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="160" width="290" x="847" y="628" as="geometry" />
+        </mxCell>
+        <mxCell id="i8OxNtJEtIe_rFLIWsNu-2" edge="1" parent="1" source="Wtv9fFIo1mN5SgH-3e_P-50" style="endArrow=classic;html=1;rounded=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;" target="i8OxNtJEtIe_rFLIWsNu-1" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1049" y="570" as="sourcePoint" />
+            <mxPoint x="907" y="665" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="i8OxNtJEtIe_rFLIWsNu-3" connectable="0" parent="i8OxNtJEtIe_rFLIWsNu-2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint x="13" y="-9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="i8OxNtJEtIe_rFLIWsNu-5" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;poll2 : Poll&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;pollID = 306&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 33&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;question = &quot;Should we go to the resturant now?&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;options = [&quot;Yes&quot;, &quot;No&quot;]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;isAnonymous = true&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;deadline = 2026-04-15&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;status = &quot;Open&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;type = &quot;standard&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="158" width="291" x="1797" y="556" as="geometry" />
+        </mxCell>
+        <mxCell id="i8OxNtJEtIe_rFLIWsNu-6" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;vote3 : Vote&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;voteID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;pollID = 305&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;userID = 1235&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;selectedOption = &quot;Yes&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="100" width="141" x="1765" y="758" as="geometry" />
+        </mxCell>
+        <mxCell id="i8OxNtJEtIe_rFLIWsNu-9" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;vote4 : Vote&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;voteID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;pollID = 305&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;userID = 1355&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;selectedOption = &quot;Yes&quot;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="100" width="142" x="1965" y="758" as="geometry" />
+        </mxCell>
+        <mxCell id="i8OxNtJEtIe_rFLIWsNu-10" edge="1" parent="1" source="Wtv9fFIo1mN5SgH-3e_P-55" style="endArrow=classic;html=1;rounded=1;exitX=0.697;exitY=1.029;exitDx=0;exitDy=0;exitPerimeter=0;" target="i8OxNtJEtIe_rFLIWsNu-5" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1954" y="522" as="sourcePoint" />
+            <mxPoint x="1812" y="573" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="i8OxNtJEtIe_rFLIWsNu-11" connectable="0" parent="i8OxNtJEtIe_rFLIWsNu-10" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint x="16" y="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="i8OxNtJEtIe_rFLIWsNu-12" edge="1" parent="1" style="endArrow=classic;html=1;rounded=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.378;entryY=0.017;entryDx=0;entryDy=0;entryPerimeter=0;" target="i8OxNtJEtIe_rFLIWsNu-6" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1831" y="719" as="sourcePoint" />
+            <mxPoint x="1827" y="759" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="i8OxNtJEtIe_rFLIWsNu-13" connectable="0" parent="i8OxNtJEtIe_rFLIWsNu-12" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint x="16" y="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="i8OxNtJEtIe_rFLIWsNu-14" edge="1" parent="1" source="i8OxNtJEtIe_rFLIWsNu-5" style="endArrow=classic;html=1;rounded=1;exitX=0.633;exitY=0.985;exitDx=0;exitDy=0;exitPerimeter=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1973" y="739" as="sourcePoint" />
+            <mxPoint x="2058" y="757" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="i8OxNtJEtIe_rFLIWsNu-15" connectable="0" parent="i8OxNtJEtIe_rFLIWsNu-14" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint x="16" y="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

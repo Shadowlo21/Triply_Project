@@ -1,0 +1,115 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="PvUsdU9424Owns26KHpY">
+    <mxGraphModel dx="1058" dy="1740" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-1" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;labelBorderColor=none;dashed=1;" value="&lt;font style=&quot;font-size: 22px;&quot;&gt;Budget Threshold Alert&lt;/font&gt;" vertex="1">
+          <mxGeometry height="30" width="444" x="841" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-2" parent="1" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=200;tabHeight=60;tabPosition=left;html=1;whiteSpace=wrap;rounded=0;labelBorderColor=none;strokeColor=#9673A6;strokeWidth=1;" value="" vertex="1">
+          <mxGeometry height="608" width="655" x="360" y="382" as="geometry" />
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-3" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;trip1: Trip&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;destination = &quot;Paris&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;startDate = &quot;2026-04-10&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;endDate = &quot;2026-04-20&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;status = &quot;Active&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;baseCurrency = &quot;EGP&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;budgetLimit = 5000.0&lt;/p&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="290" x="565" y="522" as="geometry" />
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-4" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#FFF2CC;strokeColor=#D6B656;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;expense1 : Expense&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;expenseID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 67&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;name = &quot;Hotel Stay&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;type = &quot;accommodation&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;amount = 2000.0&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;currency = &quot;EGP&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;paidBy = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;participants = [1, 2, 3]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;splitType = &quot;equal&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;dateLogged = &quot;2026-04-10&quot;&lt;/p&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="188" width="200" x="420" y="752" as="geometry" />
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-10" edge="1" parent="1" source="kZWfWwBdmcPdSUg4Emw1-3" style="endArrow=classic;html=1;rounded=1;exitX=0.079;exitY=1.003;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.641;entryY=0.025;entryDx=0;entryDy=0;entryPerimeter=0;" target="kZWfWwBdmcPdSUg4Emw1-4" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="495" y="812" as="sourcePoint" />
+            <mxPoint x="545" y="762" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-11" connectable="0" parent="kZWfWwBdmcPdSUg4Emw1-10" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-14" parent="1" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=#9673A6;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;strokeWidth=1;fillColor=#e1d5e7;" value="" vertex="1">
+          <mxGeometry height="60" width="230" x="360" y="382" as="geometry" />
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-15" parent="1" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=none;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;PRECONDITION&lt;/font&gt;" vertex="1">
+          <mxGeometry height="26" width="80" x="425" y="399" as="geometry" />
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-30" parent="1" style="shape=folder;fontStyle=1;spacingTop=10;tabWidth=240;tabHeight=60;tabPosition=left;html=1;whiteSpace=wrap;rounded=0;strokeWidth=1;strokeColor=#6C8EBF;" value="&lt;span style=&quot;color: rgba(0, 0, 0, 0); font-family: monospace; font-size: 0px; font-weight: 400; text-align: start; text-wrap-mode: nowrap;&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20parent%3D%221%22%20style%3D%22text%3Balign%3Dcenter%3BfontStyle%3D1%3BverticalAlign%3Dmiddle%3BspacingLeft%3D3%3BspacingRight%3D3%3BstrokeColor%3D%239673a6%3Brotatable%3D0%3Bpoints%3D%5B%5B0%2C0.5%5D%2C%5B1%2C0.5%5D%5D%3BportConstraint%3Deastwest%3Bhtml%3D1%3BstrokeWidth%3D2%3BfillColor%3D%23e1d5e7%3B%22%20value%3D%22%26lt%3Bspan%20style%3D%26quot%3Bfont-weight%3A%20400%3B%20text-wrap-mode%3A%20wrap%3B%26quot%3B%26gt%3B%26lt%3Bfont%20style%3D%26quot%3Bfont-size%3A%2016px%3B%26quot%3B%26gt%3BPRECONDITION%26lt%3B%2Ffont%26gt%3B%26lt%3B%2Fspan%26gt%3B%22%20vertex%3D%221%22%3E%3CmxGeometry%20height%3D%2260%22%20width%3D%22230%22%20x%3D%22850%22%20y%3D%22260%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3E&lt;/span&gt;&lt;font color=&quot;rgba(0, 0, 0, 0)&quot; face=&quot;monospace&quot;&gt;&lt;span style=&quot;font-size: 0px; font-weight: 400; text-wrap-mode: nowrap;&quot;&gt;%3CmxGraphModel%3E%3Croot%3E%3CmxCell%20id%3D%220%22%2F%3E%3CmxCell%20id%3D%221%22%20parent%3D%220%22%2F%3E%3CmxCell%20id%3D%222%22%20parent%3D%221%22%20style%3D%22text%3Balign%3Dcenter%3BfontStyle%3D1%3BverticalAlign%3Dmiddle%3BspacingLeft%3D3%3BspacingRight%3D3%3BstrokeColor%3D%239673a6%3Brotatable%3D0%3Bpoints%3D%5B%5B0%2C0.5%5D%2C%5B1%2C0.5%5D%5D%3BportConstraint%3Deastwest%3Bhtml%3D1%3BstrokeWidth%3D2%3BfillColor%3D%23e1d5e7%3B%22%20value%3D%22%26lt%3Bspan%20style%3D%26quot%3Bfont-weight%3A%20400%3B%20text-wrap-mode%3A%20wrap%3B%26quot%3B%26gt%3B%26lt%3Bfont%20style%3D%26quot%3Bfont-size%3A%2016px%3B%26quot%3B%26gt%3BPRECONDITION%26lt%3B%2Ffont%26gt%3B%26lt%3B%2Fspan%26gt%3B%22%20vertex%3D%221%22%3E%3CmxGeometry%20height%3D%2260%22%20width%3D%22230%22%20x%3D%22850%22%20y%3D%22260%22%20as%3D%22geometry%22%2F%3E%3C%2FmxCell%3E%3C%2Froot%3E%3C%2FmxGraphModel%3E&lt;/span&gt;&lt;/font&gt;" vertex="1">
+          <mxGeometry height="608" width="825" x="1125" y="382" as="geometry" />
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-49" parent="1" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=#6C8EBF;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;fillColor=#dae8fc;" value="&lt;span style=&quot;font-size: 16px;&quot;&gt;POSTCONDITION&lt;/span&gt;" vertex="1">
+          <mxGeometry height="60" width="240" x="1125" y="382" as="geometry" />
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-50" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#FFF2CC;strokeColor=#D6B656;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;expense2 : Expense&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;expenseID = 2&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 67&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;name = &quot;Flight Tickets&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;type = &quot;transport&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;amount = 3800.0&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;currency = &quot;EGP&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;paidBy = 2&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;participants = [1, 2, 3]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;splitType = &quot;equal&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;dateLogged = &quot;2026-04-11&quot;&lt;/p&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="188" width="200" x="730" y="752" as="geometry" />
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-53" edge="1" parent="1" source="kZWfWwBdmcPdSUg4Emw1-3" style="endArrow=classic;html=1;rounded=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="kZWfWwBdmcPdSUg4Emw1-50" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="790" y="720" as="sourcePoint" />
+            <mxPoint x="750" y="795" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-54" connectable="0" parent="kZWfWwBdmcPdSUg4Emw1-53" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-57" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;trip1: Trip&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 67&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;destination = &quot;Paris&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;startDate = &quot;2026-04-10&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;endDate = &quot;2026-04-20&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;status = &quot;Active&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;baseCurrency = &quot;EGP&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;budgetLimit = 5000.0&lt;/p&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="160" width="290" x="1220" y="460" as="geometry" />
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-58" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#FFF2CC;strokeColor=#D6B656;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;expense2 : Expense&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;expenseID = 2&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 67&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;name = &quot;Flight Tickets&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;type = &quot;transport&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;amount = 3800.0&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;currency = &quot;EGP&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;paidBy = 2&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;participants = [1, 2, 3]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;splitType = &quot;equal&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;dateLogged = &quot;2026-04-11&quot;&lt;/p&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="188" width="200" x="1390" y="682" as="geometry" />
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-59" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#FFF2CC;strokeColor=#D6B656;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;expense1 : Expense&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;expenseID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 67&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;name = &quot;Hotel Stay&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;type = &quot;accommodation&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;amount = 2000.0&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;currency = &quot;EGP&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;paidBy = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;participants = [1, 2, 3]&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;splitType = &quot;equal&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;dateLogged = &quot;2026-04-10&quot;&lt;/p&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="188" width="200" x="1165" y="687.25" as="geometry" />
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-60" edge="1" parent="1" source="kZWfWwBdmcPdSUg4Emw1-57" style="endArrow=classic;html=1;rounded=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="kZWfWwBdmcPdSUg4Emw1-58" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1400" y="660" as="sourcePoint" />
+            <mxPoint x="1447" y="730" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-61" connectable="0" parent="kZWfWwBdmcPdSUg4Emw1-60" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-63" edge="1" parent="1" source="kZWfWwBdmcPdSUg4Emw1-57" style="endArrow=classic;html=1;rounded=1;exitX=0.25;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="kZWfWwBdmcPdSUg4Emw1-59" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1280" y="650" as="sourcePoint" />
+            <mxPoint x="1332" y="712" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-64" connectable="0" parent="kZWfWwBdmcPdSUg4Emw1-63" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-65" parent="1" style="verticalAlign=top;align=left;overflow=fill;html=1;whiteSpace=wrap;rounded=1;fillColor=#ffe6cc;strokeColor=#d79b00;" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center;&quot;&gt;&lt;b&gt;&lt;u&gt;notif1 : Notification&lt;/u&gt;&lt;/b&gt;&lt;/p&gt;&lt;hr size=&quot;1&quot; style=&quot;border-style:solid;&quot;&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;notifID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;tripID = 67&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;userID = 1&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;message = &quot;Budget exceeded: 5800.0 EGP spent of 5000.0 EGP limit&quot;&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;isRead = false&lt;/p&gt;&lt;p style=&quot;margin:0px;margin-left:8px;&quot;&gt;createdAt =&amp;nbsp;2026-12-22&lt;/p&gt;" vertex="1">
+          <mxGeometry height="142.5" width="280" x="1660" y="704.75" as="geometry" />
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-66" edge="1" parent="1" source="kZWfWwBdmcPdSUg4Emw1-57" style="endArrow=classic;html=1;rounded=1;exitX=0.985;exitY=0.941;exitDx=0;exitDy=0;entryX=0.25;entryY=0;entryDx=0;entryDy=0;exitPerimeter=0;" target="kZWfWwBdmcPdSUg4Emw1-65" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1620" y="650" as="sourcePoint" />
+            <mxPoint x="1672" y="712" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-67" connectable="0" parent="kZWfWwBdmcPdSUg4Emw1-66" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="has" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint x="5" y="-11" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-69" edge="1" parent="1" source="kZWfWwBdmcPdSUg4Emw1-58" style="endArrow=classic;html=1;rounded=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="kZWfWwBdmcPdSUg4Emw1-65" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="1630" y="710" as="sourcePoint" />
+            <mxPoint x="1820" y="800" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kZWfWwBdmcPdSUg4Emw1-70" connectable="0" parent="kZWfWwBdmcPdSUg4Emw1-69" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rounded=1;" value="generates" vertex="1">
+          <mxGeometry relative="1" x="-0.1259" y="-2" as="geometry">
+            <mxPoint y="10" as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
