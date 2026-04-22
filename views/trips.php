@@ -134,7 +134,7 @@ async function showTrip(id, title, role) {
       <tbody>${(mRes.data || []).map(m => `
         <tr>
           <td>${escHtml(m.email)}</td>
-          <td><span class="badge ${m.role === 'leader' ? 'badge-blue' : 'badge-gray'}">${escHtml(m.role)}</span></td>
+          <td><span class="badge ${m.trip_role === 'leader' ? 'badge-blue' : 'badge-gray'}">${escHtml(m.trip_role)}</span></td>
           <td>${m.can_edit ? '✅' : '—'}</td>
         </tr>`).join('')}
       </tbody>

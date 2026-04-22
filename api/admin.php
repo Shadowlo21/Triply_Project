@@ -45,16 +45,28 @@ try {
             ]);
 
         
+        case 'set_role':
+            $userId  = (int)($_POST['user_id'] ?? 0);
+            $newRole = $_POST['role'] ?? '';
+            if (!$userId || !in_array($newRole, ['member','leader','admin'])) {
+                ApiResponse::error('user_id and valid role required.');
+            }
+            if ($userId === $user->getId()) ApiResponse::error('Cannot change your own role.');
+
+            $db = Database::getInstance('accounts');
+            $db->prepare('UPDATE users SET role = ? WHERE id = ?')->execute([$newRole, $userId]);
+            ApiResponse::success(null, 'Role updated.');
+
         case 'delete_user':
             $userId = (int)($_POST['user_id'] ?? 0);
             if (!$userId) ApiResponse::error('user_id required.');
+            if ($userId === $user->getId()) ApiResponse::error('Cannot delete your own account.');
 
             $db   = Database::getInstance('accounts');
             $row  = $db->prepare('SELECT role FROM users WHERE id = ?');
             $row->execute([$userId]);
             $target = $row->fetch();
             if (!$target) ApiResponse::error('User not found.', 404);
-            if ($target['role'] === 'admin') ApiResponse::error('Cannot delete another admin.');
 
             $db->prepare('DELETE FROM users WHERE id = ?')->execute([$userId]);
             ApiResponse::success(null, 'User deleted.');

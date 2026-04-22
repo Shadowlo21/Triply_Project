@@ -63,6 +63,13 @@ start_layout('Admin Panel');
 <script>
 let allUsers = [];
 let deleteUserId = null;
+let currentAdminId = null;
+
+(async () => {
+  const me = await API.get('auth', { action: 'me' });
+  if (me.success) currentAdminId = me.data.id;
+  loadStats();
+})();
 
 async function loadStats() {
   const [uRes, tRes, eRes, pRes] = await Promise.all([
@@ -91,16 +98,33 @@ async function loadStats() {
 function renderUsers(users) {
   const wrap = document.getElementById('users-wrap');
   if (!users.length) { wrap.innerHTML = '<div class="empty-state text-muted">No users.</div>'; return; }
+  const roleColor = { admin: 'badge-red', leader: 'badge-blue', member: 'badge-gray' };
   wrap.innerHTML = `<div class="table-wrap"><table>
     <thead><tr><th>Email</th><th>Role</th><th>Joined</th><th></th></tr></thead>
     <tbody>${users.map(u => `
       <tr>
         <td>${escHtml(u.email)}</td>
-        <td><span class="badge ${u.role === 'admin' ? 'badge-red' : u.role === 'leader' ? 'badge-blue' : 'badge-gray'}">${escHtml(u.role)}</span></td>
+        <td><span class="badge ${roleColor[u.role] || 'badge-gray'}">${escHtml(u.role)}</span></td>
         <td class="text-sm">${fmtDate(u.created_at)}</td>
-        <td>${u.role !== 'admin' ? `<button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id},'${escHtml(u.email)}')">Del</button>` : ''}</td>
+        <td style="display:flex;gap:4px;flex-wrap:wrap">
+          ${u.id !== currentAdminId ? `
+            <select class="form-control" style="width:90px;padding:2px 4px;font-size:12px" onchange="setRole(${u.id}, this)">
+              <option value="member" ${u.role==='member'?'selected':''}>member</option>
+              <option value="leader" ${u.role==='leader'?'selected':''}>leader</option>
+              <option value="admin"  ${u.role==='admin' ?'selected':''}>admin</option>
+            </select>
+            <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id},'${escHtml(u.email)}')">Del</button>
+          ` : '<span class="text-muted text-sm">(you)</span>'}
+        </td>
       </tr>`).join('')}
     </tbody></table></div>`;
+}
+
+async function setRole(userId, sel) {
+  const newRole = sel.value;
+  const res = await API.post('admin', { action: 'set_role', user_id: userId, role: newRole });
+  showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
+  if (res.success) loadStats();
 }
 
 function filterUsers() {
@@ -157,7 +181,6 @@ async function purgeExpired() {
   if (res.success) loadSessions();
 }
 
-loadStats();
 </script>
 
 <?php end_layout(); ?>

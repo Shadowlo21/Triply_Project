@@ -82,28 +82,62 @@ class Poll
     
     public function getResults(bool $isLeader = false): array
     {
-        $db   = Database::getInstance('social');
+        $db = Database::getInstance('social');
 
         if ($this->isAnonymous && !$isLeader) {
             $stmt = $db->prepare(
-                'SELECT po.option_text, COUNT(v.id) AS votes
+                'SELECT po.id AS option_id, po.option_text, COUNT(v.id) AS vote_count
                  FROM poll_options po
                  LEFT JOIN votes v ON v.option_id = po.id
                  WHERE po.poll_id = ?
-                 GROUP BY po.id'
+                 GROUP BY po.id ORDER BY po.id'
             );
-        } else {
-            $stmt = $db->prepare(
-                'SELECT po.option_text, COUNT(v.id) AS votes, GROUP_CONCAT(v.user_id) AS voters
-                 FROM poll_options po
-                 LEFT JOIN votes v ON v.option_id = po.id
-                 WHERE po.poll_id = ?
-                 GROUP BY po.id'
-            );
+            $stmt->execute([$this->id]);
+            return $stmt->fetchAll();
         }
 
+        $stmt = $db->prepare(
+            'SELECT po.id AS option_id, po.option_text, COUNT(v.id) AS vote_count,
+                    GROUP_CONCAT(v.user_id) AS voter_ids
+             FROM poll_options po
+             LEFT JOIN votes v ON v.option_id = po.id
+             WHERE po.poll_id = ?
+             GROUP BY po.id ORDER BY po.id'
+        );
         $stmt->execute([$this->id]);
-        return $stmt->fetchAll();
+        $rows = $stmt->fetchAll();
+
+        if (empty($rows)) return [];
+
+        $allVoterIds = [];
+        foreach ($rows as $row) {
+            if ($row['voter_ids']) {
+                foreach (explode(',', $row['voter_ids']) as $uid) {
+                    $allVoterIds[] = (int)$uid;
+                }
+            }
+        }
+        $allVoterIds = array_unique($allVoterIds);
+
+        $emails = [];
+        if (!empty($allVoterIds)) {
+            $ph      = implode(',', array_fill(0, count($allVoterIds), '?'));
+            $uStmt   = Database::getInstance('accounts')->prepare(
+                "SELECT id, email FROM users WHERE id IN ({$ph})"
+            );
+            $uStmt->execute($allVoterIds);
+            foreach ($uStmt->fetchAll() as $u) {
+                $emails[$u['id']] = $u['email'];
+            }
+        }
+
+        foreach ($rows as &$row) {
+            $voterIds = $row['voter_ids'] ? array_map('intval', explode(',', $row['voter_ids'])) : [];
+            $row['voters'] = array_values(array_filter(array_map(fn($id) => $emails[$id] ?? null, $voterIds)));
+            unset($row['voter_ids']);
+        }
+
+        return $rows;
     }
 
     
