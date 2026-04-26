@@ -1,106 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Register — Triply</title>
-  <link rel="stylesheet" href="/public/css/style.css">
-  <style>
-    .pwd-req { list-style: none; padding: 0; margin: 6px 0 0; font-size: 12px; }
-    .pwd-req li { padding: 2px 0; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
-    .pwd-req li::before { content: '○'; font-size: 10px; }
-    .pwd-req li.ok { color: var(--success); }
-    .pwd-req li.ok::before { content: '✓'; }
-    .auth-card { max-width: 480px; }
-  </style>
-</head>
-<body>
-<div class="auth-wrap">
-  <div class="auth-card">
-    <h1>✈ Triply</h1>
-    <p class="subtitle">Create your account</p>
-    <div id="alert-box"></div>
-    <form id="reg-form">
-      <div class="grid-2">
-        <div class="form-group">
-          <label>First Name</label>
-          <input type="text" name="first_name" class="form-control" required autofocus autocomplete="given-name">
+<?php
+require_once __DIR__ . '/layout.php';
+start_layout('Register', ['shell' => 'auth', 'pageTitle' => 'Triply - Start Your Adventure']);
+?>
+
+<div class="purple-glow -top-20 -left-20"></div>
+<div class="purple-glow -bottom-20 -right-20"></div>
+
+<main class="container py-20 flex justify-center items-center relative z-10">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center gap-2 mb-4">
+        <i class="fa-solid fa-compass text-primary text-3xl"></i>
+        <h1 class="font-h1 text-h1 tracking-tighter text-on-surface">Triply</h1>
+      </div>
+    </div>
+
+    <div class="glass-card rounded-xl p-8 md:p-10">
+      <div class="mb-8 text-center">
+        <h2 class="font-h2 text-h2 text-on-surface mb-2">Start Your Adventure</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant">Experience the elite world of concierge travel.</p>
+      </div>
+
+      <div id="alert-box"></div>
+      <form id="reg-form" class="space-y-6">
+        <div class="space-y-2">
+          <label class="font-label-sm text-label-sm text-on-surface-variant block uppercase tracking-wider" for="name">Full Name</label>
+          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-outline" id="name" name="name" placeholder="Alexander Wright" type="text" required autofocus/>
         </div>
-        <div class="form-group">
-          <label>Last Name</label>
-          <input type="text" name="last_name" class="form-control" required autocomplete="family-name">
+
+        <div class="space-y-2">
+          <label class="font-label-sm text-label-sm text-on-surface-variant block uppercase tracking-wider" for="email">Email Address</label>
+          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-outline" id="email" name="email" placeholder="alex@concierge.luxury" type="email" required/>
         </div>
+
+        <div class="space-y-2">
+          <label class="font-label-sm text-label-sm text-on-surface-variant block uppercase tracking-wider" for="phone">Phone</label>
+          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-outline" id="phone" name="phone" placeholder="+20 1xx xxx xxxx" type="tel" required/>
+        </div>
+
+        <div class="space-y-2">
+          <label class="font-label-sm text-label-sm text-on-surface-variant block uppercase tracking-wider" for="nationality">Nationality</label>
+          <select class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" id="nationality" name="nationality" required>
+            <option value="">— Select country —</option>
+            <option value="EG">🇪🇬 Egypt</option>
+            <option value="SA">🇸🇦 Saudi Arabia</option>
+            <option value="AE">🇦🇪 UAE</option>
+            <option value="US">🇺🇸 United States</option>
+            <option value="GB">🇬🇧 United Kingdom</option>
+            <option value="DE">🇩🇪 Germany</option>
+            <option value="FR">🇫🇷 France</option>
+            <option value="IT">🇮🇹 Italy</option>
+            <option value="CA">🇨🇦 Canada</option>
+            <option value="AU">🇦🇺 Australia</option>
+            <option value="JP">🇯🇵 Japan</option>
+            <option value="CN">🇨🇳 China</option>
+            <option value="KR">🇰🇷 South Korea</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+
+        <div class="space-y-2">
+          <label class="font-label-sm text-label-sm text-on-surface-variant block uppercase tracking-wider" for="pwd">Password</label>
+          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-outline" id="pwd" name="password" placeholder="••••••••••••" type="password" required autocomplete="new-password"/>
+          <ul class="pwd-req">
+            <li id="req-len">At least 8 characters</li>
+            <li id="req-upper">At least 1 uppercase letter</li>
+            <li id="req-num">At least 1 number</li>
+            <li id="req-special">At least 1 special character (!@#$…)</li>
+          </ul>
+        </div>
+
+        <button class="w-full bg-primary-container text-white font-bold py-4 rounded-lg shadow-[0_0_20px_rgba(168,85,247,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.5)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300" type="submit" id="submit-btn">
+          Sign Up
+        </button>
+      </form>
+
+      <div class="mt-10 text-center">
+        <p class="font-body-md text-on-surface-variant">
+          Already have an account?
+          <a class="text-primary font-bold hover:text-primary/80 transition-colors ml-1" href="/?page=login">Log in</a>
+        </p>
       </div>
-      <div class="form-group">
-        <label>Nationality</label>
-        <select name="nationality" class="form-control" required>
-          <option value="">— Select country —</option>
-          <option value="EG">🇪🇬 Egypt</option>
-          <option value="SA">🇸🇦 Saudi Arabia</option>
-          <option value="AE">🇦🇪 UAE</option>
-          <option value="JO">🇯🇴 Jordan</option>
-          <option value="LB">🇱🇧 Lebanon</option>
-          <option value="SY">🇸🇾 Syria</option>
-          <option value="IQ">🇮🇶 Iraq</option>
-          <option value="KW">🇰🇼 Kuwait</option>
-          <option value="QA">🇶🇦 Qatar</option>
-          <option value="BH">🇧🇭 Bahrain</option>
-          <option value="OM">🇴🇲 Oman</option>
-          <option value="YE">🇾🇪 Yemen</option>
-          <option value="MA">🇲🇦 Morocco</option>
-          <option value="TN">🇹🇳 Tunisia</option>
-          <option value="DZ">🇩🇿 Algeria</option>
-          <option value="LY">🇱🇾 Libya</option>
-          <option value="SD">🇸🇩 Sudan</option>
-          <option value="PS">🇵🇸 Palestine</option>
-          <option value="US">🇺🇸 United States</option>
-          <option value="GB">🇬🇧 United Kingdom</option>
-          <option value="DE">🇩🇪 Germany</option>
-          <option value="FR">🇫🇷 France</option>
-          <option value="IT">🇮🇹 Italy</option>
-          <option value="ES">🇪🇸 Spain</option>
-          <option value="CA">🇨🇦 Canada</option>
-          <option value="AU">🇦🇺 Australia</option>
-          <option value="JP">🇯🇵 Japan</option>
-          <option value="CN">🇨🇳 China</option>
-          <option value="IN">🇮🇳 India</option>
-          <option value="TR">🇹🇷 Turkey</option>
-          <option value="PK">🇵🇰 Pakistan</option>
-          <option value="NG">🇳🇬 Nigeria</option>
-          <option value="ZA">🇿🇦 South Africa</option>
-          <option value="BR">🇧🇷 Brazil</option>
-          <option value="MX">🇲🇽 Mexico</option>
-          <option value="RU">🇷🇺 Russia</option>
-          <option value="KR">🇰🇷 South Korea</option>
-          <option value="OTHER">Other</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" name="email" class="form-control" required autocomplete="email">
-      </div>
-      <div class="form-group">
-        <label>Phone</label>
-        <input type="tel" name="phone" class="form-control" required autocomplete="tel" placeholder="+20 1xx xxx xxxx">
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="pwd" name="password" class="form-control" required autocomplete="new-password">
-        <ul class="pwd-req">
-          <li id="req-len">At least 8 characters</li>
-          <li id="req-upper">At least 1 uppercase letter</li>
-          <li id="req-num">At least 1 number</li>
-          <li id="req-special">At least 1 special character (!@#$…)</li>
-        </ul>
-      </div>
-      <button type="submit" class="btn btn-primary btn-block mt-3" id="submit-btn">Create Account</button>
-    </form>
-    <p class="mt-3 text-sm text-muted" style="text-align:center">
-      Already have an account? <a href="/?page=login">Sign in</a>
-    </p>
+    </div>
   </div>
-</div>
-<script src="/public/js/app.js"></script>
+</main>
 <script>
 const pwdInput = document.getElementById('pwd');
 const rules = {
@@ -132,12 +115,11 @@ document.getElementById('reg-form').addEventListener('submit', async e => {
   const btn = document.getElementById('submit-btn');
   setLoading(btn, true);
 
-  const firstName = fd.get('first_name').trim();
-  const lastName  = fd.get('last_name').trim();
+  const name = (fd.get('name') || '').trim();
 
   const res = await API.post('auth', {
     action:      'register',
-    name:        firstName + ' ' + lastName,
+    name,
     email:       fd.get('email'),
     phone:       fd.get('phone'),
     nationality: fd.get('nationality'),
@@ -152,5 +134,4 @@ document.getElementById('reg-form').addEventListener('submit', async e => {
   }
 });
 </script>
-</body>
-</html>
+<?php end_layout(); ?>

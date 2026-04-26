@@ -2,25 +2,33 @@
 
 session_start();
 require_once __DIR__ . '/config/bootstrap.php';
+require_once __DIR__ . '/classes/boundary/Auth.php';
 
-$page = $_GET['page'] ?? 'dashboard';
-$allowed = ['dashboard', 'login', 'register', 'trips', 'itinerary', 'financial', 'documents', 'social', 'admin'];
+$isAuthed = (bool)Auth::current();
+$page = $_GET['page'] ?? ($isAuthed ? 'dashboard' : 'landing');
+$allowed = ['landing', 'dashboard', 'login', 'register', 'trips', 'itinerary', 'financial', 'documents', 'social', 'admin'];
 
 if (!in_array($page, $allowed)) {
     http_response_code(404);
     exit('Page not found');
 }
 
-if ($page === 'login' || $page === 'register') {
-    
-    if (Auth::current()) {
+if ($page === 'landing') {
+    if ($isAuthed) {
+        header('Location: /?page=dashboard');
+        exit;
+    }
+    require __DIR__ . "/views/landing.php";
+} elseif ($page === 'login' || $page === 'register') {
+
+    if ($isAuthed) {
         header('Location: /?page=dashboard');
         exit;
     }
     require __DIR__ . "/views/{$page}.php";
 } else {
-    
-    if (!Auth::current()) {
+
+    if (!$isAuthed) {
         header('Location: /?page=login');
         exit;
     }

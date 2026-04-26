@@ -1,23 +1,49 @@
 // Shared utilities
 const API = {
   async post(endpoint, data = {}) {
-    const fd = new FormData();
-    for (const [k, v] of Object.entries(data)) {
-      if (Array.isArray(v)) v.forEach(item => fd.append(k + '[]', item));
-      else fd.append(k, v);
-    }
-    const res = await fetch(`/api/${endpoint}.php`, { method: 'POST', body: fd });
-    return res.json();
+    return Triply.fetch(endpoint, { method: 'POST', data });
   },
   async get(endpoint, params = {}) {
-    const qs = new URLSearchParams(params).toString();
-    const res = await fetch(`/api/${endpoint}.php${qs ? '?' + qs : ''}`);
-    return res.json();
+    return Triply.fetch(endpoint, { method: 'GET', params });
   },
   async upload(endpoint, formData) {
-    const res = await fetch(`/api/${endpoint}.php`, { method: 'POST', body: formData });
-    return res.json();
+    return Triply.fetch(endpoint, { method: 'POST', body: formData });
   }
+};
+
+// Shared Triply helpers (required)
+const Triply = {
+  async fetch(endpoint, { method = 'GET', params = {}, data = {}, body = null } = {}) {
+    try {
+      let url = `/api/${endpoint}.php`;
+      if (params && Object.keys(params).length) {
+        const qs = new URLSearchParams(params).toString();
+        url += `?${qs}`;
+      }
+
+      let fetchBody = body;
+      if (!fetchBody && method.toUpperCase() !== 'GET') {
+        const fd = new FormData();
+        for (const [k, v] of Object.entries(data || {})) {
+          if (Array.isArray(v)) v.forEach(item => fd.append(k + '[]', item));
+          else if (v !== undefined && v !== null) fd.append(k, v);
+        }
+        fetchBody = fd;
+      }
+
+      const res = await fetch(url, { method, body: fetchBody });
+      const json = await res.json().catch(() => null);
+      return json || { success: false, message: 'Invalid server response.' };
+    } catch (e) {
+      return { success: false, message: e?.message || 'Network error.' };
+    }
+  },
+
+  toggleSidebar() {
+    const el = document.getElementById('sidebar');
+    if (!el) return;
+    el.classList.toggle('open');
+  },
 };
 
 function showAlert(container, msg, type = 'error') {
@@ -114,7 +140,7 @@ document.addEventListener('click', e => {
 // Active sidebar link
 document.addEventListener('DOMContentLoaded', () => {
   const page = new URLSearchParams(location.search).get('page') || 'dashboard';
-  document.querySelectorAll('.sidebar nav a').forEach(a => {
+  document.querySelectorAll('.triply-navlink, .sidebar nav a').forEach(a => {
     const href = new URLSearchParams(a.search).get('page') || 'dashboard';
     if (href === page) a.classList.add('active');
   });
