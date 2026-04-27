@@ -25,22 +25,22 @@ start_layout('Register', ['shell' => 'auth', 'pageTitle' => 'Triply - Start Your
       <form id="reg-form" class="space-y-6">
         <div class="space-y-2">
           <label class="font-label-sm text-label-sm text-on-surface-variant block uppercase tracking-wider" for="name">Full Name</label>
-          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-outline" id="name" name="name" placeholder="Alexander Wright" type="text" required autofocus/>
+          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-black focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-gray-600" id="name" name="name" placeholder="Alexander Wright" type="text" required autofocus />
         </div>
 
         <div class="space-y-2">
           <label class="font-label-sm text-label-sm text-on-surface-variant block uppercase tracking-wider" for="email">Email Address</label>
-          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-outline" id="email" name="email" placeholder="alex@concierge.luxury" type="email" required/>
+          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-black focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-gray-600" id="email" name="email" placeholder="alex@concierge.luxury" type="email" required />
         </div>
 
         <div class="space-y-2">
           <label class="font-label-sm text-label-sm text-on-surface-variant block uppercase tracking-wider" for="phone">Phone</label>
-          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-outline" id="phone" name="phone" placeholder="+20 1xx xxx xxxx" type="tel" required/>
+          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-black focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-gray-600" id="phone" name="phone" placeholder="+20 1xx xxx xxxx" type="tel" required />
         </div>
 
         <div class="space-y-2">
           <label class="font-label-sm text-label-sm text-on-surface-variant block uppercase tracking-wider" for="nationality">Nationality</label>
-          <select class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" id="nationality" name="nationality" required>
+          <select class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-black focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" id="nationality" name="nationality" required>
             <option value="">— Select country —</option>
             <option value="EG">🇪🇬 Egypt</option>
             <option value="SA">🇸🇦 Saudi Arabia</option>
@@ -61,7 +61,7 @@ start_layout('Register', ['shell' => 'auth', 'pageTitle' => 'Triply - Start Your
 
         <div class="space-y-2">
           <label class="font-label-sm text-label-sm text-on-surface-variant block uppercase tracking-wider" for="pwd">Password</label>
-          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-outline" id="pwd" name="password" placeholder="••••••••••••" type="password" required autocomplete="new-password"/>
+          <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-4 py-3 text-black focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all placeholder:text-gray-600" id="pwd" name="password" placeholder="••••••••••••" type="password" required autocomplete="new-password" />
           <ul class="pwd-req">
             <li id="req-len">At least 8 characters</li>
             <li id="req-upper">At least 1 uppercase letter</li>
@@ -85,53 +85,53 @@ start_layout('Register', ['shell' => 'auth', 'pageTitle' => 'Triply - Start Your
   </div>
 </main>
 <script>
-const pwdInput = document.getElementById('pwd');
-const rules = {
-  'req-len':     p => p.length >= 8,
-  'req-upper':   p => /[A-Z]/.test(p),
-  'req-num':     p => /[0-9]/.test(p),
-  'req-special': p => /[^A-Za-z0-9]/.test(p),
-};
+  const pwdInput = document.getElementById('pwd');
+  const rules = {
+    'req-len': p => p.length >= 8,
+    'req-upper': p => /[A-Z]/.test(p),
+    'req-num': p => /[0-9]/.test(p),
+    'req-special': p => /[^A-Za-z0-9]/.test(p),
+  };
 
-pwdInput.addEventListener('input', () => {
-  const val = pwdInput.value;
-  for (const [id, check] of Object.entries(rules)) {
-    document.getElementById(id).classList.toggle('ok', check(val));
-  }
-});
-
-document.getElementById('reg-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const fd = new FormData(e.target);
-  const pwd = fd.get('password');
-
-  // Validate all password rules
-  const failed = Object.entries(rules).find(([, check]) => !check(pwd));
-  if (failed) {
-    showAlert('#alert-box', 'Password does not meet all requirements.');
-    return;
-  }
-
-  const btn = document.getElementById('submit-btn');
-  setLoading(btn, true);
-
-  const name = (fd.get('name') || '').trim();
-
-  const res = await API.post('auth', {
-    action:      'register',
-    name,
-    email:       fd.get('email'),
-    phone:       fd.get('phone'),
-    nationality: fd.get('nationality'),
-    password:    pwd,
+  pwdInput.addEventListener('input', () => {
+    const val = pwdInput.value;
+    for (const [id, check] of Object.entries(rules)) {
+      document.getElementById(id).classList.toggle('ok', check(val));
+    }
   });
 
-  setLoading(btn, false);
-  if (res.success) {
-    location.href = '/?page=login';
-  } else {
-    showAlert('#alert-box', res.message || 'Registration failed.');
-  }
-});
+  document.getElementById('reg-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const pwd = fd.get('password');
+
+    // Validate all password rules
+    const failed = Object.entries(rules).find(([, check]) => !check(pwd));
+    if (failed) {
+      showAlert('#alert-box', 'Password does not meet all requirements.');
+      return;
+    }
+
+    const btn = document.getElementById('submit-btn');
+    setLoading(btn, true);
+
+    const name = (fd.get('name') || '').trim();
+
+    const res = await API.post('auth', {
+      action: 'register',
+      name,
+      email: fd.get('email'),
+      phone: fd.get('phone'),
+      nationality: fd.get('nationality'),
+      password: pwd,
+    });
+
+    setLoading(btn, false);
+    if (res.success) {
+      location.href = '/?page=login';
+    } else {
+      showAlert('#alert-box', res.message || 'Registration failed.');
+    }
+  });
 </script>
 <?php end_layout(); ?>

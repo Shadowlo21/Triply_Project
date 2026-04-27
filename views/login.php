@@ -31,7 +31,7 @@ start_layout('Login', ['shell' => 'auth', 'pageTitle' => 'Triply | Login']);
             <label class="font-label-sm text-surface-bright uppercase tracking-widest block px-1" for="email">Email Address</label>
             <div class="relative">
               <i class="fa-regular fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-outline"></i>
-              <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 placeholder:text-outline-variant" id="email" name="email" placeholder="concierge@triply.com" type="email" required autofocus/>
+              <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3.5 pl-12 pr-4 text-black focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 placeholder:text-gray-600" id="email" name="email" placeholder="concierge@triply.com" type="email" required autofocus />
             </div>
           </div>
 
@@ -42,7 +42,7 @@ start_layout('Login', ['shell' => 'auth', 'pageTitle' => 'Triply | Login']);
             </div>
             <div class="relative">
               <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-outline"></i>
-              <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 placeholder:text-outline-variant" id="password" name="password" placeholder="••••••••" type="password" required/>
+              <input class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg py-3.5 pl-12 pr-4 text-black focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 placeholder:text-gray-600" id="password" name="password" placeholder="••••••••" type="password" required />
             </div>
           </div>
 
@@ -64,19 +64,23 @@ start_layout('Login', ['shell' => 'auth', 'pageTitle' => 'Triply | Login']);
 </div>
 
 <script>
-document.getElementById('login-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const btn = document.getElementById('submit-btn');
-  setLoading(btn, true);
-  const fd = new FormData(e.target);
-  const res = await API.post('auth', { action: 'login', email: fd.get('email'), password: fd.get('password') });
-  setLoading(btn, false);
-  if (res.success) {
-    location.href = '/?page=dashboard';
-  } else {
-    showAlert('#alert-box', res.message || 'Login failed.');
-  }
-});
+  document.getElementById('login-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn');
+    setLoading(btn, true);
+    const fd = new FormData(e.target);
+    const res = await API.post('auth', {
+      action: 'login',
+      email: fd.get('email'),
+      password: fd.get('password')
+    });
+    setLoading(btn, false);
+    if (res.success) {
+      location.href = '/?page=dashboard';
+    } else {
+      showAlert('#alert-box', res.message || 'Login failed.');
+    }
+  });
 </script>
 
 <?php end_layout(); ?>
