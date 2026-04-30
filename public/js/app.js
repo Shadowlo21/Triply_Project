@@ -55,7 +55,7 @@ function showAlert(container, msg, type = 'error') {
 }
 
 function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function fmtDate(dt) {
@@ -79,8 +79,22 @@ function setLoading(btn, yes) {
   }
 }
 
-function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+function openModal(id) {
+  const el = document.getElementById(id);
+  if (!el) { console.error('Modal not found:', id); return; }
+  el.classList.remove('hidden');
+  el.style.display = 'flex';
+  el.style.alignItems = 'center';
+  el.style.justifyContent = 'center';
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('hidden');
+  el.style.display = 'none';
+  document.body.style.overflow = '';
+}
 
 // Close modal on overlay click
 document.addEventListener('click', e => {
@@ -137,7 +151,7 @@ document.addEventListener('click', e => {
   }
 });
 
-// Active sidebar link
+// Active sidebar linkVDVD
 document.addEventListener('DOMContentLoaded', () => {
   const page = new URLSearchParams(location.search).get('page') || 'dashboard';
   document.querySelectorAll('.triply-navlink, .sidebar nav a').forEach(a => {

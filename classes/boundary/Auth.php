@@ -1,14 +1,19 @@
 <?php
 
+/**
+ * Design Pattern: Factory
+ * Creates appropriate user objects (Member or TripLeader) based on role during login.
+ * Centralizes user instantiation logic in login() and register() methods.
+ */
 class Auth
 {
     private const COOKIE_NAME   = 'triply_token';
-    private const TOKEN_TTL     = 604800;   
-    private const COOKIE_SECURE = false;    
+    private const TOKEN_TTL     = 604800;
+    private const COOKIE_SECURE = false;
 
-    
-    
-    
+
+
+
     public static function register(
         string $email,
         string $password,
@@ -42,14 +47,14 @@ class Auth
         ], $userId);
 
         $db->prepare('UPDATE users SET data = ? WHERE id = ?')
-           ->execute([$encryptedData, $userId]);
+            ->execute([$encryptedData, $userId]);
 
         return $userId;
     }
 
-    
-    
-    
+
+
+
     public static function login(string $email, string $password): User
     {
         $row = User::findByEmail($email);
@@ -58,7 +63,7 @@ class Auth
             throw new RuntimeException('Invalid credentials.');
         }
 
-        $user = match($row['role']) {
+        $user = match ($row['role']) {
             'leader', 'admin' => new TripLeader($row['id'], $row['email'], $row['role']),
             default            => new Member($row['id'], $row['email'], $row['role']),
         };
@@ -69,9 +74,9 @@ class Auth
         return $user;
     }
 
-    
-    
-    
+
+
+
     public static function logout(): void
     {
         $raw = $_COOKIE[self::COOKIE_NAME] ?? null;
@@ -86,9 +91,9 @@ class Auth
         self::clearCookie();
     }
 
-    
-    
-    
+
+
+
     public static function current(): ?User
     {
         $raw = $_COOKIE[self::COOKIE_NAME] ?? null;
@@ -113,9 +118,9 @@ class Auth
         return User::findById((int)$row['user_id']);
     }
 
-    
-    
-    
+
+
+
     public static function require(): User
     {
         $user = self::current();
@@ -133,9 +138,9 @@ class Auth
         return $user;
     }
 
-    
-    
-    
+
+
+
     public static function requireRole(string $role): User
     {
         $user = self::require();
@@ -146,9 +151,9 @@ class Auth
         return $user;
     }
 
-    
-    
-    
+
+
+
     public static function revokeAll(int $userId): void
     {
         Database::getInstance('accounts')
@@ -156,21 +161,21 @@ class Auth
             ->execute([$userId]);
     }
 
-    
-    
-    
+
+
+
     public static function purgeExpired(): void
     {
         Database::getInstance('accounts')
             ->exec("DELETE FROM sessions WHERE datetime(expires_at) <= datetime('now')");
     }
 
-    
-    
-    
+
+
+
     private static function issueToken(int $userId): void
     {
-        
+
         $raw  = base64_encode(random_bytes(32));
         $hash = self::hashToken($raw);
         $exp  = date('Y-m-d H:i:s', time() + self::TOKEN_TTL);
@@ -184,7 +189,7 @@ class Auth
 
     private static function hashToken(string $raw): string
     {
-        
+
         return hash('sha256', $raw);
     }
 
@@ -193,7 +198,7 @@ class Auth
         setcookie(self::COOKIE_NAME, $value, [
             'expires'  => $expires,
             'path'     => '/',
-            'httponly' => true,                 
+            'httponly' => true,
             'samesite' => 'Strict',
             'secure'   => self::COOKIE_SECURE,
         ]);

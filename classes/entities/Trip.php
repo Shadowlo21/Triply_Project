@@ -54,7 +54,7 @@ class Trip
 
         if (empty($members)) return [];
 
-        
+
         $userIds    = array_column($members, 'user_id');
         $accountsDb = Database::getInstance('accounts');
         $placeholders = implode(',', array_fill(0, count($userIds), '?'));
@@ -113,12 +113,41 @@ class Trip
         return $result;
     }
 
-    
-    public function getId(): int          { return $this->id; }
-    public function getTitle(): string    { return $this->title; }
-    public function getStatus(): string   { return $this->status; }
-    public function getBudgetLimit(): ?float { return $this->budgetLimit; }
-    public function getBaseCurrency(): string { return $this->baseCurrency; }
-    public function getDestination(): string  { return $this->destination; }
-    public function getCreatedBy(): int       { return $this->createdBy; }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+    public function getBudgetLimit(): ?float
+    {
+        return $this->budgetLimit;
+    }
+    public function getBaseCurrency(): string
+    {
+        return $this->baseCurrency;
+    }
+    public function getDestination(): string
+    {
+        return $this->destination;
+    }
+    public function getCreatedBy(): int
+    {
+        return $this->createdBy;
+    }
+    public function getStartDate(): string
+    {
+        return $this->startDate;
+    }
+    public function getEndDate(): string
+    {
+        return $this->endDate;
+    }
 }

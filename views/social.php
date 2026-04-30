@@ -1,4 +1,13 @@
-<?php require_once __DIR__ . '/layout.php'; start_layout('Polls'); ?>
+<?php
+require_once __DIR__ . '/../config/bootstrap.php';
+$currentUser = Auth::current();
+if (!$currentUser) {
+  header('Location: /?page=login');
+  exit;
+}
+require_once __DIR__ . '/layout.php';
+start_layout('Polls');
+?>
 
 <div id="alert-box"></div>
 
@@ -16,8 +25,10 @@
 <div id="results-wrap" style="display:none" class="mt-4"></div>
 
 <div class="modal-overlay hidden" id="modal-create-poll">
-  <div class="modal">
-    <div class="modal-header"><h3>Create Poll</h3><button class="modal-close" onclick="closeModal('modal-create-poll')">×</button></div>
+  <div class="triply-modal">
+    <div class="modal-header">
+      <h3>Create Poll</h3><button class="modal-close" onclick="closeModal('modal-create-poll')">×</button>
+    </div>
     <div class="modal-body">
       <div id="poll-alert"></div>
       <form id="form-create-poll">
@@ -26,8 +37,10 @@
           <div class="form-group">
             <label>Type</label>
             <select name="type" class="form-control">
-              <option value="general">General</option><option value="destination">Destination</option>
-              <option value="activity">Activity</option><option value="accommodation">Accommodation</option>
+              <option value="general">General</option>
+              <option value="destination">Destination</option>
+              <option value="activity">Activity</option>
+              <option value="accommodation">Accommodation</option>
             </select>
           </div>
           <div class="form-group"><label>Deadline (optional)</label><input type="datetime-local" name="deadline" class="form-control"></div>
@@ -47,32 +60,44 @@
 </div>
 
 <script>
-let currentPollId = null;
+  let currentPollId = null;
 
-async function loadTrips() {
-  const res = await API.get('trips', { action: 'list' });
-  const sel = document.getElementById('trip-select');
-  (res.data || []).forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t.id; opt.textContent = t.title;
-    sel.appendChild(opt);
-  });
-  if (sel.options.length > 1) { sel.selectedIndex = 1; loadPolls(); }
-}
-
-async function loadPolls() {
-  const tripId = document.getElementById('trip-select').value;
-  if (!tripId) return;
-  document.getElementById('results-wrap').style.display = 'none';
-  const res = await API.get('social', { action: 'polls', trip_id: tripId });
-  const wrap = document.getElementById('polls-wrap');
-  if (!res.success) { wrap.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`; return; }
-  const polls = res.data || [];
-  if (!polls.length) {
-    wrap.innerHTML = '<div class="card empty-state"><div class="icon">🗳</div>No polls yet. Create the first one!</div>';
-    return;
+  async function loadTrips() {
+    const res = await API.get('trips', {
+      action: 'list'
+    });
+    const sel = document.getElementById('trip-select');
+    (res.data || []).forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.title;
+      sel.appendChild(opt);
+    });
+    if (sel.options.length > 1) {
+      sel.selectedIndex = 1;
+      loadPolls();
+    }
   }
-  wrap.innerHTML = polls.map(p => `
+
+  async function loadPolls() {
+    const tripId = document.getElementById('trip-select').value;
+    if (!tripId) return;
+    document.getElementById('results-wrap').style.display = 'none';
+    const res = await API.get('social', {
+      action: 'polls',
+      trip_id: tripId
+    });
+    const wrap = document.getElementById('polls-wrap');
+    if (!res.success) {
+      wrap.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`;
+      return;
+    }
+    const polls = res.data || [];
+    if (!polls.length) {
+      wrap.innerHTML = '<div class="card empty-state"><div class="icon">🗳</div>No polls yet. Create the first one!</div>';
+      return;
+    }
+    wrap.innerHTML = polls.map(p => `
     <div class="card mb-3">
       <div class="flex-between">
         <div>
@@ -91,42 +116,67 @@ async function loadPolls() {
         ${p.deadline ? ' · Deadline: ' + fmtDateTime(p.deadline) : ''}
       </div>
     </div>`).join('');
-}
+  }
 
-async function openVote(pollId) {
-  currentPollId = pollId;
-  // Fetch results to show options
-  const res = await API.get('social', { action: 'results', poll_id: pollId });
-  if (!res.success) { showAlert('#alert-box', res.message); return; }
-  const { results } = res.data;
-  const optionsHtml = results.map(o => `
+  async function openVote(pollId) {
+    currentPollId = pollId;
+    // Fetch results to show options
+    const res = await API.get('social', {
+      action: 'results',
+      poll_id: pollId
+    });
+    if (!res.success) {
+      showAlert('#alert-box', res.message);
+      return;
+    }
+    const {
+      results
+    } = res.data;
+    const optionsHtml = results.map(o => `
     <div class="poll-option" onclick="castVote(${o.option_id}, this)">
       <div style="flex:1"><strong>${escHtml(o.option_text)}</strong></div>
     </div>`).join('');
-  // Simple inline vote UI - inject below polls
-  const votePanel = document.createElement('div');
-  votePanel.id = 'vote-panel-' + pollId;
-  votePanel.className = 'card mt-3';
-  votePanel.innerHTML = `<div class="card-header"><h3>Cast Vote</h3><button class="btn btn-secondary btn-sm" onclick="this.closest('[id]').remove()">Cancel</button></div><div>${optionsHtml}</div>`;
-  document.getElementById('polls-wrap').prepend(votePanel);
-}
+    // Simple inline vote UI - inject below polls
+    const votePanel = document.createElement('div');
+    votePanel.id = 'vote-panel-' + pollId;
+    votePanel.className = 'card mt-3';
+    votePanel.innerHTML = `<div class="card-header"><h3>Cast Vote</h3><button class="btn btn-secondary btn-sm" onclick="this.closest('[id]').remove()">Cancel</button></div><div>${optionsHtml}</div>`;
+    document.getElementById('polls-wrap').prepend(votePanel);
+  }
 
-async function castVote(optionId, el) {
-  el.closest('[id]').querySelectorAll('.poll-option').forEach(o => o.classList.remove('voted'));
-  el.classList.add('voted');
-  const res = await API.post('social', { action: 'vote', poll_id: currentPollId, option_id: optionId });
-  showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
-  if (res.success) { el.closest('[id]').remove(); loadPolls(); }
-}
+  async function castVote(optionId, el) {
+    el.closest('[id]').querySelectorAll('.poll-option').forEach(o => o.classList.remove('voted'));
+    el.classList.add('voted');
+    const res = await API.post('social', {
+      action: 'vote',
+      poll_id: currentPollId,
+      option_id: optionId
+    });
+    showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
+    if (res.success) {
+      el.closest('[id]').remove();
+      loadPolls();
+    }
+  }
 
-async function loadResults(pollId) {
-  const res = await API.get('social', { action: 'results', poll_id: pollId });
-  const wrap = document.getElementById('results-wrap');
-  wrap.style.display = 'block';
-  if (!res.success) { wrap.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`; return; }
-  const { results, winner_option_id, status } = res.data;
-  const totalVotes = results.reduce((s, r) => s + (r.vote_count || 0), 0);
-  wrap.innerHTML = `<div class="card">
+  async function loadResults(pollId) {
+    const res = await API.get('social', {
+      action: 'results',
+      poll_id: pollId
+    });
+    const wrap = document.getElementById('results-wrap');
+    wrap.style.display = 'block';
+    if (!res.success) {
+      wrap.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`;
+      return;
+    }
+    const {
+      results,
+      winner_option_id,
+      status
+    } = res.data;
+    const totalVotes = results.reduce((s, r) => s + (r.vote_count || 0), 0);
+    wrap.innerHTML = `<div class="card">
     <div class="card-header">
       <h3>Results <span class="badge ${status === 'open' ? 'badge-green' : 'badge-gray'}">${escHtml(status)}</span></h3>
     </div>
@@ -143,43 +193,58 @@ async function loadResults(pollId) {
       </div>`;
     }).join('')}
   </div>`;
-  wrap.scrollIntoView({ behavior: 'smooth' });
-}
+    wrap.scrollIntoView({
+      behavior: 'smooth'
+    });
+  }
 
-async function closePoll(pollId) {
-  if (!confirm('Close this poll? Voting will end.')) return;
-  const res = await API.post('social', { action: 'close_poll', poll_id: pollId });
-  showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
-  if (res.success) loadPolls();
-}
+  async function closePoll(pollId) {
+    if (!confirm('Close this poll? Voting will end.')) return;
+    const res = await API.post('social', {
+      action: 'close_poll',
+      poll_id: pollId
+    });
+    showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
+    if (res.success) loadPolls();
+  }
 
-document.getElementById('form-create-poll').addEventListener('submit', async e => {
-  e.preventDefault();
-  const tripId = document.getElementById('trip-select').value;
-  if (!tripId) { showAlert('#poll-alert', 'Select a trip first.'); return; }
-  const btn = document.getElementById('btn-create-poll');
-  setLoading(btn, true);
-  const fd = new FormData(e.target);
-  const optionsText = fd.get('options_text') || '';
-  const options = optionsText.split('\n').map(s => s.trim()).filter(Boolean);
-  if (options.length < 2) { showAlert('#poll-alert', 'At least 2 options required.'); setLoading(btn, false); return; }
+  document.getElementById('form-create-poll').addEventListener('submit', async e => {
+    e.preventDefault();
+    const tripId = document.getElementById('trip-select').value;
+    if (!tripId) {
+      showAlert('#poll-alert', 'Select a trip first.');
+      return;
+    }
+    const btn = document.getElementById('btn-create-poll');
+    setLoading(btn, true);
+    const fd = new FormData(e.target);
+    const optionsText = fd.get('options_text') || '';
+    const options = optionsText.split('\n').map(s => s.trim()).filter(Boolean);
+    if (options.length < 2) {
+      showAlert('#poll-alert', 'At least 2 options required.');
+      setLoading(btn, false);
+      return;
+    }
 
-  const formData = new FormData();
-  formData.append('action', 'create_poll');
-  formData.append('trip_id', tripId);
-  formData.append('question', fd.get('question'));
-  formData.append('type', fd.get('type'));
-  formData.append('deadline', fd.get('deadline') || '');
-  formData.append('is_anonymous', fd.get('is_anonymous') ? '1' : '');
-  options.forEach(o => formData.append('options[]', o));
+    const formData = new FormData();
+    formData.append('action', 'create_poll');
+    formData.append('trip_id', tripId);
+    formData.append('question', fd.get('question'));
+    formData.append('type', fd.get('type'));
+    formData.append('deadline', fd.get('deadline') || '');
+    formData.append('is_anonymous', fd.get('is_anonymous') ? '1' : '');
+    options.forEach(o => formData.append('options[]', o));
 
-  const res = await API.upload('social', formData);
-  setLoading(btn, false);
-  if (res.success) { closeModal('modal-create-poll'); e.target.reset(); loadPolls(); }
-  else showAlert('#poll-alert', res.message);
-});
+    const res = await API.upload('social', formData);
+    setLoading(btn, false);
+    if (res.success) {
+      closeModal('modal-create-poll');
+      e.target.reset();
+      loadPolls();
+    } else showAlert('#poll-alert', res.message);
+  });
 
-loadTrips();
+  loadTrips();
 </script>
 
 <?php end_layout(); ?>

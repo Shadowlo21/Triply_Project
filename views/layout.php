@@ -100,6 +100,12 @@ function start_layout(string $title, array $opts = []): void
                     <a class="triply-navlink text-gray-500 hover:text-white px-4 py-3 flex items-center gap-3 hover:bg-white/5 hover:translate-x-1 transition-all duration-200 ease-in-out" href="/?page=itinerary">
                       <i class="fa-solid fa-calendar-days"></i><span>Itinerary</span>
                     </a>
+                    <a class="triply-navlink text-gray-500 hover:text-white px-4 py-3 flex items-center gap-3 hover:bg-white/5 hover:translate-x-1 transition-all duration-200 ease-in-out" href="/?page=notifications">
+                      <i class="fa-solid fa-bell"></i><span>Notifications</span>
+                    </a>
+                    <a class="triply-navlink text-gray-500 hover:text-white px-4 py-3 flex items-center gap-3 hover:bg-white/5 hover:translate-x-1 transition-all duration-200 ease-in-out" href="/?page=emergency">
+                      <i class="fa-solid fa-triangle-exclamation"></i><span>Emergency</span>
+                    </a>
                     <?php if ($_user && $_user->getRole() === 'admin'): ?>
                       <a class="triply-navlink text-gray-500 hover:text-white px-4 py-3 flex items-center gap-3 hover:bg-white/5 hover:translate-x-1 transition-all duration-200 ease-in-out" href="/?page=admin">
                         <i class="fa-solid fa-shield-halved"></i><span>Admin</span>
@@ -107,11 +113,17 @@ function start_layout(string $title, array $opts = []): void
                     <?php endif; ?>
                   </nav>
                   <div class="px-4 mt-auto space-y-3">
-                    <div class="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl px-3 py-2">
+                    <a href="/?page=profile" class="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl px-3 py-2 hover:bg-white/10 transition-colors">
                       <div class="min-w-0">
                         <div class="text-white text-sm font-semibold truncate"><?= $name ?></div>
                         <div class="text-[10px] uppercase tracking-widest text-gray-400"><?= htmlspecialchars($role) ?></div>
                       </div>
+                      <i class="fa-solid fa-user text-gray-400"></i>
+                    </a>
+                    <div class="flex gap-2">
+                      <a href="/?page=profile" class="flex-1 btn btn-secondary btn-sm text-center">
+                        <i class="fa-solid fa-user-gear"></i> Profile
+                      </a>
                       <button class="btn btn-secondary btn-sm" onclick="logout(); return false;" title="Sign out">
                         <i class="fa-solid fa-right-from-bracket"></i>
                       </button>
@@ -139,8 +151,12 @@ function start_layout(string $title, array $opts = []): void
                       </button>
                       <div id="notif-dropdown" class="notif-dropdown" style="display:none">
                         <div class="notif-header">
-                          Notifications
-                          <a href="#" onclick="markAllRead(); return false;">Mark all read</a>
+                          <span>Notifications</span>
+                          <div>
+                            <a href="#" onclick="markAllRead(); return false;">Mark all read</a>
+                            <span class="mx-1">|</span>
+                            <a href="/?page=notifications">View All</a>
+                          </div>
                         </div>
                         <div id="notif-list"></div>
                       </div>

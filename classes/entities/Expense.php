@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Design Pattern: Strategy
+ * Provides multiple expense-splitting strategies: equal, custom, and percentage-based.
+ * Allows runtime selection of splitting algorithm via splitEqual(), splitCustom(), splitByPercentage().
+ */
 class Expense
 {
     private int    $id;
@@ -32,9 +37,9 @@ class Expense
         return $row ? new self($row) : null;
     }
 
-    
-    
-    
+
+
+
     public static function convertCurrency(float $amount, string $from, string $to): float
     {
         if ($from === $to) return $amount;
@@ -51,9 +56,9 @@ class Expense
         return round($amount * (float)$row['rate'], 2);
     }
 
-    
-    
-    
+
+
+
     public function splitEqual(array $userIds): bool
     {
         if (empty($userIds)) return false;
@@ -62,17 +67,17 @@ class Expense
         return $this->saveSplits(array_fill_keys($userIds, $share));
     }
 
-    
-    
-    
+
+
+
     public function splitCustom(array $splits): bool
     {
         return $this->saveSplits($splits);
     }
 
-    
-    
-    
+
+
+
     public function splitByPercentage(array $percentages): bool
     {
         $splits = [];
@@ -86,7 +91,7 @@ class Expense
     {
         $db   = Database::getInstance('financial');
 
-        
+
         $db->prepare('DELETE FROM expense_splits WHERE expense_id = ?')->execute([$this->id]);
 
         $stmt = $db->prepare(
@@ -119,10 +124,25 @@ class Expense
         return $stmt->fetchAll();
     }
 
-    
-    public function getId(): int                  { return $this->id; }
-    public function getTripId(): int              { return $this->tripId; }
-    public function getConvertedAmount(): float   { return $this->convertedAmount; }
-    public function getPaidBy(): int              { return $this->paidBy; }
-    public function getOriginalCurrency(): string { return $this->originalCurrency; }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+    public function getTripId(): int
+    {
+        return $this->tripId;
+    }
+    public function getConvertedAmount(): float
+    {
+        return $this->convertedAmount;
+    }
+    public function getPaidBy(): int
+    {
+        return $this->paidBy;
+    }
+    public function getOriginalCurrency(): string
+    {
+        return $this->originalCurrency;
+    }
 }

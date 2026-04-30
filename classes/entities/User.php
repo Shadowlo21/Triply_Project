@@ -6,7 +6,7 @@ abstract class User
     protected string $email;
     protected string $role;
 
-    
+
     protected string $name            = '';
     protected string $phone           = '';
     protected string $nationality     = '';
@@ -20,9 +20,9 @@ abstract class User
         $this->role  = $role;
     }
 
-    
-    
-    
+
+
+
     public function decryptData(string $blob): void
     {
         $data = Encryption::decryptJson($blob, $this->id);
@@ -34,9 +34,9 @@ abstract class User
         $this->points           = (int)($data['points']    ?? 0);
     }
 
-    
-    
-    
+
+
+
     public function encryptData(): string
     {
         return Encryption::encryptJson([
@@ -48,9 +48,9 @@ abstract class User
         ], $this->id);
     }
 
-    
-    
-    
+
+
+
     public static function findById(int $id): ?static
     {
         $db   = Database::getInstance('accounts');
@@ -60,7 +60,7 @@ abstract class User
 
         if (!$row) return null;
 
-        $user = match($row['role']) {
+        $user = match ($row['role']) {
             'leader', 'admin' => new TripLeader($row['id'], $row['email'], $row['role']),
             default            => new Member($row['id'], $row['email'], $row['role']),
         };
@@ -69,9 +69,9 @@ abstract class User
         return $user;
     }
 
-    
-    
-    
+
+
+
     public static function findByEmail(string $email): ?array
     {
         $db   = Database::getInstance('accounts');
@@ -105,13 +105,39 @@ abstract class User
         return $stmt->fetch() ?: null;
     }
 
-    
-    
-    
-    public function getId(): int       { return $this->id; }
-    public function getEmail(): string { return $this->email; }
-    public function getRole(): string  { return $this->role; }
-    public function getName(): string  { return $this->name; }
-    public function getPoints(): int   { return $this->points; }
-    public function getNationality(): string { return $this->nationality; }
+
+
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+    public function getName(): string
+    {
+        return $this->name;
+    }
+    public function getPoints(): int
+    {
+        return $this->points;
+    }
+    public function getNationality(): string
+    {
+        return $this->nationality;
+    }
+    public function getPhone(): string
+    {
+        return $this->phone;
+    }
+    public function getEmergencyContact(): string
+    {
+        return $this->emergencyContact;
+    }
 }

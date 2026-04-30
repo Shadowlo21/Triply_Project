@@ -8,13 +8,13 @@ $action = $_POST['action'] ?? $_GET['action'] ?? '';
 try {
     switch ($action) {
 
-        
+
         case 'list':
             $tripId = (int)($_GET['trip_id'] ?? 0);
             if (!$tripId) ApiResponse::error('trip_id required.');
             if (!$user->viewTrip($tripId)) ApiResponse::error('Access denied.', 403);
 
-            
+
             $financialDb = Database::getInstance('financial');
             $stmt        = $financialDb->prepare(
                 'SELECT * FROM expenses WHERE trip_id = ? ORDER BY created_at DESC'
@@ -22,7 +22,7 @@ try {
             $stmt->execute([$tripId]);
             $expenses = $stmt->fetchAll();
 
-            
+
             if (!empty($expenses)) {
                 $paidByIds    = array_unique(array_column($expenses, 'paid_by'));
                 $accountsDb   = Database::getInstance('accounts');
@@ -40,7 +40,7 @@ try {
                 }
             }
 
-            
+
             $splitStmt = $financialDb->prepare(
                 'SELECT * FROM expense_splits WHERE expense_id = ?'
             );
@@ -48,7 +48,7 @@ try {
                 $splitStmt->execute([$exp['id']]);
                 $splits = $splitStmt->fetchAll();
 
-                
+
                 if (!empty($splits)) {
                     $splitUserIds  = array_unique(array_column($splits, 'user_id'));
                     $accountsDb    = Database::getInstance('accounts');
@@ -69,7 +69,7 @@ try {
                 $exp['splits'] = $splits;
             }
 
-            
+
             $trip = Trip::findById($tripId);
             ApiResponse::success([
                 'expenses'     => $expenses,
@@ -78,7 +78,7 @@ try {
                 'currency'     => $trip->getBaseCurrency(),
             ]);
 
-        
+
         case 'add':
             $tripId = (int)($_POST['trip_id'] ?? 0);
             if (!$tripId) ApiResponse::error('trip_id required.');
@@ -105,20 +105,20 @@ try {
                 'type'              => $_POST['type'] ?? 'general',
             ]);
 
-            
+
             $expense   = Expense::findById($expenseId);
             $splitType = $_POST['split_type'] ?? 'equal';
             $memberIds = array_map('intval', $_POST['member_ids'] ?? []);
 
             if (empty($memberIds)) {
-                
+
                 $tripsDb = Database::getInstance('trips');
                 $stmt    = $tripsDb->prepare('SELECT user_id FROM trip_members WHERE trip_id = ?');
                 $stmt->execute([$tripId]);
                 $memberIds = array_column($stmt->fetchAll(), 'user_id');
             }
 
-            match($splitType) {
+            match ($splitType) {
                 'equal'      => $expense->splitEqual($memberIds),
                 'percentage' => $expense->splitByPercentage(
                     array_combine($memberIds, array_map('floatval', $_POST['percentages'] ?? []))
@@ -129,12 +129,12 @@ try {
                 default      => $expense->splitEqual($memberIds),
             };
 
-            
+
             Notification::checkBudgetThreshold($tripId);
 
             ApiResponse::success(['expense_id' => $expenseId], 'Expense logged.');
 
-        
+
         case 'settlement':
             $tripId = (int)($_GET['trip_id'] ?? 0);
             if (!$tripId) ApiResponse::error('trip_id required.');
@@ -142,7 +142,7 @@ try {
 
             $transactions = Itinerary::calculateSettlement($tripId);
 
-            
+
             if (!empty($transactions)) {
                 $allIds = array_unique(array_merge(
                     array_column($transactions, 'from'),
@@ -168,7 +168,7 @@ try {
                 'currency'     => $trip->getBaseCurrency(),
             ]);
 
-        
+
         case 'approve_settlement':
             $settlementId = (int)($_POST['settlement_id'] ?? 0);
             if (!$settlementId) ApiResponse::error('settlement_id required.');
@@ -178,11 +178,44 @@ try {
 
             ApiResponse::success(null, $ok ? 'Settlement approved.' : 'Failed.');
 
-        
+
         case 'rates':
             $db   = Database::getInstance('financial');
             $stmt = $db->query('SELECT from_currency, to_currency, rate FROM currency_rates');
             ApiResponse::success($stmt->fetchAll());
+
+        /**
+         * Delete an expense
+         */
+        case 'delete_expense':
+            $expenseId = (int)($_POST['expense_id'] ?? 0);
+            if (!$expenseId) ApiResponse::error('expense_id required.');
+
+            // Get expense details
+            $db = Database::getInstance('financial');
+            $stmt = $db->prepare('SELECT * FROM expenses WHERE id = ?');
+            $stmt->execute([$expenseId]);
+            $expense = $stmt->fetch();
+
+            if (!$expense) ApiResponse::error('Expense not found.', 404);
+
+            // Verify user has access to the trip
+            if (!$user->viewTrip($expense['trip_id'])) {
+                ApiResponse::error('Access denied.', 403);
+            }
+
+            // Only expense creator, trip leader, or admin can delete
+            if ($expense['paid_by'] !== $user->getId() && !($user instanceof TripLeader) && $user->getRole() !== 'admin') {
+                ApiResponse::error('Only expense creator or trip leader can delete.', 403);
+            }
+
+            // Delete expense splits first
+            $db->prepare('DELETE FROM expense_splits WHERE expense_id = ?')->execute([$expenseId]);
+
+            // Delete expense
+            $db->prepare('DELETE FROM expenses WHERE id = ?')->execute([$expenseId]);
+
+            ApiResponse::success(null, 'Expense deleted.');
 
         default:
             ApiResponse::error('Unknown action.', 400);
@@ -190,4 +223,3 @@ try {
 } catch (\Throwable $e) {
     ApiResponse::error($e->getMessage());
 }
-

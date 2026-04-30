@@ -1,11 +1,16 @@
 <?php
 
+/**
+ * Design Pattern: Observer
+ * Observes state changes in trips and sends notifications to interested parties.
+ * Triggers on events: trip invite, poll closed, budget threshold exceeded, daily briefing.
+ */
 class Notification
 {
-    
-    
-    
-    
+
+
+
+
     public static function checkBudgetThreshold(int $tripId): void
     {
         $trip = Trip::findById($tripId);
@@ -20,16 +25,16 @@ class Notification
         $label = $percent >= 100 ? 'EXCEEDED' : 'WARNING (80%+)';
         $msg   = "Budget {$label}: {$used} / {$limit} {$trip->getBaseCurrency()} used on trip \"{$trip->getTitle()}\"";
 
-        
+
         $members = $trip->getMembers();
         foreach ($members as $m) {
             self::send($m['id'], 'budget_alert', $msg);
         }
     }
 
-    
-    
-    
+
+
+
     public static function pollClosed(int $pollId, int $tripId, ?int $winnerOptionId): void
     {
         $socialDb = Database::getInstance('social');
@@ -50,11 +55,11 @@ class Notification
         }
     }
 
-    
-    
-    
-    
-    
+
+
+
+
+
     public static function sendDailyBriefings(): void
     {
         $tripsDb  = Database::getInstance('trips');
@@ -70,7 +75,7 @@ class Notification
         $stmt->execute([$tomorrow]);
         $rows = $stmt->fetchAll();
 
-        
+
         $byUser = [];
         foreach ($rows as $row) {
             $byUser[$row['user_id']][$row['trip_id']][] = $row;
@@ -88,17 +93,17 @@ class Notification
         }
     }
 
-    
-    
-    
+
+
+
     public static function tripInvite(int $userId, string $tripTitle, string $inviterName): void
     {
         self::send($userId, 'invite', "{$inviterName} invited you to join trip \"{$tripTitle}\"");
     }
 
-    
-    
-    
+
+
+
     public static function send(int $userId, string $type, string $message): void
     {
         $db   = Database::getInstance('trips');
@@ -108,9 +113,9 @@ class Notification
         $stmt->execute([$userId, $type, $message]);
     }
 
-    
-    
-    
+
+
+
     public static function getUnread(int $userId): array
     {
         $db   = Database::getInstance('trips');

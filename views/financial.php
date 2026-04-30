@@ -1,4 +1,13 @@
-<?php require_once __DIR__ . '/layout.php'; start_layout('Financial'); ?>
+<?php
+require_once __DIR__ . '/../config/bootstrap.php';
+$currentUser = Auth::current();
+if (!$currentUser) {
+  header('Location: /?page=login');
+  exit;
+}
+require_once __DIR__ . '/layout.php';
+start_layout('Financial');
+?>
 
 <div id="alert-box"></div>
 
@@ -10,13 +19,20 @@
   </div>
   <div style="display:flex;gap:8px">
     <button class="btn btn-secondary btn-sm" onclick="loadSettlement()">Settlement</button>
+    <button class="btn btn-secondary btn-sm" id="btn-report" onclick="generateReport()" style="display:none">📊 Report</button>
     <button class="btn btn-primary" onclick="openModal('modal-add-expense')">+ Add Expense</button>
   </div>
 </div>
 
 <div class="grid-3 mb-4" id="fin-stats" style="display:none">
-  <div class="card"><div class="stat-value" id="stat-total">0</div><div class="stat-label">Total Spent</div></div>
-  <div class="card"><div class="stat-value" id="stat-budget">—</div><div class="stat-label">Budget Limit</div></div>
+  <div class="card">
+    <div class="stat-value" id="stat-total">0</div>
+    <div class="stat-label">Total Spent</div>
+  </div>
+  <div class="card">
+    <div class="stat-value" id="stat-budget">—</div>
+    <div class="stat-label">Budget Limit</div>
+  </div>
   <div class="card">
     <div class="stat-value" id="stat-pct">0%</div>
     <div class="stat-label">Budget Used</div>
@@ -31,8 +47,10 @@
 <div id="settlement-wrap" style="display:none" class="mt-4"></div>
 
 <div class="modal-overlay hidden" id="modal-add-expense">
-  <div class="modal">
-    <div class="modal-header"><h3>Add Expense</h3><button class="modal-close" onclick="closeModal('modal-add-expense')">×</button></div>
+  <div class="triply-modal">
+    <div class="modal-header">
+      <h3>Add Expense</h3><button class="modal-close" onclick="closeModal('modal-add-expense')">×</button>
+    </div>
     <div class="modal-body">
       <div id="exp-alert"></div>
       <form id="form-add-expense">
@@ -42,16 +60,20 @@
           <div class="form-group">
             <label>Currency</label>
             <select name="currency" class="form-control">
-              <option value="EGP">EGP</option><option value="USD">USD</option>
-              <option value="EUR">EUR</option><option value="GBP">GBP</option>
+              <option value="EGP">EGP</option>
+              <option value="USD">USD</option>
+              <option value="EUR">EUR</option>
+              <option value="GBP">GBP</option>
             </select>
           </div>
         </div>
         <div class="form-group">
           <label>Type</label>
           <select name="type" class="form-control">
-            <option value="general">General</option><option value="food">Food</option>
-            <option value="transport">Transport</option><option value="accommodation">Accommodation</option>
+            <option value="general">General</option>
+            <option value="food">Food</option>
+            <option value="transport">Transport</option>
+            <option value="accommodation">Accommodation</option>
             <option value="activity">Activity</option>
           </select>
         </div>
@@ -69,42 +91,57 @@
 </div>
 
 <script>
-async function loadTrips() {
-  const res = await API.get('trips', { action: 'list' });
-  const sel = document.getElementById('trip-select');
-  (res.data || []).forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t.id; opt.textContent = t.title;
-    sel.appendChild(opt);
-  });
-  if (sel.options.length > 1) { sel.selectedIndex = 1; loadFinancial(); }
-}
-
-async function loadFinancial() {
-  const tripId = document.getElementById('trip-select').value;
-  if (!tripId) return;
-  document.getElementById('settlement-wrap').style.display = 'none';
-  const res = await API.get('financial', { action: 'list', trip_id: tripId });
-  if (!res.success) return;
-  const { expenses, total_spent, budget_limit, currency } = res.data;
-
-  document.getElementById('fin-stats').style.display = 'grid';
-  document.getElementById('stat-total').textContent = (total_spent || 0).toFixed(2) + ' ' + currency;
-  document.getElementById('stat-budget').textContent = budget_limit ? budget_limit.toFixed(2) + ' ' + currency : 'Not set';
-  if (budget_limit) {
-    const pct = Math.min(100, ((total_spent / budget_limit) * 100)).toFixed(1);
-    document.getElementById('stat-pct').textContent = pct + '%';
-    const bar = document.getElementById('budget-bar');
-    bar.style.width = pct + '%';
-    bar.style.background = pct > 90 ? 'var(--danger)' : pct > 70 ? 'var(--warning)' : 'var(--primary)';
+  async function loadTrips() {
+    const res = await API.get('trips', {
+      action: 'list'
+    });
+    const sel = document.getElementById('trip-select');
+    (res.data || []).forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.title;
+      sel.appendChild(opt);
+    });
+    if (sel.options.length > 1) {
+      sel.selectedIndex = 1;
+      loadFinancial();
+    }
   }
 
-  const wrap = document.getElementById('expenses-wrap');
-  if (!expenses.length) {
-    wrap.innerHTML = '<div class="card empty-state"><div class="icon">💰</div>No expenses yet.</div>';
-    return;
-  }
-  wrap.innerHTML = `<div class="card"><div class="card-header"><h3>Expenses</h3></div>
+  async function loadFinancial() {
+    const tripId = document.getElementById('trip-select').value;
+    if (!tripId) return;
+    document.getElementById('settlement-wrap').style.display = 'none';
+    document.getElementById('btn-report').style.display = 'inline-block';
+    const res = await API.get('financial', {
+      action: 'list',
+      trip_id: tripId
+    });
+    if (!res.success) return;
+    const {
+      expenses,
+      total_spent,
+      budget_limit,
+      currency
+    } = res.data;
+
+    document.getElementById('fin-stats').style.display = 'grid';
+    document.getElementById('stat-total').textContent = (total_spent || 0).toFixed(2) + ' ' + currency;
+    document.getElementById('stat-budget').textContent = budget_limit ? budget_limit.toFixed(2) + ' ' + currency : 'Not set';
+    if (budget_limit) {
+      const pct = Math.min(100, ((total_spent / budget_limit) * 100)).toFixed(1);
+      document.getElementById('stat-pct').textContent = pct + '%';
+      const bar = document.getElementById('budget-bar');
+      bar.style.width = pct + '%';
+      bar.style.background = pct > 90 ? 'var(--danger)' : pct > 70 ? 'var(--warning)' : 'var(--primary)';
+    }
+
+    const wrap = document.getElementById('expenses-wrap');
+    if (!expenses.length) {
+      wrap.innerHTML = '<div class="card empty-state"><div class="icon">💰</div>No expenses yet.</div>';
+      return;
+    }
+    wrap.innerHTML = `<div class="card"><div class="card-header"><h3>Expenses</h3></div>
     <div class="table-wrap"><table>
       <thead><tr><th>Title</th><th>Amount</th><th>Type</th><th>Paid By</th><th>Splits</th><th>Date</th></tr></thead>
       <tbody>${expenses.map(e => `
@@ -117,21 +154,33 @@ async function loadFinancial() {
           <td class="text-sm">${fmtDate(e.created_at)}</td>
         </tr>`).join('')}
       </tbody></table></div></div>`;
-}
-
-async function loadSettlement() {
-  const tripId = document.getElementById('trip-select').value;
-  if (!tripId) { showAlert('#alert-box', 'Select a trip first.'); return; }
-  const res = await API.get('financial', { action: 'settlement', trip_id: tripId });
-  const wrap = document.getElementById('settlement-wrap');
-  wrap.style.display = 'block';
-  if (!res.success) { wrap.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`; return; }
-  const { transactions, currency } = res.data;
-  if (!transactions.length) {
-    wrap.innerHTML = '<div class="card empty-state"><div class="icon">✅</div>All settled! No transactions needed.</div>';
-    return;
   }
-  wrap.innerHTML = `<div class="card">
+
+  async function loadSettlement() {
+    const tripId = document.getElementById('trip-select').value;
+    if (!tripId) {
+      showAlert('#alert-box', 'Select a trip first.');
+      return;
+    }
+    const res = await API.get('financial', {
+      action: 'settlement',
+      trip_id: tripId
+    });
+    const wrap = document.getElementById('settlement-wrap');
+    wrap.style.display = 'block';
+    if (!res.success) {
+      wrap.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`;
+      return;
+    }
+    const {
+      transactions,
+      currency
+    } = res.data;
+    if (!transactions.length) {
+      wrap.innerHTML = '<div class="card empty-state"><div class="icon">✅</div>All settled! No transactions needed.</div>';
+      return;
+    }
+    wrap.innerHTML = `<div class="card">
     <div class="card-header"><h3>Settlement Transactions</h3></div>
     <div class="table-wrap"><table>
       <thead><tr><th>From</th><th>To</th><th>Amount</th></tr></thead>
@@ -142,28 +191,48 @@ async function loadSettlement() {
           <td><strong>${(+t.amount).toFixed(2)} ${escHtml(currency)}</strong></td>
         </tr>`).join('')}
       </tbody></table></div></div>`;
-  wrap.scrollIntoView({ behavior: 'smooth' });
-}
+    wrap.scrollIntoView({
+      behavior: 'smooth'
+    });
+  }
 
-document.getElementById('form-add-expense').addEventListener('submit', async e => {
-  e.preventDefault();
-  const tripId = document.getElementById('trip-select').value;
-  if (!tripId) { showAlert('#exp-alert', 'Select a trip first.'); return; }
-  const btn = document.getElementById('btn-add-exp');
-  setLoading(btn, true);
-  const fd = new FormData(e.target);
-  const res = await API.post('financial', {
-    action: 'add', trip_id: tripId,
-    title: fd.get('title'), amount: fd.get('amount'),
-    currency: fd.get('currency'), type: fd.get('type'),
-    split_type: fd.get('split_type'),
+  document.getElementById('form-add-expense').addEventListener('submit', async e => {
+    e.preventDefault();
+    const tripId = document.getElementById('trip-select').value;
+    if (!tripId) {
+      showAlert('#exp-alert', 'Select a trip first.');
+      return;
+    }
+    const btn = document.getElementById('btn-add-exp');
+    setLoading(btn, true);
+    const fd = new FormData(e.target);
+    const res = await API.post('financial', {
+      action: 'add',
+      trip_id: tripId,
+      title: fd.get('title'),
+      amount: fd.get('amount'),
+      currency: fd.get('currency'),
+      type: fd.get('type'),
+      split_type: fd.get('split_type'),
+    });
+    setLoading(btn, false);
+    if (res.success) {
+      closeModal('modal-add-expense');
+      e.target.reset();
+      loadFinancial();
+    } else showAlert('#exp-alert', res.message);
   });
-  setLoading(btn, false);
-  if (res.success) { closeModal('modal-add-expense'); e.target.reset(); loadFinancial(); }
-  else showAlert('#exp-alert', res.message);
-});
 
-loadTrips();
+  function generateReport() {
+    const tripId = document.getElementById('trip-select').value;
+    if (!tripId) {
+      showAlert('#alert-box', 'Select a trip first.');
+      return;
+    }
+    window.open('/report.php?trip_id=' + tripId + '&print=1', '_blank');
+  }
+
+  loadTrips();
 </script>
 
 <?php end_layout(); ?>

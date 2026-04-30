@@ -6,7 +6,7 @@ require_once __DIR__ . '/classes/boundary/Auth.php';
 
 $isAuthed = (bool)Auth::current();
 $page = $_GET['page'] ?? ($isAuthed ? 'dashboard' : 'landing');
-$allowed = ['landing', 'dashboard', 'login', 'register', 'trips', 'itinerary', 'financial', 'documents', 'social', 'admin'];
+$allowed = ['landing', 'dashboard', 'login', 'register', 'trips', 'itinerary', 'financial', 'documents', 'social', 'admin', 'profile', 'notifications', 'emergency', 'logout'];
 
 if (!in_array($page, $allowed)) {
     http_response_code(404);

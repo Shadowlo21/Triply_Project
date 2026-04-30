@@ -1,8 +1,13 @@
 <?php
 
+/**
+ * Design Pattern: Singleton
+ * Ensures only one database connection per database file exists throughout the application.
+ * Provides centralized DB access via static getInstance() method.
+ */
 class Database
 {
-    
+
     private const DBS = [
         'accounts'  => 'database/accounts.db',
         'trips'     => 'database/trips.db',
@@ -11,7 +16,7 @@ class Database
         'documents' => 'database/documents.db',
     ];
 
-    
+
     private const TABLE_MAP = [
         'users'               => 'accounts',
         'sessions'            => 'accounts',
@@ -33,17 +38,17 @@ class Database
         'documents'           => 'documents',
     ];
 
-    
+
     private static array $instances = [];
 
     private function __construct() {}
     private function __clone() {}
 
-    
-    
-    
-    
-    
+
+
+
+
+
     public static function getInstance(string $db = 'accounts'): PDO
     {
         if (!isset(self::$instances[$db])) {
@@ -60,20 +65,20 @@ class Database
         return self::$instances[$db];
     }
 
-    
-    
-    
-    
+
+
+
+
     public static function for(string $table): PDO
     {
         $db = self::TABLE_MAP[$table] ?? 'accounts';
         return self::getInstance($db);
     }
 
-    
+
     private static function resolvePath(string $relative): string
     {
-        
+
         if (str_starts_with($relative, '/') || preg_match('/^[A-Za-z]:/', $relative)) {
             return $relative;
         }

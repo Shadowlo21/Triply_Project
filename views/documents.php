@@ -1,4 +1,13 @@
-<?php require_once __DIR__ . '/layout.php'; start_layout('Documents'); ?>
+<?php
+require_once __DIR__ . '/../config/bootstrap.php';
+$currentUser = Auth::current();
+if (!$currentUser) {
+  header('Location: /?page=login');
+  exit;
+}
+require_once __DIR__ . '/layout.php';
+start_layout('Documents');
+?>
 
 <div id="alert-box"></div>
 
@@ -17,16 +26,20 @@
 <div id="docs-wrap"></div>
 
 <div class="modal-overlay hidden" id="modal-upload">
-  <div class="modal">
-    <div class="modal-header"><h3>Upload Document</h3><button class="modal-close" onclick="closeModal('modal-upload')">×</button></div>
+  <div class="triply-modal">
+    <div class="modal-header">
+      <h3>Upload Document</h3><button class="modal-close" onclick="closeModal('modal-upload')">×</button>
+    </div>
     <div class="modal-body">
       <div id="upload-alert"></div>
       <form id="form-upload">
         <div class="form-group">
           <label>Document Type</label>
           <select name="type" class="form-control">
-            <option value="passport">Passport</option><option value="ticket">Ticket</option>
-            <option value="visa">Visa</option><option value="insurance">Insurance</option>
+            <option value="passport">Passport</option>
+            <option value="ticket">Ticket</option>
+            <option value="visa">Visa</option>
+            <option value="insurance">Insurance</option>
             <option value="other">Other</option>
           </select>
         </div>
@@ -45,8 +58,10 @@
 </div>
 
 <div class="modal-overlay hidden" id="modal-visa">
-  <div class="modal">
-    <div class="modal-header"><h3>Visa Requirement Check</h3><button class="modal-close" onclick="closeModal('modal-visa')">×</button></div>
+  <div class="triply-modal">
+    <div class="modal-header">
+      <h3>Visa Requirement Check</h3><button class="modal-close" onclick="closeModal('modal-visa')">×</button>
+    </div>
     <div class="modal-body">
       <div id="visa-alert"></div>
       <div class="grid-2">
@@ -60,86 +75,143 @@
 </div>
 
 <script>
-async function loadTrips() {
-  const res = await API.get('trips', { action: 'list' });
-  const sel = document.getElementById('trip-select');
-  (res.data || []).forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t.id; opt.textContent = t.title;
-    sel.appendChild(opt);
-  });
-  if (sel.options.length > 1) { sel.selectedIndex = 1; loadDocuments(); }
-}
+  async function loadTrips() {
+    const res = await API.get('trips', {
+      action: 'list'
+    });
+    const sel = document.getElementById('trip-select');
+    (res.data || []).forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.title;
+      sel.appendChild(opt);
+    });
+    if (sel.options.length > 1) {
+      sel.selectedIndex = 1;
+      loadDocuments();
+    }
+  }
 
-async function loadDocuments() {
+  async function loadDocuments() {
   const tripId = document.getElementById('trip-select').value;
   if (!tripId) return;
-  const res = await API.get('documents', { action: 'list', trip_id: tripId });
+  const res = await API.get('documents', {
+    action: 'list',
+    trip_id: tripId
+  });
   const wrap = document.getElementById('docs-wrap');
-  if (!res.success) { wrap.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`; return; }
+  if (!res.success) {
+    wrap.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`;
+    return;
+  }
   const docs = res.data || [];
   if (!docs.length) {
     wrap.innerHTML = '<div class="card empty-state"><div class="icon">📁</div>No documents yet. Upload one!</div>';
     return;
   }
-  const typeIcons = { passport: '🛂', ticket: '🎫', visa: '📋', insurance: '🛡', other: '📄' };
+  const typeIcons = {
+    passport: '🛂',
+    ticket: '🎫',
+    visa: '📋',
+    insurance: '🛡',
+    other: '📄'
+  };
   wrap.innerHTML = `<div class="card"><div class="table-wrap"><table>
-    <thead><tr><th>File</th><th>Type</th><th>Visibility</th><th>Actions</th></tr></thead>
-    <tbody>${docs.map(d => {
-      const meta = d.metadata || {};
-      const icon = typeIcons[d.type] || '📄';
-      return `<tr>
-        <td>${icon} ${escHtml(meta.original_name || 'Document #' + d.id)}</td>
-        <td><span class="badge badge-blue">${escHtml(d.type)}</span></td>
-        <td><span class="badge ${d.visibility === 'private' ? 'badge-gray' : 'badge-green'}">${escHtml(d.visibility)}</span></td>
-        <td>
-          <a href="/api/documents.php?action=download&doc_id=${d.id}" class="btn btn-secondary btn-sm" target="_blank">⬇ Download</a>
-          <button class="btn btn-danger btn-sm" onclick="deleteDoc(${d.id})">Delete</button>
-        </td>
-      </tr>`;
-    }).join('')}
-    </tbody></table></div></div>`;
-}
+      <thead><tr><th>File</th><th>Type</th><th>Visibility</th><th>Actions</th></tr></thead>
+      <tbody>${docs.map(d => {
+        const meta = d.metadata || {};
+        const icon = typeIcons[d.type] || '📄';
+        return ` < tr >
+    <
+    td > $ {
+      icon
+    }
+  $ {
+    escHtml(meta.original_name || 'Document #' + d.id)
+  } < /td> <
+  td > < span class = "badge badge-blue" > $ {
+      escHtml(d.type)
+    } < /span></td >
+    <
+    td > < span class = "badge ${d.visibility === 'private' ? 'badge-gray' : 'badge-green'}" > $ {
+      escHtml(d.visibility)
+    } < /span></td >
+    <
+    td >
+    <
+    a href = "/api/documents.php?action=download&doc_id=${d.id}"
+  class = "btn btn-secondary btn-sm"
+  target = "_blank" > ⬇Download < /a> <
+  button class = "btn btn-danger btn-sm"
+  onclick = "deleteDoc(${d.id})" > Delete < /button> < /
+    td > <
+    /tr>`;
+  }).join('')
+  } < /tbody> < /
+  table > < /div > < /div > `;
+  }
 
-document.getElementById('form-upload').addEventListener('submit', async e => {
-  e.preventDefault();
-  const tripId = document.getElementById('trip-select').value;
-  if (!tripId) { showAlert('#upload-alert', 'Select a trip first.'); return; }
-  const btn = document.getElementById('btn-upload');
-  setLoading(btn, true);
-  const fd = new FormData(e.target);
-  fd.append('action', 'upload');
-  fd.append('trip_id', tripId);
-  const res = await API.upload('documents', fd);
-  setLoading(btn, false);
-  if (res.success) { closeModal('modal-upload'); e.target.reset(); loadDocuments(); }
-  else showAlert('#upload-alert', res.message);
-});
+  document.getElementById('form-upload').addEventListener('submit', async e => {
+    e.preventDefault();
+    const tripId = document.getElementById('trip-select').value;
+    if (!tripId) {
+      showAlert('#upload-alert', 'Select a trip first.');
+      return;
+    }
+    const btn = document.getElementById('btn-upload');
+    setLoading(btn, true);
+    const fd = new FormData(e.target);
+    fd.append('action', 'upload');
+    fd.append('trip_id', tripId);
+    const res = await API.upload('documents', fd);
+    setLoading(btn, false);
+    if (res.success) {
+      closeModal('modal-upload');
+      e.target.reset();
+      loadDocuments();
+    } else showAlert('#upload-alert', res.message);
+  });
 
-async function deleteDoc(docId) {
-  if (!confirm('Delete this document?')) return;
-  const res = await API.post('documents', { action: 'delete', doc_id: docId });
-  showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
-  if (res.success) loadDocuments();
-}
+  async function deleteDoc(docId) {
+    if (!confirm('Delete this document?')) return;
+    const res = await API.post('documents', {
+      action: 'delete',
+      doc_id: docId
+    });
+    showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
+    if (res.success) loadDocuments();
+  }
 
-async function checkVisa() {
-  const nat = document.getElementById('visa-nat').value.trim().toUpperCase();
-  const dest = document.getElementById('visa-dest').value.trim().toUpperCase();
-  if (!nat || !dest) { showAlert('#visa-alert', 'Both fields required.'); return; }
-  const res = await API.get('documents', { action: 'visa_check', nationality: nat, destination: dest });
-  const resultEl = document.getElementById('visa-result');
-  if (res.success) {
-    const d = res.data;
-    resultEl.innerHTML = `<div class="alert ${d.visa_required ? 'alert-error' : 'alert-success'}">
-      <strong>${d.visa_required ? '🔴 Visa Required' : '🟢 No Visa Required'}</strong><br>
-      ${escHtml(d.note)}</div>`;
+  async function checkVisa() {
+    const nat = document.getElementById('visa-nat').value.trim().toUpperCase();
+    const dest = document.getElementById('visa-dest').value.trim().toUpperCase();
+    if (!nat || !dest) {
+      showAlert('#visa-alert', 'Both fields required.');
+      return;
+    }
+    const res = await API.get('documents', {
+      action: 'visa_check',
+      nationality: nat,
+      destination: dest
+    });
+    const resultEl = document.getElementById('visa-result');
+    if (res.success) {
+      const d = res.data;
+      resultEl.innerHTML = ` < div class = "alert ${d.visa_required ? 'alert-error' : 'alert-success'}" >
+    <
+    strong > $ {
+      d.visa_required ? '🔴 Visa Required' : '🟢 No Visa Required'
+    } < /strong><br>
+  $ {
+    escHtml(d.note)
+  } <
+  /div>`;
   } else {
     resultEl.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`;
   }
-}
+  }
 
-loadTrips();
+  loadTrips();
 </script>
 
 <?php end_layout(); ?>
