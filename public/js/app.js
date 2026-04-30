@@ -96,7 +96,6 @@ function closeModal(id) {
   document.body.style.overflow = '';
 }
 
-// Close modal on overlay click
 document.addEventListener('click', e => {
   if (e.target.classList.contains('modal-overlay')) e.target.classList.add('hidden');
 });

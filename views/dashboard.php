@@ -7,19 +7,19 @@ start_layout('Dashboard');
 
 <div class="grid-4 mb-4" id="stats-grid">
   <div class="card">
-    <div class="stat-value" id="stat-trips">—</div>
+    <div class="stat-value text-gray-400" id="stat-trips">—</div>
     <div class="stat-label">My Trips</div>
   </div>
   <div class="card">
-    <div class="stat-value" id="stat-activities">—</div>
+    <div class="stat-value text-gray-400" id="stat-activities">—</div>
     <div class="stat-label">Activities</div>
   </div>
   <div class="card">
-    <div class="stat-value" id="stat-expenses">—</div>
+    <div class="stat-value text-gray-400" id="stat-expenses">—</div>
     <div class="stat-label">Total Spent</div>
   </div>
   <div class="card">
-    <div class="stat-value" id="stat-polls">—</div>
+    <div class="stat-value text-gray-400" id="stat-polls">—</div>
     <div class="stat-label">Open Polls</div>
   </div>
 </div>
@@ -60,17 +60,23 @@ start_layout('Dashboard');
 
     document.getElementById('stat-trips').textContent = trips.length;
 
+    const statusColor = {
+      active: 'badge-green',
+      planning: 'badge-yellow',
+      completed: 'badge-blue',
+      settled: 'badge-red'
+    };
     const tripsEl = document.getElementById('dash-trips');
     if (!trips.length) {
       tripsEl.innerHTML = '<div class="empty-state"><div class="icon">🗺</div>No trips yet. <a href="/?page=trips">Create one</a></div>';
     } else {
       tripsEl.innerHTML = trips.slice(0, 5).map(t => `
-      <div class="flex-between" style="padding:8px 0; border-bottom:1px solid var(--border)">
+      <div class="flex-between" style="padding:10px 0; border-bottom:3px solid var(--border)">
         <div>
-          <a href="/?page=trips&trip_id=${t.id}"><strong>${escHtml(t.title)}</strong></a>
-          <div class="text-sm text-muted">${escHtml(t.destination)} · ${fmtDate(t.start_date)}</div>
+          <a href="/?page=trips&trip_id=${t.id}"><strong class="text-gray-400">${escHtml(t.title)}</strong></a>
+          <div class="text-sm text-gray-600">${escHtml(t.destination)} · ${fmtDate(t.start_date)}</div>
         </div>
-        <span class="badge ${t.status === 'active' ? 'badge-green' : 'badge-gray'}">${escHtml(t.status)}</span>
+        <span class="badge ${statusColor[t.status] || 'badge-gray'}">${escHtml(t.status)}</span>
       </div>`).join('');
     }
 
@@ -88,9 +94,9 @@ start_layout('Dashboard');
         actsEl.innerHTML = '<div class="empty-state"><div class="icon">📅</div>No activities yet.</div>';
       } else {
         actsEl.innerHTML = acts.map(a => `
-        <div style="padding:8px 0; border-bottom:1px solid var(--border)">
-          <strong>${escHtml(a.title)}</strong>
-          <div class="text-sm text-muted">${fmtDateTime(a.datetime)} · ${escHtml(a.location || '—')}</div>
+        <div style="padding:10px 0; border-bottom:3px solid var(--border)">
+          <strong class="text-sm text-gray-400">${escHtml(a.title)}</strong>
+          <div class="text-sm text-gray-600">${fmtDateTime(a.datetime)} · ${escHtml(a.location || '—')}</div>
         </div>`).join('');
       }
 

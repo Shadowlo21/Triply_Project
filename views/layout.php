@@ -25,7 +25,7 @@ function start_layout(string $title, array $opts = []): void
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <link rel="stylesheet" href="/public/css/style.css">
-    <script src="/public/js/app.js" defer></script>
+    <script src="/public/js/app.js"></script>
   </head>
 
   <body class="font-body-md bg-triply-bg text-triply-text antialiased overflow-x-hidden">
@@ -51,9 +51,9 @@ function start_layout(string $title, array $opts = []): void
                     Notifications
                     <a href="#" onclick="markAllRead(); return false;">Mark all read</a>
                   </div>
-                  <div id="notif-list"></div>
+                  <div id="notif-list" class="text-sm text-gray-300"></div>
                 </div>
-                <span class="text-sm text-gray-300"><?= $name ?></span>
+                <span class="text-sm"><?= $name ?></span>
                 <a class="btn btn-primary btn-sm" href="/?page=dashboard">Open App</a>
               <?php else: ?>
                 <a class="btn btn-secondary btn-sm" href="/?page=login">Log in</a>
@@ -158,7 +158,7 @@ function start_layout(string $title, array $opts = []): void
                             <a href="/?page=notifications">View All</a>
                           </div>
                         </div>
-                        <div id="notif-list"></div>
+                        <div id="notif-list" class="p-1 text-sm text-gray-300"></div>
                       </div>
                     </div>
                     <span class="hidden sm:block text-sm text-gray-300"><?= $name ?></span>

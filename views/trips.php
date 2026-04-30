@@ -108,6 +108,12 @@ start_layout('Trips');
       el.innerHTML = '<div class="card empty-state"><div class="icon">🗺</div>No trips yet. Create one to get started!</div>';
       return;
     }
+    const statusColor = {
+      active: 'badge-green',
+      planning: 'badge-yellow',
+      completed: 'badge-blue',
+      settled: 'badge-red'
+    };
     el.innerHTML = `<div class="card"><div class="table-wrap"><table>
       <thead><tr><th>Trip</th><th>Destination</th><th>Dates</th><th>Role</th><th>Status</th><th></th></tr></thead>
       <tbody>${res.data.map(t => `
@@ -116,7 +122,7 @@ start_layout('Trips');
           <td class="text-gray-400">${escHtml(t.destination)}</td>
           <td class="text-sm text-gray-400">${fmtDate(t.start_date)} – ${fmtDate(t.end_date)}</td>
           <td><span class="badge ${t.my_role === 'leader' ? 'badge-blue' : 'badge-gray'}">${escHtml(t.my_role)}</span></td>
-          <td><span class="badge ${t.status === 'active' ? 'badge-green' : 'badge-gray'}">${escHtml(t.status)}</span></td>
+          <td><span class="badge ${statusColor[t.status] || 'badge-gray'}">${escHtml(t.status)}</span></td>
           <td><button class="btn btn-secondary btn-sm" 
                 data-action="show-trip"
                 data-id="${t.id}" 
