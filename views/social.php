@@ -50,7 +50,7 @@ start_layout('Polls');
           <label for="chk-anon" style="margin:0">Anonymous voting</label>
         </div>
         <div class="form-group">
-          <label>Options <span class="text-muted">(one per line, min 2)</span></label>
+          <label>Options <span class="text-sm text-gray-500">(one per line, min 2)</span></label>
           <textarea name="options_text" id="options-text" class="form-control" rows="4" placeholder="Option A&#10;Option B&#10;Option C" required></textarea>
         </div>
         <button type="submit" class="btn btn-primary btn-block" id="btn-create-poll">Create Poll</button>
@@ -101,23 +101,23 @@ start_layout('Polls');
     <div class="card mb-3">
       <div class="flex-between">
         <div>
-          <strong>${escHtml(p.question)}</strong>
+          <strong class="text-lg text-white">${escHtml(p.question)}</strong>
           <span class="badge ${p.status === 'open' ? 'badge-green' : 'badge-gray'} ml-2">${escHtml(p.status)}</span>
           ${p.is_anonymous ? '<span class="badge badge-gray ml-1">anonymous</span>' : ''}
         </div>
         <div style="display:flex;gap:6px">
           ${p.status === 'open' ? `<button class="btn btn-primary btn-sm" onclick="openVote(${p.id})">Vote</button>` : ''}
           <button class="btn btn-secondary btn-sm" onclick="loadResults(${p.id})">Results</button>
-          <button class="btn btn-danger btn-sm" onclick="closePoll(${p.id})">Close</button>
+          <button class="btn btn-danger btn-sm" onclick="closePoll(${p.id}, ${p.status})">Close</button>
         </div>
       </div>
-      <div class="text-sm text-muted mt-2">
+      <div class="text-sm text-gray-400 mt-2">
         ${p.option_count} option(s)
         ${p.deadline ? ' · Deadline: ' + fmtDateTime(p.deadline) : ''}
       </div>
     </div>`).join('');
   }
-
+  let currentResultsPollId = null;
   async function openVote(pollId) {
     currentPollId = pollId;
     // Fetch results to show options
@@ -129,14 +129,15 @@ start_layout('Polls');
       showAlert('#alert-box', res.message);
       return;
     }
+    document.querySelectorAll('[id^="vote-panel-"]').forEach(el => el.remove());
+    currentPollId = pollId;
     const {
       results
     } = res.data;
     const optionsHtml = results.map(o => `
-    <div class="poll-option" onclick="castVote(${o.option_id}, this)">
+    <div class="poll-option text-gray-400" onclick="castVote(${o.option_id}, this)">
       <div style="flex:1"><strong>${escHtml(o.option_text)}</strong></div>
     </div>`).join('');
-    // Simple inline vote UI - inject below polls
     const votePanel = document.createElement('div');
     votePanel.id = 'vote-panel-' + pollId;
     votePanel.className = 'card mt-3';
@@ -165,11 +166,17 @@ start_layout('Polls');
       poll_id: pollId
     });
     const wrap = document.getElementById('results-wrap');
-    wrap.style.display = 'block';
     if (!res.success) {
       wrap.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`;
       return;
     }
+    if (currentResultsPollId === pollId && wrap.style.display === 'block') {
+      wrap.style.display = 'none';
+      currentResultsPollId = null;
+      return;
+    }
+    wrap.style.display = 'block';
+    currentResultsPollId = pollId;
     const {
       results,
       winner_option_id,
@@ -185,11 +192,11 @@ start_layout('Polls');
       const isWinner = r.option_id === winner_option_id;
       return `<div class="mb-3">
         <div class="flex-between mb-1">
-          <span>${isWinner ? '🏆 ' : ''}${escHtml(r.option_text)}</span>
-          <span class="text-sm text-muted">${r.vote_count} vote(s) · ${pct}%</span>
+          <span class="text-gray-400 text-sm">${isWinner ? '🏆 ' : ''}${escHtml(r.option_text)}</span>
+          <span class="text-sm text-gray-500">${r.vote_count} vote(s) · ${pct}%</span>
         </div>
         <div class="poll-bar"><div class="poll-bar-fill" style="width:${pct}%"></div></div>
-        ${r.voters && r.voters.length ? `<div class="text-sm text-muted mt-1">Voters: ${r.voters.map(v => escHtml(v)).join(', ')}</div>` : ''}
+        ${r.voters && r.voters.length ? `<div class="text-sm text-gray-500 mt-1">Voters: ${r.voters.map(v => escHtml(v)).join(', ')}</div>` : ''}
       </div>`;
     }).join('')}
   </div>`;
@@ -198,7 +205,11 @@ start_layout('Polls');
     });
   }
 
-  async function closePoll(pollId) {
+  async function closePoll(pollId, status) {
+    if (status !== 'open') {
+      showAlert('#alert-box', 'This poll is already closed.');
+      return;
+    }
     if (!confirm('Close this poll? Voting will end.')) return;
     const res = await API.post('social', {
       action: 'close_poll',
