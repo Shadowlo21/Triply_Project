@@ -102,7 +102,7 @@ start_layout('Polls');
       <div class="flex-between">
         <div>
           <strong class="text-lg text-white">${escHtml(p.question)}</strong>
-          <span class="badge ${p.status === 'open' ? 'badge-green' : 'badge-gray'} ml-2">${escHtml(p.status)}</span>
+          <span class="badge ${p.status === 'open' ? 'badge-green' : 'badge-red'} ml-2">${escHtml(p.status)}</span>
           ${p.is_anonymous ? '<span class="badge badge-gray ml-1">anonymous</span>' : ''}
         </div>
         <div style="display:flex;gap:6px">

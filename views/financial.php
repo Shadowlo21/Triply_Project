@@ -26,15 +26,15 @@ start_layout('Financial');
 
 <div class="grid-3 mb-4" id="fin-stats" style="display:none">
   <div class="card">
-    <div class="stat-value" id="stat-total">0</div>
+    <div class="stat-value text-gray-400" id="stat-total">0</div>
     <div class="stat-label">Total Spent</div>
   </div>
   <div class="card">
-    <div class="stat-value" id="stat-budget">—</div>
+    <div class="stat-value text-gray-400" id="stat-budget">—</div>
     <div class="stat-label">Budget Limit</div>
   </div>
   <div class="card">
-    <div class="stat-value" id="stat-pct">0%</div>
+    <div class="stat-value text-gray-400" id="stat-pct">0%</div>
     <div class="stat-label">Budget Used</div>
     <div style="height:6px;background:var(--border);border-radius:3px;margin-top:8px">
       <div id="budget-bar" style="height:100%;background:var(--primary);border-radius:3px;width:0%;transition:width .4s"></div>
@@ -76,6 +76,10 @@ start_layout('Financial');
             <option value="accommodation">Accommodation</option>
             <option value="activity">Activity</option>
           </select>
+        </div>
+        <div id="custom-split-wrap" style="display:none">
+          <label class="text-sm text-gray-400">Custom amounts per member</label>
+          <div id="custom-split-items"></div>
         </div>
         <div class="form-group">
           <label>Split</label>
@@ -146,12 +150,12 @@ start_layout('Financial');
       <thead><tr><th>Title</th><th>Amount</th><th>Type</th><th>Paid By</th><th>Splits</th><th>Date</th></tr></thead>
       <tbody>${expenses.map(e => `
         <tr>
-          <td><strong>${escHtml(e.title)}</strong></td>
-          <td>${(e.converted_amount || e.amount).toFixed(2)} ${escHtml(currency)}</td>
+          <td><strong class="text-sm text-gray-600">${escHtml(e.title)}</strong></td>
+          <td class="text-gray-600">${(e.converted_amount || e.amount).toFixed(2)} ${escHtml(currency)}</td>
           <td><span class="badge badge-blue">${escHtml(e.type)}</span></td>
-          <td class="text-sm">${escHtml(e.paid_by_email)}</td>
-          <td class="text-sm">${(e.splits || []).map(s => escHtml(s.email) + ': ' + (s.amount||0).toFixed(2)).join(', ')}</td>
-          <td class="text-sm">${fmtDate(e.created_at)}</td>
+          <td class="text-sm text-gray-600">${escHtml(e.paid_by_email)}</td>
+          <td class="text-sm text-gray-600">${(e.splits || []).map(s => escHtml(s.email) + ': ' + (s.amount||0).toFixed(2)).join(', ')}</td>
+          <td class="text-sm text-gray-600">${fmtDate(e.created_at)}</td>
         </tr>`).join('')}
       </tbody></table></div></div>`;
   }
