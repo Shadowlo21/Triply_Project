@@ -86,6 +86,45 @@ try {
             if (empty($_POST['title']) || empty($_POST['amount'])) {
                 ApiResponse::error('title and amount required.');
             }
+            if ((float)$_POST['amount'] <= 0) ApiResponse::error('Amount must be positive.');
+
+            $splitType = $_POST['split_type'] ?? 'equal';
+            $memberIds = array_map('intval', $_POST['member_ids'] ?? []);
+
+            if (empty($memberIds)) {
+                $tripsDb = Database::getInstance('trips');
+                $stmt    = $tripsDb->prepare('SELECT user_id FROM trip_members WHERE trip_id = ?');
+                $stmt->execute([$tripId]);
+                $memberIds = array_column($stmt->fetchAll(), 'user_id');
+            }
+
+            if (empty($memberIds)) ApiResponse::error('Trip has no members to split with.');
+
+            $splitMap = null;
+            if ($splitType === 'percentage' || $splitType === 'custom') {
+                $values = $splitType === 'percentage'
+                    ? array_map('floatval', $_POST['percentages'] ?? [])
+                    : array_map('floatval', $_POST['amounts'] ?? []);
+
+                if (count($memberIds) !== count($values)) {
+                    ApiResponse::error('member_ids and ' . ($splitType === 'percentage' ? 'percentages' : 'amounts') . ' must have the same length.');
+                }
+
+                if ($splitType === 'custom') {
+                    $sum = array_sum($values);
+                    $amt = (float)$_POST['amount'];
+                    if (abs($sum - $amt) > 0.01) {
+                        ApiResponse::error("Custom amounts must sum to {$amt}, got {$sum}.");
+                    }
+                } else {
+                    $sum = array_sum($values);
+                    if (abs($sum - 100) > 0.01) {
+                        ApiResponse::error("Percentages must sum to 100, got {$sum}.");
+                    }
+                }
+
+                $splitMap = array_combine($memberIds, $values);
+            }
 
             $trip             = Trip::findById($tripId);
             $originalCurrency = $_POST['currency'] ?? $trip->getBaseCurrency();
@@ -105,29 +144,11 @@ try {
                 'type'              => $_POST['type'] ?? 'general',
             ]);
 
+            $expense = Expense::findById($expenseId);
 
-            $expense   = Expense::findById($expenseId);
-            $splitType = $_POST['split_type'] ?? 'equal';
-            $memberIds = array_map('intval', $_POST['member_ids'] ?? []);
-
-            if (empty($memberIds)) {
-
-                $tripsDb = Database::getInstance('trips');
-                $stmt    = $tripsDb->prepare('SELECT user_id FROM trip_members WHERE trip_id = ?');
-                $stmt->execute([$tripId]);
-                $memberIds = array_column($stmt->fetchAll(), 'user_id');
-            }
-
-            match ($splitType) {
-                'equal'      => $expense->splitEqual($memberIds),
-                'percentage' => $expense->splitByPercentage(
-                    array_combine($memberIds, array_map('floatval', $_POST['percentages'] ?? []))
-                ),
-                'custom'     => $expense->splitCustom(
-                    array_combine($memberIds, array_map('floatval', $_POST['amounts'] ?? []))
-                ),
-                default      => $expense->splitEqual($memberIds),
-            };
+            if ($splitType === 'percentage')   $expense->splitByPercentage($splitMap);
+            elseif ($splitType === 'custom')   $expense->splitCustom($splitMap);
+            else                               $expense->splitEqual($memberIds);
 
 
             Notification::checkBudgetThreshold($tripId);
@@ -175,8 +196,9 @@ try {
 
             if (!($user instanceof Member)) ApiResponse::error('Not allowed.');
             $ok = $user->approveSettlement($settlementId);
+            if (!$ok) ApiResponse::error('Settlement not found.', 404);
 
-            ApiResponse::success(null, $ok ? 'Settlement approved.' : 'Failed.');
+            ApiResponse::success(null, 'Settlement approved.');
 
 
         case 'rates':
