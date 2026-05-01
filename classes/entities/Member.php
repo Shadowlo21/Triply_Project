@@ -43,13 +43,7 @@ class Member extends User
         );
         $result = $stmt->execute([$tripId, $target['id']]);
 
-        
-        if ($result && $stmt->rowCount() > 0) {
-            $accountsDb->prepare('UPDATE users SET data = ? WHERE id = ?');
-            
-        }
-
-        return $result;
+        return $result && $stmt->rowCount() > 0;
     }
 
     
@@ -97,24 +91,34 @@ class Member extends User
     
     public function approveSettlement(int $settlementId): bool
     {
-        $db   = Database::getInstance('financial');
+        $db = Database::getInstance('financial');
 
-        
+        $check = $db->prepare('SELECT trip_id FROM settlements WHERE id = ?');
+        $check->execute([$settlementId]);
+        $tripId = $check->fetchColumn();
+        if (!$tripId) return false;
+
         $stmt = $db->prepare(
             'UPDATE expense_splits SET is_settled = 1
              WHERE user_id = ?
-             AND expense_id IN (
-                 SELECT id FROM expenses WHERE trip_id = (
-                     SELECT trip_id FROM settlements WHERE id = ?
-                 )
-             )'
+             AND expense_id IN (SELECT id FROM expenses WHERE trip_id = ?)'
         );
-        return $stmt->execute([$this->id, $settlementId]);
+        return $stmt->execute([$this->id, $tripId]);
     }
 
     
     
     
+    public function isTripLeader(int $tripId): bool
+    {
+        $db = Database::getInstance('trips');
+        $stmt = $db->prepare(
+            'SELECT 1 FROM trip_members WHERE trip_id = ? AND user_id = ? AND role = "leader"'
+        );
+        $stmt->execute([$tripId, $this->id]);
+        return (bool)$stmt->fetchColumn();
+    }
+
     public function getDocuments(int $tripId): array
     {
         $db   = Database::getInstance('documents');

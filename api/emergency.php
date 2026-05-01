@@ -80,9 +80,10 @@ try {
             // Send emergency notification to all members
             $notificationCount = 0;
             foreach ($members as $member) {
-                if ((int)$member['user_id'] !== $user->getId()) {
+                $memberId = (int)$member['id'];
+                if ($memberId !== $user->getId()) {
                     Notification::send(
-                        (int)$member['user_id'],
+                        $memberId,
                         'budget_alert',
                         '🚨 EMERGENCY ALERT from ' . $user->getName() . ' (' . $trip->getTitle() . '): ' . $message
                     );

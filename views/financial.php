@@ -77,16 +77,17 @@ start_layout('Financial');
             <option value="activity">Activity</option>
           </select>
         </div>
-        <div id="custom-split-wrap" style="display:none">
-          <label class="text-sm text-gray-400">Custom amounts per member</label>
-          <div id="custom-split-items"></div>
-        </div>
         <div class="form-group">
           <label>Split</label>
-          <select name="split_type" class="form-control">
+          <select name="split_type" id="split-type" class="form-control" onchange="toggleCustomSplit()">
             <option value="equal">Equal (all members)</option>
             <option value="custom">Custom amounts</option>
           </select>
+        </div>
+        <div id="custom-split-wrap" class="form-group" style="display:none">
+          <label class="text-sm">Custom amount per member</label>
+          <div id="custom-split-items" class="text-sm" style="display:flex;flex-direction:column;gap:6px"></div>
+          <div class="text-sm text-muted mt-1" id="custom-split-sum"></div>
         </div>
         <button type="submit" class="btn btn-primary btn-block" id="btn-add-exp">Add Expense</button>
       </form>
@@ -200,6 +201,44 @@ start_layout('Financial');
     });
   }
 
+  let tripMembersCache = [];
+
+  async function toggleCustomSplit() {
+    const wrap = document.getElementById('custom-split-wrap');
+    const isCustom = document.getElementById('split-type').value === 'custom';
+    wrap.style.display = isCustom ? 'block' : 'none';
+    if (!isCustom) return;
+
+    const tripId = document.getElementById('trip-select').value;
+    if (!tripId) return;
+
+    const res = await API.get('trips', { action: 'members', trip_id: tripId });
+    if (!res.success) { showAlert('#exp-alert', res.message); return; }
+    tripMembersCache = res.data || [];
+
+    const itemsEl = document.getElementById('custom-split-items');
+    itemsEl.innerHTML = tripMembersCache.map(m => `
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="flex:1">${escHtml(m.email)}</span>
+        <input type="number" step="0.01" min="0" value="0"
+               class="form-control custom-amt" data-uid="${m.id}"
+               style="width:110px;margin:0" oninput="updateSplitSum()">
+      </div>`).join('');
+    updateSplitSum();
+  }
+
+  function updateSplitSum() {
+    const total = parseFloat(document.querySelector('[name=amount]').value) || 0;
+    let sum = 0;
+    document.querySelectorAll('.custom-amt').forEach(i => sum += parseFloat(i.value) || 0);
+    const el = document.getElementById('custom-split-sum');
+    const diff = (total - sum).toFixed(2);
+    el.textContent = `Sum: ${sum.toFixed(2)} / ${total.toFixed(2)} (diff: ${diff})`;
+    el.style.color = Math.abs(total - sum) < 0.01 ? 'var(--success)' : 'var(--danger)';
+  }
+
+  document.querySelector('[name=amount]').addEventListener('input', updateSplitSum);
+
   document.getElementById('form-add-expense').addEventListener('submit', async e => {
     e.preventDefault();
     const tripId = document.getElementById('trip-select').value;
@@ -208,21 +247,47 @@ start_layout('Financial');
       return;
     }
     const btn = document.getElementById('btn-add-exp');
-    setLoading(btn, true);
     const fd = new FormData(e.target);
-    const res = await API.post('financial', {
+    const splitType = fd.get('split_type');
+
+    const payload = {
       action: 'add',
       trip_id: tripId,
       title: fd.get('title'),
       amount: fd.get('amount'),
       currency: fd.get('currency'),
       type: fd.get('type'),
-      split_type: fd.get('split_type'),
-    });
+      split_type: splitType,
+    };
+
+    if (splitType === 'custom') {
+      const inputs = [...document.querySelectorAll('.custom-amt')];
+      if (!inputs.length) { showAlert('#exp-alert', 'Open the custom split section first.'); return; }
+      const memberIds = [], amounts = [];
+      let sum = 0;
+      inputs.forEach(i => {
+        memberIds.push(i.dataset.uid);
+        const v = parseFloat(i.value) || 0;
+        amounts.push(v.toFixed(2));
+        sum += v;
+      });
+      const total = parseFloat(fd.get('amount')) || 0;
+      if (Math.abs(sum - total) > 0.01) {
+        showAlert('#exp-alert', `Custom amounts must sum to ${total.toFixed(2)}, got ${sum.toFixed(2)}.`);
+        return;
+      }
+      payload.member_ids = memberIds;
+      payload.amounts = amounts;
+    }
+
+    setLoading(btn, true);
+    const res = await API.post('financial', payload);
     setLoading(btn, false);
     if (res.success) {
       closeModal('modal-add-expense');
       e.target.reset();
+      document.getElementById('custom-split-wrap').style.display = 'none';
+      document.getElementById('custom-split-items').innerHTML = '';
       loadFinancial();
     } else showAlert('#exp-alert', res.message);
   });

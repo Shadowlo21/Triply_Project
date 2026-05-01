@@ -83,8 +83,7 @@ try {
             if (!$user->viewTrip($tripId)) ApiResponse::error('Access denied.', 403);
 
             if (!($user instanceof Member)) ApiResponse::error('Not allowed.');
-            // $ok = $user->inviteUser($email, $tripId);
-            $ok = true;
+            $ok = $user->inviteUser($email, $tripId);
 
             if ($ok) {
                 $trip    = Trip::findById($tripId);
@@ -101,47 +100,47 @@ try {
 
 
         case 'set_permission':
-            if (!($user instanceof TripLeader)) ApiResponse::error('Only trip leaders.', 403);
-
             $tripId  = (int)($_POST['trip_id'] ?? 0);
             $userId  = (int)($_POST['user_id'] ?? 0);
             $canEdit = (int)($_POST['can_edit'] ?? 0);
             if (!$tripId || !$userId) ApiResponse::error('trip_id and user_id required.');
+            if (!($user instanceof Member) || !$user->isTripLeader($tripId)) {
+                ApiResponse::error('Only the leader of this trip can change permissions.', 403);
+            }
 
             $ok = $user->editPermission($tripId, $userId, (bool)$canEdit);
             ApiResponse::success(null, $ok ? 'Permission updated.' : 'Failed.');
 
 
         case 'set_budget':
-            if (!($user instanceof TripLeader)) ApiResponse::error('Only trip leaders.', 403);
-
             $tripId = (int)($_POST['trip_id'] ?? 0);
             $limit  = (float)($_POST['budget_limit'] ?? 0);
             if (!$tripId || $limit <= 0) ApiResponse::error('trip_id and budget_limit required.');
+            if (!($user instanceof Member) || !$user->isTripLeader($tripId)) {
+                ApiResponse::error('Only the leader of this trip can set budget.', 403);
+            }
 
             $ok = $user->setBudgetLimit($tripId, $limit);
             ApiResponse::success(null, $ok ? 'Budget set.' : 'Failed.');
 
 
         case 'close':
-            if (!($user instanceof TripLeader)) ApiResponse::error('Only trip leaders.', 403);
-
             $tripId = (int)($_POST['trip_id'] ?? 0);
             if (!$tripId) ApiResponse::error('trip_id required.');
+            if (!($user instanceof Member) || !$user->isTripLeader($tripId)) {
+                ApiResponse::error('Only the leader of this trip can close it.', 403);
+            }
 
             $ok = $user->closeTrip($tripId);
             ApiResponse::success(null, $ok ? 'Trip settled.' : 'Failed.');
 
         case 'delete':
-            if (!($user instanceof TripLeader)) ApiResponse::error('Only trip leaders can delete trips.', 403);
-
             $tripId = (int)($_POST['trip_id'] ?? 0);
             if (!$tripId) ApiResponse::error('trip_id required.');
-            if (!$user->viewTrip($tripId)) ApiResponse::error('Access denied.', 403);
-
-            $trip = Trip::findById($tripId);
-            if ($trip->getCreatedBy() !== $user->getId() && $user->getRole() !== 'admin') {
-                ApiResponse::error('Only the trip creator or admin can delete.', 403);
+            $isAdmin = $user->getRole() === 'admin';
+            $isTripLeader = $user instanceof Member && $user->isTripLeader($tripId);
+            if (!$isAdmin && !$isTripLeader) {
+                ApiResponse::error('Only the leader of this trip or an admin can delete it.', 403);
             }
 
             Database::getInstance('trips')
@@ -151,15 +150,15 @@ try {
             ApiResponse::success(null, 'Trip deleted.');
 
         case 'update_status':
-            if (!($user instanceof TripLeader)) ApiResponse::error('Only trip leaders.', 403);
-
             $tripId = (int)($_POST['trip_id'] ?? 0);
+            if (!$tripId) ApiResponse::error('trip_id required.');
+            if (!($user instanceof Member) || !$user->isTripLeader($tripId)) {
+                ApiResponse::error('Only the leader of this trip can update status.', 403);
+            }
+
             $status = $_POST['status'] ?? '';
             $validStatuses = ['planning', 'active', 'completed', 'settled'];
-
-            if (!$tripId) ApiResponse::error('trip_id required.');
             if (!in_array($status, $validStatuses)) ApiResponse::error('Invalid status.');
-            if (!$user->viewTrip($tripId)) ApiResponse::error('Access denied.', 403);
 
             Database::getInstance('trips')
                 ->prepare('UPDATE trips SET status = ? WHERE id = ?')
