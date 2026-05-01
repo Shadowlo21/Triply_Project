@@ -87,7 +87,7 @@ start_layout('Financial');
         <div id="custom-split-wrap" class="form-group" style="display:none">
           <label class="text-sm">Custom amount per member</label>
           <div id="custom-split-items" class="text-sm" style="display:flex;flex-direction:column;gap:6px"></div>
-          <div class="text-sm text-muted mt-1" id="custom-split-sum"></div>
+          <div class="text-sm text-gray-400 mt-1" id="custom-split-sum"></div>
         </div>
         <button type="submit" class="btn btn-primary btn-block" id="btn-add-exp">Add Expense</button>
       </form>
@@ -212,8 +212,14 @@ start_layout('Financial');
     const tripId = document.getElementById('trip-select').value;
     if (!tripId) return;
 
-    const res = await API.get('trips', { action: 'members', trip_id: tripId });
-    if (!res.success) { showAlert('#exp-alert', res.message); return; }
+    const res = await API.get('trips', {
+      action: 'members',
+      trip_id: tripId
+    });
+    if (!res.success) {
+      showAlert('#exp-alert', res.message);
+      return;
+    }
     tripMembersCache = res.data || [];
 
     const itemsEl = document.getElementById('custom-split-items');
@@ -262,8 +268,12 @@ start_layout('Financial');
 
     if (splitType === 'custom') {
       const inputs = [...document.querySelectorAll('.custom-amt')];
-      if (!inputs.length) { showAlert('#exp-alert', 'Open the custom split section first.'); return; }
-      const memberIds = [], amounts = [];
+      if (!inputs.length) {
+        showAlert('#exp-alert', 'Open the custom split section first.');
+        return;
+      }
+      const memberIds = [],
+        amounts = [];
       let sum = 0;
       inputs.forEach(i => {
         memberIds.push(i.dataset.uid);

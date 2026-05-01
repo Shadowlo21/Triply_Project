@@ -18,8 +18,8 @@ start_layout('Documents');
     </select>
   </div>
   <div style="display:flex;gap:8px">
-    <button class="btn btn-secondary btn-sm" onclick="openModal('modal-visa')">Visa Check</button>
-    <button class="btn btn-primary" onclick="openModal('modal-upload')">+ Upload Doc</button>
+    <button class="btn btn-secondary btn-sm text-base" style="padding: 0.5rem 1rem; margin-right: 0.5rem;" onclick="openModal('modal-visa')">Visa Check</button>
+    <button class="btn btn-primary" style="margin-left: 0;" onclick=" openModal('modal-upload')">+ Upload Doc</button>
   </div>
 </div>
 
@@ -35,7 +35,7 @@ start_layout('Documents');
       <form id="form-upload">
         <div class="form-group">
           <label>Document Type</label>
-          <select name="type" class="form-control">
+          <select name="type" class="form-control text-base">
             <option value="passport">Passport</option>
             <option value="ticket">Ticket</option>
             <option value="visa">Visa</option>
@@ -45,12 +45,12 @@ start_layout('Documents');
         </div>
         <div class="form-group">
           <label>Visibility</label>
-          <select name="visibility" class="form-control">
+          <select name="visibility" class="form-control text-base">
             <option value="private">Private (only me + leader)</option>
             <option value="group">Group (all members)</option>
           </select>
         </div>
-        <div class="form-group"><label>File (PDF or Image, max 10 MB)</label><input type="file" name="file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" required></div>
+        <div class="form-group"><label>File (PDF or Image, max 10 MB)</label><input type="file" name="file" style="padding: 0.5rem 1rem;" class="form-control text-base" accept=".pdf,.jpg,.jpeg,.png" required></div>
         <button type="submit" class="btn btn-primary btn-block" id="btn-upload">Upload</button>
       </form>
     </div>
@@ -93,62 +93,44 @@ start_layout('Documents');
   }
 
   async function loadDocuments() {
-  const tripId = document.getElementById('trip-select').value;
-  if (!tripId) return;
-  const res = await API.get('documents', {
-    action: 'list',
-    trip_id: tripId
-  });
-  const wrap = document.getElementById('docs-wrap');
-  if (!res.success) {
-    wrap.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`;
-    return;
-  }
-  const docs = res.data || [];
-  if (!docs.length) {
-    wrap.innerHTML = '<div class="card empty-state"><div class="icon">📁</div>No documents yet. Upload one!</div>';
-    return;
-  }
-  const typeIcons = {
-    passport: '🛂',
-    ticket: '🎫',
-    visa: '📋',
-    insurance: '🛡',
-    other: '📄'
-  };
-  wrap.innerHTML = `<div class="card"><div class="table-wrap"><table>
-      <thead><tr><th>File</th><th>Type</th><th>Visibility</th><th>Actions</th></tr></thead>
-      <tbody>${docs.map(d => {
+    const tripId = document.getElementById('trip-select').value;
+    if (!tripId) return;
+    const res = await API.get('documents', {
+      action: 'list',
+      trip_id: tripId
+    });
+    const wrap = document.getElementById('docs-wrap');
+    if (!res.success) {
+      wrap.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`;
+      return;
+    }
+    const docs = res.data || [];
+    if (!docs.length) {
+      wrap.innerHTML = '<div class="card empty-state"><div class="icon">📁</div>No documents yet. Upload one!</div>';
+      return;
+    }
+    const typeIcons = {
+      passport: '🛂',
+      ticket: '🎫',
+      visa: '📋',
+      insurance: '🛡',
+      other: '📄'
+    };
+    wrap.innerHTML = '<div class="card"><div class="table-wrap"><table>' +
+      '<thead><tr><th>File</th><th>Type</th><th>Visibility</th><th>Actions</th></tr></thead>' +
+      '<tbody>' + docs.map(d => {
         const meta = d.metadata || {};
         const icon = typeIcons[d.type] || '📄';
-        return ` < tr >
-    <
-    td > $ {
-      icon
-    }
-  $ {
-    escHtml(meta.original_name || 'Document #' + d.id)
-  } < /td> <
-  td > < span class = "badge badge-blue" > $ {
-      escHtml(d.type)
-    } < /span></td >
-    <
-    td > < span class = "badge ${d.visibility === 'private' ? 'badge-gray' : 'badge-green'}" > $ {
-      escHtml(d.visibility)
-    } < /span></td >
-    <
-    td >
-    <
-    a href = "/api/documents.php?action=download&doc_id=${d.id}"
-  class = "btn btn-secondary btn-sm"
-  target = "_blank" > ⬇Download < /a> <
-  button class = "btn btn-danger btn-sm"
-  onclick = "deleteDoc(${d.id})" > Delete < /button> < /
-    td > <
-    /tr>`;
-  }).join('')
-  } < /tbody> < /
-  table > < /div > < /div > `;
+        return '<tr>' +
+          '<td class="text-gray-400">' + icon + ' ' + escHtml(meta.original_name || 'Document #' + d.id) + '</td>' +
+          '<td><span class="badge badge-blue">' + escHtml(d.type) + '</span></td>' +
+          '<td><span class="badge ' + (d.visibility === 'private' ? 'badge-gray' : 'badge-green') + '">' + escHtml(d.visibility) + '</span></td>' +
+          '<td>' +
+          '<a href="/api/documents.php?action=download&doc_id=' + d.id + '" class="btn btn-secondary btn-sm" target="_blank" style="margin-right: 1rem;">⬇ Download</a>' +
+          '<button class="btn btn-danger btn-sm" onclick="deleteDoc(' + d.id + ')">Delete</button>' +
+          '</td>' +
+          '</tr>';
+      }).join('') + '</tbody></table></div></div>';
   }
 
   document.getElementById('form-upload').addEventListener('submit', async e => {
@@ -197,18 +179,16 @@ start_layout('Documents');
     const resultEl = document.getElementById('visa-result');
     if (res.success) {
       const d = res.data;
-      resultEl.innerHTML = ` < div class = "alert ${d.visa_required ? 'alert-error' : 'alert-success'}" >
-    <
-    strong > $ {
-      d.visa_required ? '🔴 Visa Required' : '🟢 No Visa Required'
-    } < /strong><br>
-  $ {
-    escHtml(d.note)
-  } <
-  /div>`;
-  } else {
-    resultEl.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`;
-  }
+      resultEl.innerHTML = '';
+      resultEl.appendChild(buildAlert(
+        d.visa_required ? 'alert-error' : 'alert-success',
+        d.visa_required ? '🔴 Visa Required' : '🟢 No Visa Required',
+        d.note
+      ));
+    } else {
+      resultEl.innerHTML = '';
+      resultEl.appendChild(buildAlert('alert-error', '❌ Error', res.message));
+    }
   }
 
   loadTrips();

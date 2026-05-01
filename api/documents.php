@@ -8,13 +8,13 @@ $action = $_POST['action'] ?? $_GET['action'] ?? '';
 try {
     switch ($action) {
 
-        
+
         case 'list':
             $tripId = (int)($_GET['trip_id'] ?? 0);
             if (!$tripId) ApiResponse::error('trip_id required.');
             if (!$user->viewTrip($tripId)) ApiResponse::error('Access denied.', 403);
 
-            
+
             if ($user instanceof TripLeader) {
                 $docs = Document::findByTrip($tripId);
             } else {
@@ -25,13 +25,13 @@ try {
                 'id'          => $d->getId(),
                 'type'        => $d->getType(),
                 'visibility'  => $d->getVisibility(),
-                'metadata'    => $d->getMetadata(),   
+                'metadata'    => $d->getMetadata(),
                 'uploaded_at' => '',
             ], $docs);
 
             ApiResponse::success($result);
 
-        
+
         case 'upload':
             $tripId     = (int)($_POST['trip_id'] ?? 0);
             $type       = $_POST['type']       ?? 'other';
@@ -42,13 +42,14 @@ try {
             if (empty($_FILES['file'])) ApiResponse::error('No file uploaded.');
             if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) ApiResponse::error('Upload error.');
 
-            
+
             if ($_FILES['file']['size'] > 10 * 1024 * 1024) {
                 ApiResponse::error('File too large. Max 10 MB.');
             }
 
-            $allowed = ['application/pdf','image/jpeg','image/png','image/jpg'];
-            $mime    = mime_content_type($_FILES['file']['tmp_name']);
+            $allowed = ['application/pdf', 'image/jpeg', 'image/png'];
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mime    = $finfo->file($_FILES['file']['tmp_name']);
             if (!in_array($mime, $allowed)) {
                 ApiResponse::error('Only PDF and images allowed.');
             }
@@ -64,7 +65,7 @@ try {
 
             ApiResponse::success(['doc_id' => $doc->getId()], 'Document uploaded.');
 
-        
+
         case 'download':
             $docId = (int)($_GET['doc_id'] ?? 0);
             if (!$docId) ApiResponse::error('doc_id required.');
@@ -77,7 +78,7 @@ try {
 
             $doc = new Document($docRow);
 
-            
+
             $tripsDb   = Database::getInstance('trips');
             $memberRow = $tripsDb->prepare(
                 'SELECT role FROM trip_members WHERE trip_id = ? AND user_id = ?'
@@ -99,7 +100,7 @@ try {
             echo $bytes;
             exit;
 
-        
+
         case 'delete':
             $docId = (int)($_POST['doc_id'] ?? 0);
             if (!$docId) ApiResponse::error('doc_id required.');
@@ -110,7 +111,7 @@ try {
             $docRow = $row->fetch();
             if (!$docRow) ApiResponse::error('Document not found.', 404);
 
-            
+
             if ((int)$docRow['user_id'] !== $user->getId() && !($user instanceof TripLeader)) {
                 ApiResponse::error('Access denied.', 403);
             }
@@ -119,8 +120,8 @@ try {
             $doc->delete();
             ApiResponse::success(null, 'Document deleted.');
 
-        
-        
+
+
         case 'visa_check':
             $nationality = strtoupper(trim($_GET['nationality'] ?? ''));
             $destination = strtoupper(trim($_GET['destination'] ?? ''));
@@ -128,10 +129,10 @@ try {
                 ApiResponse::error('nationality and destination required.');
             }
 
-            
+
             $rules = [
-                'EG' => ['US','GB','DE','FR','IT','CA','AU','JP','CN','KR'],  
-                'US' => [],       
+                'EG' => ['US', 'GB', 'DE', 'FR', 'IT', 'CA', 'AU', 'JP', 'CN', 'KR'],
+                'US' => [],
                 'GB' => ['CN'],
             ];
 
@@ -152,4 +153,3 @@ try {
 } catch (\Throwable $e) {
     ApiResponse::error($e->getMessage());
 }
-

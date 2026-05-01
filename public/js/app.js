@@ -134,6 +134,13 @@ async function markAllRead() {
   loadNotifications();
 }
 
+function buildAlert(className, title, message) {
+  const div = document.createElement('div');
+  div.className = `alert ${className}`;
+  div.innerHTML = `<strong>${escHtml(title)}</strong>${message ? '<br>' + escHtml(message) : ''}`;
+  return div;
+}
+
 function toggleNotifDropdown() {
   const dd = document.getElementById('notif-dropdown');
   if (!dd) return;
@@ -150,7 +157,7 @@ document.addEventListener('click', e => {
   }
 });
 
-// Active sidebar linkVDVD
+// Active sidebar link
 document.addEventListener('DOMContentLoaded', () => {
   const page = new URLSearchParams(location.search).get('page') || 'dashboard';
   document.querySelectorAll('.triply-navlink, .sidebar nav a').forEach(a => {
