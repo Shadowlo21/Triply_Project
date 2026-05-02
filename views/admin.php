@@ -13,19 +13,19 @@ start_layout('Admin Panel');
 
 <div class="grid-4 mb-4" id="admin-stats">
   <div class="card">
-    <div class="stat-value" id="s-users">—</div>
+    <div class="stat-value text-gray-500" id="s-users">—</div>
     <div class="stat-label">Total Users</div>
   </div>
   <div class="card">
-    <div class="stat-value" id="s-trips">—</div>
+    <div class="stat-value text-gray-500" id="s-trips">—</div>
     <div class="stat-label">Total Trips</div>
   </div>
   <div class="card">
-    <div class="stat-value" id="s-expenses">—</div>
+    <div class="stat-value text-gray-500" id="s-expenses">—</div>
     <div class="stat-label">Expenses Logged</div>
   </div>
   <div class="card">
-    <div class="stat-value" id="s-polls">—</div>
+    <div class="stat-value text-gray-500" id="s-polls">—</div>
     <div class="stat-label">Polls Created</div>
   </div>
 </div>
@@ -140,9 +140,9 @@ start_layout('Admin Panel');
     <thead><tr><th>Email</th><th>Role</th><th>Joined</th><th></th></tr></thead>
     <tbody>${users.map(u => `
       <tr>
-        <td>${escHtml(u.email)}</td>
+        <td class="text-gray-400">${escHtml(u.email)}</td>
         <td><span class="badge ${roleColor[u.role] || 'badge-gray'}">${escHtml(u.role)}</span></td>
-        <td class="text-sm">${fmtDate(u.created_at)}</td>
+        <td class="text-sm text-gray-500">${fmtDate(u.created_at)}</td>
         <td style="display:flex;gap:4px;flex-wrap:wrap">
           ${u.id !== currentAdminId ? `
             <select class="form-control" style="width:90px;padding:2px 4px;font-size:12px" onchange="setRole(${u.id}, this)">
@@ -151,7 +151,7 @@ start_layout('Admin Panel');
               <option value="admin"  ${u.role==='admin' ?'selected':''}>admin</option>
             </select>
             <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id},'${escHtml(u.email)}')">Del</button>
-          ` : '<span class="text-muted text-sm text-gray-600">(you)</span>'}
+          ` : '<span class="text-gray-500 text-sm">(you)</span>'}
         </td>
       </tr>`).join('')}
     </tbody></table></div>`;
@@ -199,10 +199,10 @@ start_layout('Admin Panel');
     <thead><tr><th>Title</th><th>Dest</th><th>Status</th><th>Created</th></tr></thead>
     <tbody>${trips.map(t => `
       <tr>
-        <td><strong>${escHtml(t.title)}</strong></td>
-        <td>${escHtml(t.destination)}</td>
+        <td class="text-gray-400"><strong>${escHtml(t.title)}</strong></td>
+        <td class="text-gray-400">${escHtml(t.destination)}</td>
         <td><span class="badge ${t.status === 'active' ? 'badge-green' : 'badge-gray'}">${escHtml(t.status)}</span></td>
-        <td class="text-sm">${fmtDate(t.created_at)}</td>
+        <td class="text-sm text-gray-400">${fmtDate(t.created_at)}</td>
       </tr>`).join('')}
     </tbody></table></div>`;
   }
@@ -220,9 +220,9 @@ start_layout('Admin Panel');
     <thead><tr><th>User</th><th>Expires</th><th>Created</th></tr></thead>
     <tbody>${res.data.map(s => `
       <tr>
-        <td>${escHtml(s.email || s.user_id)}</td>
-        <td class="text-sm">${fmtDateTime(s.expires_at)}</td>
-        <td class="text-sm">${fmtDateTime(s.created_at)}</td>
+        <td class="text-gray-400">${escHtml(s.email || s.user_id)}</td>
+        <td class="text-sm text-gray-400">${fmtDateTime(s.expires_at)}</td>
+        <td class="text-sm text-gray-400">${fmtDateTime(s.created_at)}</td>
       </tr>`).join('')}
     </tbody></table></div>`;
   }

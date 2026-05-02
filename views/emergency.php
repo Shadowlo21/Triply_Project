@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Emergency Page
  * Emergency contact broadcaster for trip members
@@ -46,24 +47,24 @@ start_layout('Emergency');
   <div class="card">
     <div class="card-header">
       <h3>Emergency Broadcast</h3>
-      <span class="badge badge-red">Trip Leaders Only</span>
+      <span class="badge badge-red mb-1">Trip Leaders Only</span>
     </div>
     <div class="card-body">
       <div id="broadcast-alert"></div>
-      <p class="text-muted mb-3">Send an emergency alert to all members of a trip. Use only in real emergencies.</p>
-      
+      <p class="text-gray-500 mb-3">Send an emergency alert to all members of a trip. Use only in real emergencies.</p>
+
       <div class="form-group">
         <label>Select Trip</label>
         <select id="broadcast-trip" class="form-control">
           <option value="">— Select a trip —</option>
         </select>
       </div>
-      
+
       <div class="form-group">
         <label>Emergency Message</label>
         <textarea id="broadcast-message" class="form-control" rows="4" placeholder="Enter emergency details... This will be sent to all trip members immediately."></textarea>
       </div>
-      
+
       <button class="btn btn-danger btn-block" id="btn-broadcast" onclick="sendBroadcast()">
         <i class="fa-solid fa-triangle-exclamation"></i> Send Emergency Alert
       </button>
@@ -84,7 +85,9 @@ start_layout('Emergency');
 
 <script>
   async function loadTrips() {
-    const res = await API.get('trips', { action: 'list' });
+    const res = await API.get('trips', {
+      action: 'list'
+    });
     const sel = document.getElementById('broadcast-trip');
     (res.data || []).forEach(t => {
       const opt = document.createElement('option');
@@ -96,7 +99,9 @@ start_layout('Emergency');
   }
 
   async function loadEmergencyContact() {
-    const res = await API.get('emergency', { action: 'get_contact' });
+    const res = await API.get('emergency', {
+      action: 'get_contact'
+    });
     if (res.success && res.data) {
       const data = res.data;
       document.getElementById('emergency-name').value = data.emergency_name || '';
@@ -123,7 +128,7 @@ start_layout('Emergency');
   async function sendBroadcast() {
     const tripId = document.getElementById('broadcast-trip').value;
     const message = document.getElementById('broadcast-message').value.trim();
-    
+
     if (!tripId) {
       showAlert('#broadcast-alert', 'Please select a trip.', 'error');
       return;
@@ -132,11 +137,11 @@ start_layout('Emergency');
       showAlert('#broadcast-alert', 'Please enter an emergency message.', 'error');
       return;
     }
-    
+
     if (!confirm('WARNING: This will send an emergency alert to ALL trip members. Are you sure?')) {
       return;
     }
-    
+
     const btn = document.getElementById('btn-broadcast');
     setLoading(btn, true);
     const res = await API.post('emergency', {
@@ -154,23 +159,25 @@ start_layout('Emergency');
   async function loadTripEmergencyContacts() {
     const tripId = document.getElementById('broadcast-trip').value;
     if (!tripId) return;
-    
-    // Get trip members and their emergency contacts
-    const res = await API.get('trips', { action: 'members', trip_id: tripId });
+
+    const res = await API.get('trips', {
+      action: 'members',
+      trip_id: tripId
+    });
     const wrap = document.getElementById('trip-contacts-list');
-    
+
     if (!res.success || !res.data.length) {
       wrap.innerHTML = '<div class="card empty-state"><div class="icon">👥</div>No members found.</div>';
       return;
     }
-    
+
     wrap.innerHTML = `<div class="card"><div class="table-wrap"><table>
       <thead><tr><th>Member</th><th>Role</th><th>Emergency Contact</th></tr></thead>
       <tbody>${res.data.map(m => `
         <tr>
-          <td>${escHtml(m.email)}</td>
+          <td class="text-sm text-gray-400">${escHtml(m.email)}</td>
           <td><span class="badge ${m.trip_role === 'leader' ? 'badge-blue' : 'badge-gray'}">${escHtml(m.trip_role)}</span></td>
-          <td class="text-sm text-muted">Contact info available in profile</td>
+          <td class="text-sm text-gray-400">Contact info available in profile</td>
         </tr>
       `).join('')}</tbody>
     </table></div></div>`;

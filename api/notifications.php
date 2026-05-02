@@ -8,15 +8,9 @@ $action = $_POST['action'] ?? $_GET['action'] ?? '';
 try {
     switch ($action) {
 
-        /**
-         * Get all unread notifications for the user
-         */
         case 'list':
             ApiResponse::success(Notification::getUnread($user->getId()));
 
-        /**
-         * Get unread notification count
-         */
         case 'unread_count':
             $stmt = Database::getInstance('trips')
                 ->prepare('SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0');

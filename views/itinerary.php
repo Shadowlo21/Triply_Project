@@ -125,13 +125,13 @@ start_layout('Itinerary');
     const statusBadge = {
       confirmed: 'badge-green',
       draft: 'badge-yellow',
-      cancelled: 'badge-gray'
+      cancelled: 'badge-red'
     };
     wrap.innerHTML = `<div class="card"><div class="timeline">${acts.map(a => `
     <div class="timeline-item">
       <div class="timeline-dot ${a.status}"></div>
       <div class="card" style="margin-left:4px;padding:14px">
-        <div class="flex-between">
+        <div class="flex-between text-gray-400">
           <div>
             <strong>${escHtml(a.title)}</strong>
             <span class="badge ${statusBadge[a.status] || 'badge-gray'} ml-2">${escHtml(a.status)}</span>
@@ -142,7 +142,7 @@ start_layout('Itinerary');
             <button class="btn btn-secondary btn-sm" onclick="rsvp(${a.id}, 'out')">❌ Out</button>
           </div>
         </div>
-        <div class="text-sm text-muted mt-2">
+        <div class="text-sm mt-2 text-gray-500">
           📍 ${escHtml(a.location || '—')} &nbsp;·&nbsp; 🕐 ${fmtDateTime(a.datetime)}
           &nbsp;·&nbsp; ${a.duration_min} min &nbsp;·&nbsp; ${escHtml(a.transport_mode || '')}
         </div>
@@ -253,13 +253,13 @@ start_layout('Itinerary');
     });
     const el = document.getElementById('comments-list');
     if (!res.success || !res.data.length) {
-      el.innerHTML = '<p class="text-muted">No comments yet.</p>';
+      el.innerHTML = '<p class="text-gray-600">No comments yet.</p>';
       return;
     }
     el.innerHTML = res.data.map(c => `
     <div style="padding:8px 0;border-bottom:1px solid var(--border)">
-      <strong>${escHtml(c.email)}</strong> <span class="text-sm text-muted">${fmtDateTime(c.created_at)}</span>
-      <p>${escHtml(c.content)}</p>
+      <strong>${escHtml(c.email)}</strong> <span class="text-sm text-gray-500 ml-1">${fmtDateTime(c.created_at)}</span>
+      <p class="ml-2 text-gray-300"> - ${escHtml(c.content)}</p>
     </div>`).join('');
   }
 

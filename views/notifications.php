@@ -1,8 +1,4 @@
 <?php
-/**
- * Notifications Page
- * Full notifications page listing all notifications for the user
- */
 
 require_once __DIR__ . '/../config/bootstrap.php';
 $currentUser = Auth::current();
@@ -30,7 +26,9 @@ start_layout('Notifications');
 
 <script>
   async function loadAllNotifications() {
-    const res = await API.get('notifications', { action: 'list' });
+    const res = await API.get('notifications', {
+      action: 'list'
+    });
     const list = document.getElementById('notifications-list');
     if (!res.success) {
       list.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`;
@@ -45,17 +43,20 @@ start_layout('Notifications');
       <div class="notification-item ${n.is_read ? 'read' : 'unread'}" data-id="${n.id}" style="padding: 16px; border-bottom: 1px solid var(--border); ${!n.is_read ? 'background: rgba(168, 85, 247, 0.05);' : ''}">
         <div class="flex-between">
           <div style="flex: 1;">
-            <div>${escHtml(n.message)}</div>
-            <div class="text-sm text-muted mt-1">${fmtDateTime(n.created_at)}</div>
+            <div class="text-gray-300">${escHtml(n.message)}</div>
+            <div class="text-sm text-gray-500 mt-2">${fmtDateTime(n.created_at)}</div>
           </div>
-          ${!n.is_read ? `<button class="btn btn-secondary btn-sm" onclick="markNotificationRead(${n.id})">Mark Read</button>` : ''}
+          ${!n.is_read ? `<button class="btn btn-primary btn-sm ml-2" onclick="markNotificationRead(${n.id})">Mark Read</button>` : ''}
         </div>
       </div>
     `).join('');
   }
 
   async function markNotificationRead(id) {
-    const res = await API.post('notifications', { action: 'read', id });
+    const res = await API.post('notifications', {
+      action: 'read',
+      id
+    });
     if (res.success) {
       const el = document.querySelector(`[data-id="${id}"]`);
       if (el) {
@@ -65,16 +66,18 @@ start_layout('Notifications');
         const btn = el.querySelector('button');
         if (btn) btn.remove();
       }
-      loadNotifications(); // Refresh navbar badge
+      loadNotifications();
     }
   }
 
   async function markAllRead() {
-    const res = await API.post('notifications', { action: 'read_all' });
+    const res = await API.post('notifications', {
+      action: 'read_all'
+    });
     showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
     if (res.success) {
       loadAllNotifications();
-      loadNotifications(); // Refresh navbar badge
+      loadNotifications();
     }
   }
 
