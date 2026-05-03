@@ -2,6 +2,51 @@
 
 require_once __DIR__ . '/../config/bootstrap.php';
 
+function checkFileUpload(string $field): void {
+    $phpErrors = [
+        UPLOAD_ERR_INI_SIZE   => 'File exceeds server upload limit.',
+        UPLOAD_ERR_FORM_SIZE  => 'File exceeds form size limit.',
+        UPLOAD_ERR_PARTIAL    => 'File was only partially uploaded.',
+        UPLOAD_ERR_NO_FILE    => 'No file was uploaded.',
+        UPLOAD_ERR_NO_TMP_DIR => 'Server missing temporary folder.',
+        UPLOAD_ERR_CANT_WRITE => 'Server failed to write file to disk.',
+        UPLOAD_ERR_EXTENSION  => 'Upload blocked by server extension.',
+    ];
+    if (empty($_FILES[$field])) ApiResponse::error('No file received.');
+    $code = $_FILES[$field]['error'];
+    if ($code !== UPLOAD_ERR_OK) {
+        ApiResponse::error($phpErrors[$code] ?? "Upload failed (error code {$code}).");
+    }
+}
+
+// Whitelist-only MIME + extension check (both must match — prevents renamed exe etc.)
+function validateDocFile(string $field): void {
+    $allowedMap = [
+        'pdf'  => ['application/pdf'],
+        'jpg'  => ['image/jpeg'],
+        'jpeg' => ['image/jpeg'],
+        'png'  => ['image/png'],
+        'docx' => [
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/zip', // finfo sometimes returns this for .docx
+        ],
+    ];
+
+    $originalName = $_FILES[$field]['name'] ?? '';
+    $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+
+    if (!isset($allowedMap[$ext])) {
+        ApiResponse::error('Only PDF, JPG, PNG, and DOCX files are allowed.');
+    }
+
+    $finfo = new finfo(FILEINFO_MIME_TYPE);
+    $mime  = $finfo->file($_FILES[$field]['tmp_name']);
+
+    if (!in_array($mime, $allowedMap[$ext])) {
+        ApiResponse::error('File content does not match its extension. Upload rejected.');
+    }
+}
+
 $user   = Auth::require();
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
@@ -13,7 +58,6 @@ try {
             $tripId = (int)($_GET['trip_id'] ?? 0);
             if (!$tripId) ApiResponse::error('trip_id required.');
             if (!$user->viewTrip($tripId)) ApiResponse::error('Access denied.', 403);
-
 
             if ($user instanceof TripLeader) {
                 $docs = Document::findByTrip($tripId);
@@ -40,20 +84,13 @@ try {
 
             if (!$tripId) ApiResponse::error('trip_id required.');
             if (!$user->viewTrip($tripId)) ApiResponse::error('Access denied.', 403);
-            if (empty($_FILES['file'])) ApiResponse::error('No file uploaded.');
-            if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) ApiResponse::error('Upload error.');
-
+            checkFileUpload('file');
 
             if ($_FILES['file']['size'] > 10 * 1024 * 1024) {
                 ApiResponse::error('File too large. Max 10 MB.');
             }
 
-            $allowed = ['application/pdf', 'image/jpeg', 'image/png'];
-            $finfo = new finfo(FILEINFO_MIME_TYPE);
-            $mime    = $finfo->file($_FILES['file']['tmp_name']);
-            if (!in_array($mime, $allowed)) {
-                ApiResponse::error('Only PDF and images allowed.');
-            }
+            validateDocFile('file');
 
             $doc = Document::upload(
                 $user->getId(),
@@ -79,7 +116,6 @@ try {
 
             $doc = new Document($docRow);
 
-
             $tripsDb   = Database::getInstance('trips');
             $memberRow = $tripsDb->prepare(
                 'SELECT role FROM trip_members WHERE trip_id = ? AND user_id = ?'
@@ -95,8 +131,68 @@ try {
             $meta     = $doc->getMetadata();
             $filename = $meta['original_name'] ?? ('document_' . $docId);
 
-            header('Content-Type: application/octet-stream');
-            header('Content-Disposition: attachment; filename="' . addslashes($filename) . '"');
+            $ext      = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+            $mimeMap  = [
+                'pdf'  => 'application/pdf',
+                'jpg'  => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'png'  => 'image/png',
+                'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            ];
+            $ct = $mimeMap[$ext] ?? 'application/octet-stream';
+            $inline = in_array($ext, ['pdf', 'jpg', 'jpeg', 'png']);
+
+            header('Content-Type: ' . $ct);
+            header('Content-Disposition: ' . ($inline ? 'inline' : 'attachment') . '; filename="' . addslashes($filename) . '"');
+            header('Content-Length: ' . strlen($bytes));
+            echo $bytes;
+            exit;
+
+
+        case 'download_profile':
+            $docId = (int)($_GET['doc_id'] ?? 0);
+            if (!$docId) ApiResponse::error('doc_id required.');
+
+            $docsDb = Database::getInstance('documents');
+            $row    = $docsDb->prepare('SELECT * FROM profile_documents WHERE id = ?');
+            $row->execute([$docId]);
+            $docRow = $row->fetch();
+            if (!$docRow) ApiResponse::error('Document not found.', 404);
+
+            // Only owner, admins, or leaders may download
+            $isOwner  = (int)$docRow['user_id'] === $user->getId();
+            $isAdmin  = $user->getRole() === 'admin';
+            $isLeader = $user->getRole() === 'leader';
+            if (!$isOwner && !$isAdmin && !$isLeader) {
+                ApiResponse::error('Access denied.', 403);
+            }
+
+            // Decrypt using the document owner's key
+            $ownerId    = (int)$docRow['user_id'];
+            $uploadDir  = __DIR__ . '/../public/uploads/';
+            $raw        = file_get_contents($uploadDir . $docRow['stored_name']);
+            if ($raw === false) ApiResponse::error('File not found on disk.', 404);
+
+            $bytes = Encryption::decryptFile($raw, $ownerId);
+            $meta  = [];
+            if ($docRow['metadata']) {
+                try { $meta = Encryption::decryptJson($docRow['metadata'], $ownerId); } catch (\Throwable $ignored) {}
+            }
+            $filename = $meta['original_name'] ?? ('profile_doc_' . $docId);
+
+            $ext     = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+            $mimeMap = [
+                'pdf'  => 'application/pdf',
+                'jpg'  => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'png'  => 'image/png',
+                'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            ];
+            $ct     = $mimeMap[$ext] ?? 'application/octet-stream';
+            $inline = in_array($ext, ['pdf', 'jpg', 'jpeg', 'png']);
+
+            header('Content-Type: ' . $ct);
+            header('Content-Disposition: ' . ($inline ? 'inline' : 'attachment') . '; filename="' . addslashes($filename) . '"');
             header('Content-Length: ' . strlen($bytes));
             echo $bytes;
             exit;
@@ -112,7 +208,6 @@ try {
             $docRow = $row->fetch();
             if (!$docRow) ApiResponse::error('Document not found.', 404);
 
-
             if ((int)$docRow['user_id'] !== $user->getId() && !($user instanceof TripLeader)) {
                 ApiResponse::error('Access denied.', 403);
             }
@@ -120,7 +215,6 @@ try {
             $doc = new Document($docRow);
             $doc->delete();
             ApiResponse::success(null, 'Document deleted.');
-
 
 
         case 'list_profile':
@@ -132,15 +226,10 @@ try {
             if (!in_array($type, ['passport', 'national_id', 'license', 'other'])) {
                 ApiResponse::error('Invalid document type.');
             }
-            if (empty($_FILES['file'])) ApiResponse::error('No file uploaded.');
-            if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) ApiResponse::error('Upload error.');
+            checkFileUpload('file');
             if ($_FILES['file']['size'] > 10 * 1024 * 1024) ApiResponse::error('File too large. Max 10 MB.');
 
-            $finfo = new finfo(FILEINFO_MIME_TYPE);
-            $mime  = $finfo->file($_FILES['file']['tmp_name']);
-            if (!in_array($mime, ['application/pdf', 'image/jpeg', 'image/png'])) {
-                ApiResponse::error('Only PDF and images allowed.');
-            }
+            validateDocFile('file');
 
             $doc = Document::uploadProfile(
                 $user->getId(), $type,
@@ -161,15 +250,23 @@ try {
             if (!in_array($user->getRole(), ['admin', 'leader'])) {
                 ApiResponse::error('Only admins and leaders can verify documents.', 403);
             }
-            $docId      = (int)($_POST['doc_id'] ?? 0);
-            $doVerify   = ($_POST['verified'] ?? '1') === '1';
+            $docId  = (int)($_POST['doc_id'] ?? 0);
+            $status = $_POST['status'] ?? 'verified';
+            $note   = trim($_POST['note'] ?? '');
             if (!$docId) ApiResponse::error('doc_id required.');
-            $doVerify ? Document::verifyDoc($docId, $user->getId()) : Document::unverifyDoc($docId);
-            ApiResponse::success(null, $doVerify ? 'Document verified.' : 'Verification removed.');
+            if (!in_array($status, ['verified', 'rejected', 'pending'])) ApiResponse::error('Invalid status.');
+            Document::reviewDoc($docId, $user->getId(), $status, $note);
+            ApiResponse::success(null, 'Document status updated to ' . $status . '.');
+
+
+        case 'pending_docs':
+            if (!in_array($user->getRole(), ['admin', 'leader'])) {
+                ApiResponse::error('Access denied.', 403);
+            }
+            ApiResponse::success(Document::listPendingDocs());
 
 
         case 'list_member_docs':
-            // Leader or admin views a specific user's profile docs (for verification)
             if (!in_array($user->getRole(), ['admin', 'leader'])) {
                 ApiResponse::error('Access denied.', 403);
             }
@@ -185,7 +282,6 @@ try {
                 ApiResponse::error('nationality and destination required.');
             }
 
-
             $rules = [
                 'EG' => ['US', 'GB', 'DE', 'FR', 'IT', 'CA', 'AU', 'JP', 'CN', 'KR'],
                 'US' => [],
@@ -195,10 +291,10 @@ try {
             $needsVisa = in_array($destination, $rules[$nationality] ?? []);
 
             ApiResponse::success([
-                'nationality' => $nationality,
-                'destination' => $destination,
+                'nationality'   => $nationality,
+                'destination'   => $destination,
                 'visa_required' => $needsVisa,
-                'note' => $needsVisa
+                'note'          => $needsVisa
                     ? 'Visa required. Please check the official embassy website.'
                     : 'No visa required (verify before travel).',
             ]);

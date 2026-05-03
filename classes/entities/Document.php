@@ -77,7 +77,8 @@ class Document
     public function checkAccess(int $requesterId, string $requesterTripRole): bool
     {
         if ($requesterId === $this->userId) return true;
-        if ($this->visibility === 'leader' && $requesterTripRole === 'leader') return true;
+        if ($this->visibility === 'group' && $requesterTripRole !== '') return true;
+        if ($this->visibility === 'private' && $requesterTripRole === 'leader') return true;
         return false;
     }
 
@@ -163,25 +164,37 @@ class Document
         $db   = Database::getInstance('documents');
         $stmt = $db->prepare('SELECT * FROM profile_documents WHERE user_id = ? ORDER BY uploaded_at DESC');
         $stmt->execute([$userId]);
-        return array_map(function ($r) {
-            $meta = [];
-            if ($r['metadata']) {
-                try { $meta = Encryption::decryptJson($r['metadata'], (int)$r['user_id']); } catch (\Throwable $e) {}
-            }
-            return [
-                'id'            => (int)$r['id'],
-                'type'          => $r['type'],
-                'is_verified'   => (int)$r['is_verified'],
-                'verified_by'   => $r['verified_by'],
-                'uploaded_at'   => $r['uploaded_at'],
-                'original_name' => $meta['original_name'] ?? '',
-            ];
-        }, $stmt->fetchAll());
+        return array_map([self::class, 'formatProfileRow'], $stmt->fetchAll());
+    }
+
+    private static function formatProfileRow(array $r): array
+    {
+        $meta = [];
+        if ($r['metadata']) {
+            try { $meta = Encryption::decryptJson($r['metadata'], (int)$r['user_id']); } catch (\Throwable $ignored) {}
+        }
+        return [
+            'id'            => (int)$r['id'],
+            'user_id'       => (int)$r['user_id'],
+            'type'          => $r['type'],
+            'status'        => $r['status'] ?? 'pending',
+            'review_note'   => $r['review_note'] ?? '',
+            'reviewed_by'   => $r['reviewed_by'] ?? null,
+            'uploaded_at'   => $r['uploaded_at'],
+            'original_name' => $meta['original_name'] ?? '',
+        ];
     }
 
     public static function listProfileForUser(int $targetUserId): array
     {
         return self::listProfile($targetUserId);
+    }
+
+    public static function listPendingDocs(): array
+    {
+        $db   = Database::getInstance('documents');
+        $stmt = $db->query("SELECT * FROM profile_documents WHERE status = 'pending' ORDER BY uploaded_at ASC");
+        return array_map([self::class, 'formatProfileRow'], $stmt->fetchAll());
     }
 
     public static function deleteProfileDoc(int $docId, int $userId): bool
@@ -199,22 +212,15 @@ class Document
     public static function hasVerifiedDoc(int $userId, string $type): bool
     {
         $stmt = Database::getInstance('documents')
-            ->prepare('SELECT 1 FROM profile_documents WHERE user_id = ? AND type = ? AND is_verified = 1');
+            ->prepare("SELECT 1 FROM profile_documents WHERE user_id = ? AND type = ? AND status = 'verified'");
         $stmt->execute([$userId, $type]);
         return (bool)$stmt->fetchColumn();
     }
 
-    public static function verifyDoc(int $docId, int $verifiedBy): void
+    public static function reviewDoc(int $docId, int $reviewedBy, string $status, string $note = ''): void
     {
         Database::getInstance('documents')
-            ->prepare('UPDATE profile_documents SET is_verified = 1, verified_by = ? WHERE id = ?')
-            ->execute([$verifiedBy, $docId]);
-    }
-
-    public static function unverifyDoc(int $docId): void
-    {
-        Database::getInstance('documents')
-            ->prepare('UPDATE profile_documents SET is_verified = 0, verified_by = NULL WHERE id = ?')
-            ->execute([$docId]);
+            ->prepare('UPDATE profile_documents SET status = ?, reviewed_by = ?, review_note = ? WHERE id = ?')
+            ->execute([$status, $reviewedBy, $note, $docId]);
     }
 }

@@ -109,7 +109,7 @@ start_layout('Profile');
         </div>
         <div class="form-group">
           <label>File (PDF or image, max 10 MB)</label>
-          <input type="file" name="file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" required>
+          <input type="file" name="file" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.docx" required>
         </div>
         <button type="submit" class="btn btn-primary btn-block" id="btn-upload-pdoc">Upload</button>
       </form>
@@ -184,9 +184,11 @@ start_layout('Profile');
           <td><span class="badge badge-blue">${escHtml(docTypeLabel[d.type] || d.type)}</span></td>
           <td class="text-sm text-gray-400">${escHtml(d.original_name || '—')}</td>
           <td class="text-sm text-gray-500">${fmtDate(d.uploaded_at)}</td>
-          <td>${d.is_verified
-            ? '<span class="badge badge-green">✓ Verified</span>'
-            : '<span class="badge badge-yellow">Pending Verification</span>'}</td>
+          <td>${d.status === 'verified'
+              ? '<span class="badge badge-green">✓ Verified</span>'
+              : d.status === 'rejected'
+                ? `<span class="badge badge-red">✗ Rejected${d.review_note ? ' — '+escHtml(d.review_note) : ''}</span>`
+                : '<span class="badge badge-yellow">Under Review</span>'}</td>
           <td><button class="btn btn-danger btn-sm" onclick="deleteProfileDoc(${d.id})">Delete</button></td>
         </tr>`).join('')}
       </tbody></table></div>`;

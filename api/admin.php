@@ -37,11 +37,14 @@ try {
 
         
         case 'stats':
-            $expCount  = Database::getInstance('financial')->query('SELECT COUNT(*) FROM expenses')->fetchColumn();
-            $pollCount = Database::getInstance('social')->query('SELECT COUNT(*) FROM polls')->fetchColumn();
+            $expCount     = Database::getInstance('financial')->query('SELECT COUNT(*) FROM expenses')->fetchColumn();
+            $pollCount    = Database::getInstance('social')->query('SELECT COUNT(*) FROM polls')->fetchColumn();
+            $pendingDocs  = Database::getInstance('documents')
+                ->query("SELECT COUNT(*) FROM profile_documents WHERE status = 'pending'")->fetchColumn();
             ApiResponse::success([
-                'expense_count' => (int)$expCount,
-                'poll_count'    => (int)$pollCount,
+                'expense_count'    => (int)$expCount,
+                'poll_count'       => (int)$pollCount,
+                'pending_docs'     => (int)$pendingDocs,
             ]);
 
         

@@ -50,7 +50,7 @@ start_layout('Documents');
             <option value="group">Group (all members)</option>
           </select>
         </div>
-        <div class="form-group"><label>File (PDF or Image, max 10 MB)</label><input type="file" name="file" style="padding: 0.5rem 1rem;" class="form-control text-base" accept=".pdf,.jpg,.jpeg,.png" required></div>
+        <div class="form-group"><label>File (PDF, Image, or DOCX, max 10 MB)</label><input type="file" name="file" style="padding: 0.5rem 1rem;" class="form-control text-base" accept=".pdf,.jpg,.jpeg,.png,.docx" required></div>
         <button type="submit" class="btn btn-primary btn-block" id="btn-upload">Upload</button>
       </form>
     </div>

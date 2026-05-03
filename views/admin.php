@@ -25,8 +25,8 @@ start_layout('Admin Panel');
     <div class="stat-label">Expenses Logged</div>
   </div>
   <div class="card">
-    <div class="stat-value text-gray-500" id="s-polls">—</div>
-    <div class="stat-label">Polls Created</div>
+    <div class="stat-value" id="s-pending-docs" style="color:var(--warning)">—</div>
+    <div class="stat-label">Docs Pending Review</div>
   </div>
 </div>
 
@@ -56,12 +56,40 @@ start_layout('Admin Panel');
 </div>
 
 <div class="card mt-4">
+  <div class="card-header flex-between">
+    <h3>Document Verification</h3>
+    <span class="badge badge-yellow" id="pending-docs-badge" style="display:none"></span>
+  </div>
+  <div id="docs-verify-wrap">
+    <div class="empty-state text-sm text-gray-600">Loading…</div>
+  </div>
+</div>
+
+<div class="card mt-4">
   <div class="card-header">
     <h3>Active Sessions</h3>
     <button class="btn btn-danger btn-sm" onclick="purgeExpired()">Purge Expired</button>
   </div>
   <div id="sessions-wrap">
     <div class="empty-state text-sm text-gray-600">Loading…</div>
+  </div>
+</div>
+
+<div class="modal-overlay hidden" id="modal-reject-doc">
+  <div class="triply-modal">
+    <div class="modal-header">
+      <h3>Reject Document</h3><button class="modal-close" onclick="closeModal('modal-reject-doc')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Reason (optional — shown to user)</label>
+        <textarea id="reject-note" class="form-control" rows="3" placeholder="e.g. Image is blurry, please re-upload…"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn btn-danger" onclick="confirmReject()">Reject</button>
+        <button class="btn btn-secondary" onclick="closeModal('modal-reject-doc')">Cancel</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -120,9 +148,13 @@ start_layout('Admin Panel');
       renderTrips(tRes.data);
     }
     if (eRes.success && eRes.data) {
-      document.getElementById('s-expenses').textContent = eRes.data.expense_count ?? '—';
-      document.getElementById('s-polls').textContent = eRes.data.poll_count ?? '—';
+      document.getElementById('s-expenses').textContent     = eRes.data.expense_count ?? '—';
+      const pendingCount = eRes.data.pending_docs ?? 0;
+      document.getElementById('s-pending-docs').textContent = pendingCount;
+      const badge = document.getElementById('pending-docs-badge');
+      if (pendingCount > 0) { badge.textContent = pendingCount + ' pending'; badge.style.display = ''; }
     }
+    loadPendingDocs();
     loadSessions();
   }
 
@@ -232,11 +264,72 @@ start_layout('Admin Panel');
   }
 
   async function purgeExpired() {
-    const res = await API.post('admin', {
-      action: 'purge_sessions'
-    });
+    const res = await API.post('admin', { action: 'purge_sessions' });
     showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
     if (res.success) loadSessions();
+  }
+
+  const docTypeLabel = { passport: 'Passport', national_id: 'National ID', license: "Driver's License", other: 'Other' };
+  const docStatusBadge = {
+    pending:  '<span class="badge badge-yellow">Under Review</span>',
+    verified: '<span class="badge badge-green">✓ Verified</span>',
+    rejected: '<span class="badge badge-red">✗ Rejected</span>',
+  };
+  let _allPendingDocs = [];
+
+  async function loadPendingDocs() {
+    const res  = await API.get('documents', { action: 'pending_docs' });
+    const wrap = document.getElementById('docs-verify-wrap');
+    _allPendingDocs = res.data || [];
+
+    if (!_allPendingDocs.length) {
+      wrap.innerHTML = '<div class="empty-state text-sm text-gray-600">No documents pending review.</div>';
+      return;
+    }
+
+    // Batch-fetch user names
+    const userIds = [...new Set(_allPendingDocs.map(d => d.user_id))];
+    const uRes    = await API.get('admin', { action: 'users' });
+    const userMap = {};
+    (uRes.data || []).forEach(u => { userMap[u.id] = u.email; });
+
+    wrap.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>User</th><th>Type</th><th>File</th><th>Uploaded</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>${_allPendingDocs.map(d => `
+        <tr>
+          <td class="text-sm text-gray-400">${escHtml(userMap[d.user_id] || '#'+d.user_id)}</td>
+          <td><span class="badge badge-blue">${escHtml(docTypeLabel[d.type] || d.type)}</span></td>
+          <td class="text-sm text-gray-400">${escHtml(d.original_name || '—')}</td>
+          <td class="text-sm text-gray-500">${fmtDate(d.uploaded_at)}</td>
+          <td>${docStatusBadge[d.status] || d.status}</td>
+          <td style="display:flex;gap:4px;flex-wrap:wrap">
+            <a class="btn btn-secondary btn-sm" href="/api/documents.php?action=download_profile&doc_id=${d.id}" target="_blank">👁 View</a>
+            <button class="btn btn-primary btn-sm" onclick="reviewDoc(${d.id},'verified')">Verify</button>
+            <button class="btn btn-danger  btn-sm" onclick="openRejectModal(${d.id})">Reject</button>
+          </td>
+        </tr>`).join('')}
+      </tbody></table></div>`;
+  }
+
+  async function reviewDoc(docId, status, note = '') {
+    const res = await API.post('documents', { action: 'verify_profile', doc_id: docId, status, note });
+    showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
+    if (res.success) loadPendingDocs();
+  }
+
+  let _rejectDocId = null;
+  function openRejectModal(docId) {
+    _rejectDocId = docId;
+    document.getElementById('reject-note').value = '';
+    openModal('modal-reject-doc');
+  }
+
+  async function confirmReject() {
+    const note = document.getElementById('reject-note').value.trim();
+    const res  = await API.post('documents', { action: 'verify_profile', doc_id: _rejectDocId, status: 'rejected', note });
+    closeModal('modal-reject-doc');
+    showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
+    if (res.success) loadPendingDocs();
   }
 </script>
 
