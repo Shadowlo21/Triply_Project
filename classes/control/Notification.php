@@ -28,7 +28,7 @@ class Notification
 
         $members = $trip->getMembers();
         foreach ($members as $m) {
-            self::send($m['id'], 'budget_alert', $msg);
+            self::send($m['id'], 'budget_alert', $msg, 'Budget Alert');
         }
     }
 
@@ -51,7 +51,7 @@ class Notification
         $stmt    = $tripsDb->prepare('SELECT user_id FROM trip_members WHERE trip_id = ?');
         $stmt->execute([$tripId]);
         foreach ($stmt->fetchAll() as $row) {
-            self::send($row['user_id'], 'poll_closed', $msg);
+            self::send($row['user_id'], 'poll_closed', $msg, 'Poll Closed');
         }
     }
 
@@ -88,7 +88,7 @@ class Notification
                     $activities
                 );
                 $msg = "Tomorrow's schedule for \"{$activities[0]['trip_title']}\":\n" . implode("\n", $lines);
-                self::send($userId, 'daily_briefing', $msg);
+                self::send($userId, 'daily_briefing', $msg, 'Daily Briefing');
             }
         }
     }
@@ -98,23 +98,38 @@ class Notification
 
     public static function tripInvite(int $userId, string $tripTitle, string $inviterName): void
     {
-        self::send($userId, 'invite', "{$inviterName} invited you to join trip \"{$tripTitle}\"");
+        self::send($userId, 'invite', "{$inviterName} invited you to join trip \"{$tripTitle}\"", 'Trip Invitation');
     }
 
 
 
 
-    public static function send(int $userId, string $type, string $message): void
+    public static function send(int $userId, string $type, string $message, string $title = ''): void
     {
         $db   = Database::getInstance('trips');
         $stmt = $db->prepare(
-            'INSERT INTO notifications (user_id, type, message) VALUES (?, ?, ?)'
+            'INSERT INTO notifications (user_id, type, title, message) VALUES (?, ?, ?, ?)'
         );
-        $stmt->execute([$userId, $type, $message]);
+        $stmt->execute([$userId, $type, $title, $message]);
     }
 
 
 
+
+    public static function getAll(int $userId): array
+    {
+        $db   = Database::getInstance('trips');
+        // auto-purge anything older than 7 days for this user
+        $db->prepare(
+            "DELETE FROM notifications WHERE user_id = ? AND created_at < datetime('now', '-7 days')"
+        )->execute([$userId]);
+
+        $stmt = $db->prepare(
+            'SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC'
+        );
+        $stmt->execute([$userId]);
+        return $stmt->fetchAll();
+    }
 
     public static function getUnread(int $userId): array
     {

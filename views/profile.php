@@ -76,6 +76,47 @@ start_layout('Profile');
   </div>
 </div>
 
+<!-- My Profile Documents -->
+<div class="card mt-4">
+  <div class="card-header flex-between">
+    <h3>My Documents</h3>
+    <button class="btn btn-primary btn-sm" onclick="openModal('modal-upload-profile-doc')">+ Upload</button>
+  </div>
+  <div class="card-body">
+    <p class="text-sm text-gray-500 mb-3">Upload permanent documents (Passport, National ID, License) once. Leaders can verify them so you can join trips that require them.</p>
+    <div id="profile-docs-list"><div class="text-sm text-gray-500">Loading…</div></div>
+  </div>
+</div>
+
+<!-- Upload profile doc modal -->
+<div class="modal-overlay hidden" id="modal-upload-profile-doc">
+  <div class="triply-modal">
+    <div class="modal-header">
+      <h3>Upload Profile Document</h3>
+      <button class="modal-close" onclick="closeModal('modal-upload-profile-doc')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="pdoc-alert"></div>
+      <form id="form-upload-pdoc" enctype="multipart/form-data">
+        <div class="form-group">
+          <label>Document Type</label>
+          <select name="type" class="form-control">
+            <option value="passport">Passport</option>
+            <option value="national_id">National ID</option>
+            <option value="license">Driver's License</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>File (PDF or image, max 10 MB)</label>
+          <input type="file" name="file" class="form-control" accept=".pdf,.jpg,.jpeg,.png" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="btn-upload-pdoc">Upload</button>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
   async function loadProfile() {
     const res = await API.get('profile', { action: 'get' });
@@ -126,6 +167,57 @@ start_layout('Profile');
     if (res.success) e.target.reset();
   });
 
+  const docTypeLabel = { passport: 'Passport', national_id: 'National ID', license: "Driver's License", other: 'Other' };
+
+  async function loadProfileDocs() {
+    const res  = await API.get('documents', { action: 'list_profile' });
+    const wrap = document.getElementById('profile-docs-list');
+    const docs = res.data || [];
+    if (!docs.length) {
+      wrap.innerHTML = '<div class="empty-state"><div class="icon">📄</div>No documents yet. Upload your passport or ID.</div>';
+      return;
+    }
+    wrap.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Type</th><th>File</th><th>Uploaded</th><th>Status</th><th></th></tr></thead>
+      <tbody>${docs.map(d => `
+        <tr>
+          <td><span class="badge badge-blue">${escHtml(docTypeLabel[d.type] || d.type)}</span></td>
+          <td class="text-sm text-gray-400">${escHtml(d.original_name || '—')}</td>
+          <td class="text-sm text-gray-500">${fmtDate(d.uploaded_at)}</td>
+          <td>${d.is_verified
+            ? '<span class="badge badge-green">✓ Verified</span>'
+            : '<span class="badge badge-yellow">Pending Verification</span>'}</td>
+          <td><button class="btn btn-danger btn-sm" onclick="deleteProfileDoc(${d.id})">Delete</button></td>
+        </tr>`).join('')}
+      </tbody></table></div>`;
+  }
+
+  async function deleteProfileDoc(id) {
+    if (!confirm('Delete this document?')) return;
+    const res = await API.post('documents', { action: 'delete_profile', doc_id: id });
+    showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
+    if (res.success) loadProfileDocs();
+  }
+
+  document.getElementById('form-upload-pdoc').addEventListener('submit', async e => {
+    e.preventDefault();
+    const btn = document.getElementById('btn-upload-pdoc');
+    setLoading(btn, true);
+    const fd = new FormData(e.target);
+    fd.append('action', 'upload_profile');
+    const res = await fetch('/api/documents.php', { method: 'POST', body: fd }).then(r => r.json());
+    setLoading(btn, false);
+    if (res.success) {
+      closeModal('modal-upload-profile-doc');
+      e.target.reset();
+      showAlert('#alert-box', 'Document uploaded!', 'success');
+      loadProfileDocs();
+    } else {
+      showAlert('#pdoc-alert', res.message, 'error');
+    }
+  });
+
+  loadProfileDocs();
   loadProfile();
 </script>
 

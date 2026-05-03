@@ -84,12 +84,13 @@ start_layout('Admin Panel');
   let allUsers = [];
   let deleteUserId = null;
   let currentAdminId = null;
+  let currentAdminEmail = null;
 
   (async () => {
     const me = await API.get('auth', {
       action: 'me'
     });
-    if (me.success) currentAdminId = me.data.id;
+    if (me.success) { currentAdminId = me.data.id; currentAdminEmail = me.data.email; }
     loadStats();
   })();
 
@@ -144,14 +145,17 @@ start_layout('Admin Panel');
         <td><span class="badge ${roleColor[u.role] || 'badge-gray'}">${escHtml(u.role)}</span></td>
         <td class="text-sm text-gray-500">${fmtDate(u.created_at)}</td>
         <td style="display:flex;gap:4px;flex-wrap:wrap">
-          ${u.id !== currentAdminId ? `
-            <select class="form-control" style="width:90px;padding:2px 4px;font-size:12px" onchange="setRole(${u.id}, this)">
-              <option value="member" ${u.role==='member'?'selected':''}>member</option>
-              <option value="leader" ${u.role==='leader'?'selected':''}>leader</option>
-              <option value="admin"  ${u.role==='admin' ?'selected':''}>admin</option>
-            </select>
-            <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id},'${escHtml(u.email)}')">Del</button>
-          ` : '<span class="text-gray-500 text-sm">(you)</span>'}
+          ${u.id === currentAdminId
+            ? '<span class="text-gray-500 text-sm">(you)</span>'
+            : (u.role === 'admin' && currentAdminEmail !== 'admin@admin.com')
+              ? '<span class="text-gray-500 text-sm">owner only</span>'
+              : `<select class="form-control" style="width:90px;padding:2px 4px;font-size:12px" onchange="setRole(${u.id}, this)">
+                  <option value="member" ${u.role==='member'?'selected':''}>member</option>
+                  <option value="leader" ${u.role==='leader'?'selected':''}>leader</option>
+                  <option value="admin"  ${u.role==='admin' ?'selected':''}>admin</option>
+                </select>
+                <button class="btn btn-danger btn-sm" onclick="deleteUser(${u.id},'${escHtml(u.email)}')">Del</button>`
+          }
         </td>
       </tr>`).join('')}
     </tbody></table></div>`;

@@ -53,7 +53,17 @@ try {
             }
             if ($userId === $user->getId()) ApiResponse::error('Cannot change your own role.');
 
-            $db = Database::getInstance('accounts');
+            $db          = Database::getInstance('accounts');
+            $targetStmt  = $db->prepare('SELECT role FROM users WHERE id = ?');
+            $targetStmt->execute([$userId]);
+            $targetRole  = $targetStmt->fetchColumn();
+            if (!$targetRole) ApiResponse::error('User not found.', 404);
+
+            // Only admin@admin.com can change the role of another admin
+            if ($targetRole === 'admin' && $user->getEmail() !== 'admin@admin.com') {
+                ApiResponse::error('Only the owner can change another admin\'s role.', 403);
+            }
+
             $db->prepare('UPDATE users SET role = ? WHERE id = ?')->execute([$newRole, $userId]);
             ApiResponse::success(null, 'Role updated.');
 
@@ -63,10 +73,15 @@ try {
             if ($userId === $user->getId()) ApiResponse::error('Cannot delete your own account.');
 
             $db   = Database::getInstance('accounts');
-            $row  = $db->prepare('SELECT role FROM users WHERE id = ?');
+            $row  = $db->prepare('SELECT role, email FROM users WHERE id = ?');
             $row->execute([$userId]);
             $target = $row->fetch();
             if (!$target) ApiResponse::error('User not found.', 404);
+
+            // Only admin@admin.com can delete another admin
+            if ($target['role'] === 'admin' && $user->getEmail() !== 'admin@admin.com') {
+                ApiResponse::error('Only the owner can delete another admin.', 403);
+            }
 
             $db->prepare('DELETE FROM users WHERE id = ?')->execute([$userId]);
             ApiResponse::success(null, 'User deleted.');

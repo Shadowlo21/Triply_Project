@@ -9,8 +9,10 @@ class Trip
     private string $endDate;
     private string $baseCurrency;
     private ?float $budgetLimit;
+    private ?int   $maxSlots;
     private int    $createdBy;
-    private string $status;
+    private string  $status;
+    private ?string $requiredDocs;
 
     public function __construct(array $row)
     {
@@ -21,8 +23,10 @@ class Trip
         $this->endDate      = $row['end_date'];
         $this->baseCurrency = $row['base_currency'];
         $this->budgetLimit  = isset($row['budget_limit']) ? (float)$row['budget_limit'] : null;
+        $this->maxSlots     = isset($row['max_slots'])    ? (int)$row['max_slots']    : null;
         $this->createdBy    = (int)$row['created_by'];
         $this->status       = $row['status'];
+        $this->requiredDocs = $row['required_docs'] ?? null;
     }
 
     public static function findById(int $id): ?self
@@ -47,7 +51,7 @@ class Trip
     {
         $tripsDb = Database::getInstance('trips');
         $stmt    = $tripsDb->prepare(
-            'SELECT user_id, role AS trip_role, can_edit FROM trip_members WHERE trip_id = ?'
+            "SELECT user_id, role AS trip_role, can_edit FROM trip_members WHERE trip_id = ? AND status = 'accepted'"
         );
         $stmt->execute([$this->id]);
         $members = $stmt->fetchAll();
@@ -59,7 +63,7 @@ class Trip
         $accountsDb = Database::getInstance('accounts');
         $placeholders = implode(',', array_fill(0, count($userIds), '?'));
         $userStmt   = $accountsDb->prepare(
-            "SELECT id, email, role FROM users WHERE id IN ({$placeholders})"
+            "SELECT id, email, role, data FROM users WHERE id IN ({$placeholders})"
         );
         $userStmt->execute($userIds);
         $users = [];
@@ -69,13 +73,21 @@ class Trip
 
         $result = [];
         foreach ($members as $m) {
-            $uid = $m['user_id'];
+            $uid  = $m['user_id'];
+            $blob = $users[$uid]['data'] ?? '';
+            $name = '';
+            if ($blob) {
+                try {
+                    $dec  = Encryption::decryptJson($blob, $uid);
+                    $name = $dec['name'] ?? '';
+                } catch (\Throwable $ignored) {}
+            }
             $result[] = [
                 'id'        => $uid,
+                'name'      => $name ?: ($users[$uid]['email'] ?? ''),
                 'email'     => $users[$uid]['email'] ?? '',
                 'role'      => $users[$uid]['role']  ?? '',
                 'trip_role' => $m['trip_role'],
-                'can_edit'  => $m['can_edit'],
             ];
         }
         return $result;
@@ -130,6 +142,19 @@ class Trip
     {
         return $this->budgetLimit;
     }
+    public function getMaxSlots(): ?int
+    {
+        return $this->maxSlots;
+    }
+    public function getAcceptedMemberCount(): int
+    {
+        $db   = Database::getInstance('trips');
+        $stmt = $db->prepare(
+            "SELECT COUNT(*) FROM trip_members WHERE trip_id = ? AND status = 'accepted'"
+        );
+        $stmt->execute([$this->id]);
+        return (int)$stmt->fetchColumn();
+    }
     public function getBaseCurrency(): string
     {
         return $this->baseCurrency;
@@ -149,5 +174,11 @@ class Trip
     public function getEndDate(): string
     {
         return $this->endDate;
+    }
+
+    public function getRequiredDocs(): array
+    {
+        if (!$this->requiredDocs) return [];
+        return json_decode($this->requiredDocs, true) ?? [];
     }
 }

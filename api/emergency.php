@@ -17,10 +17,12 @@ try {
          * Get current user's emergency contact info
          */
         case 'get_contact':
+            $raw   = $user->getEmergencyContact();
+            $parts = array_map('trim', explode('|', $raw . '||'));
             ApiResponse::success([
-                'emergency_name'     => $user->getEmergencyContact(),
-                'emergency_phone'    => '', // Stored in encrypted blob
-                'emergency_relation' => '',
+                'emergency_name'     => $parts[0] ?? '',
+                'emergency_phone'    => $parts[1] ?? '',
+                'emergency_relation' => $parts[2] ?? '',
             ]);
 
         /**
@@ -52,6 +54,44 @@ try {
         /**
          * Broadcast emergency alert to all trip members
          */
+        case 'get_trip_contacts':
+            $tripId = (int)($_GET['trip_id'] ?? 0);
+            if (!$tripId) ApiResponse::error('trip_id required.');
+            if (!$user->viewTrip($tripId)) ApiResponse::error('Access denied.', 403);
+
+            $trip       = Trip::findById($tripId);
+            $members    = $trip->getMembers();
+            $accountsDb = Database::getInstance('accounts');
+            $result     = [];
+
+            foreach ($members as $m) {
+                $blobStmt = $accountsDb->prepare('SELECT data FROM users WHERE id = ?');
+                $blobStmt->execute([$m['id']]);
+                $blob = $blobStmt->fetchColumn();
+
+                $eName = $ePhone = $eRel = '';
+                if ($blob) {
+                    try {
+                        $data  = Encryption::decryptJson($blob, $m['id']);
+                        $raw   = $data['emergency_contact'] ?? '';
+                        $parts = array_map('trim', explode('|', $raw . '||'));
+                        $eName  = $parts[0];
+                        $ePhone = $parts[1];
+                        $eRel   = $parts[2];
+                    } catch (\Throwable $ignored) {}
+                }
+
+                $result[] = [
+                    'id'                 => $m['id'],
+                    'email'              => $m['email'],
+                    'trip_role'          => $m['trip_role'],
+                    'emergency_name'     => $eName,
+                    'emergency_phone'    => $ePhone,
+                    'emergency_relation' => $eRel,
+                ];
+            }
+            ApiResponse::success($result);
+
         case 'broadcast':
             $tripId  = (int)($_POST['trip_id'] ?? 0);
             $message = trim($_POST['message'] ?? '');
@@ -85,7 +125,8 @@ try {
                     Notification::send(
                         $memberId,
                         'budget_alert',
-                        '🚨 EMERGENCY ALERT from ' . $user->getName() . ' (' . $trip->getTitle() . '): ' . $message
+                        '🚨 EMERGENCY ALERT from ' . $user->getName() . ' (' . $trip->getTitle() . '): ' . $message,
+                        '🚨 Emergency Alert'
                     );
                     $notificationCount++;
                 }

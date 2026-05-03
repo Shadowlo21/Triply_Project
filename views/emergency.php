@@ -1,25 +1,19 @@
 <?php
 
-/**
- * Emergency Page
- * Emergency contact broadcaster for trip members
- * - Set personal emergency contact
- * - Trip leaders can broadcast emergency alerts
- */
-
 require_once __DIR__ . '/../config/bootstrap.php';
 $currentUser = Auth::current();
 if (!$currentUser) {
   header('Location: /?page=login');
   exit;
 }
+$canViewTripContacts = $currentUser->getRole() !== 'member';
 require_once __DIR__ . '/layout.php';
 start_layout('Emergency');
 ?>
 
 <div id="alert-box"></div>
 
-<div class="grid-2">
+<div class="<?= $canViewTripContacts ? 'grid-2' : '' ?>">
   <div class="card">
     <div class="card-header">
       <h3>My Emergency Contact</h3>
@@ -44,69 +38,48 @@ start_layout('Emergency');
     </div>
   </div>
 
+  <?php if ($canViewTripContacts): ?>
   <div class="card">
     <div class="card-header">
-      <h3>Emergency Broadcast</h3>
-      <span class="badge badge-red mb-1">Trip Leaders Only</span>
+      <h3>Trip Emergency Contacts</h3>
     </div>
     <div class="card-body">
-      <div id="broadcast-alert"></div>
-      <p class="text-gray-500 mb-3">Send an emergency alert to all members of a trip. Use only in real emergencies.</p>
-
-      <div class="form-group">
+      <div class="form-group mb-3">
         <label>Select Trip</label>
-        <select id="broadcast-trip" class="form-control">
+        <select id="ec-trip-select" class="form-control" onchange="loadTripEmergencyContacts()">
           <option value="">— Select a trip —</option>
         </select>
       </div>
-
-      <div class="form-group">
-        <label>Emergency Message</label>
-        <textarea id="broadcast-message" class="form-control" rows="4" placeholder="Enter emergency details... This will be sent to all trip members immediately."></textarea>
+      <div id="trip-contacts-list">
+        <div class="empty-state">
+          <div class="icon">👥</div>
+          <p class="text-gray-500 text-sm">Select a trip to view member emergency contacts.</p>
+        </div>
       </div>
-
-      <button class="btn btn-danger btn-block" id="btn-broadcast" onclick="sendBroadcast()">
-        <i class="fa-solid fa-triangle-exclamation"></i> Send Emergency Alert
-      </button>
     </div>
   </div>
-</div>
-
-<div class="card mt-4">
-  <div class="card-header">
-    <h3>Trip Emergency Contacts</h3>
-  </div>
-  <div id="trip-contacts-list">
-    <div class="empty-state">
-      <div class="icon">👥</div>Select a trip to view member emergency contacts
-    </div>
-  </div>
+  <?php endif; ?>
 </div>
 
 <script>
   async function loadTrips() {
-    const res = await API.get('trips', {
-      action: 'list'
-    });
-    const sel = document.getElementById('broadcast-trip');
-    (res.data || []).forEach(t => {
+    const res = await API.get('trips', { action: 'list' });
+    const sel = document.getElementById('ec-trip-select');
+    (res.data || []).filter(t => t.my_status === 'accepted').forEach(t => {
       const opt = document.createElement('option');
       opt.value = t.id;
       opt.textContent = t.title;
       sel.appendChild(opt);
     });
-    sel.addEventListener('change', loadTripEmergencyContacts);
   }
 
   async function loadEmergencyContact() {
-    const res = await API.get('emergency', {
-      action: 'get_contact'
-    });
+    const res = await API.get('emergency', { action: 'get_contact' });
     if (res.success && res.data) {
-      const data = res.data;
-      document.getElementById('emergency-name').value = data.emergency_name || '';
-      document.getElementById('emergency-phone').value = data.emergency_phone || '';
-      document.getElementById('emergency-relation').value = data.emergency_relation || '';
+      const d = res.data;
+      document.getElementById('emergency-name').value     = d.emergency_name     || '';
+      document.getElementById('emergency-phone').value    = d.emergency_phone    || '';
+      document.getElementById('emergency-relation').value = d.emergency_relation || '';
     }
   }
 
@@ -116,74 +89,50 @@ start_layout('Emergency');
     setLoading(btn, true);
     const fd = new FormData(e.target);
     const res = await API.post('emergency', {
-      action: 'update_contact',
-      emergency_name: fd.get('emergency_name'),
-      emergency_phone: fd.get('emergency_phone'),
-      emergency_relation: fd.get('emergency_relation')
+      action:             'update_contact',
+      emergency_name:     fd.get('emergency_name'),
+      emergency_phone:    fd.get('emergency_phone'),
+      emergency_relation: fd.get('emergency_relation'),
     });
     setLoading(btn, false);
     showAlert('#contact-alert', res.message, res.success ? 'success' : 'error');
   });
 
-  async function sendBroadcast() {
-    const tripId = document.getElementById('broadcast-trip').value;
-    const message = document.getElementById('broadcast-message').value.trim();
-
-    if (!tripId) {
-      showAlert('#broadcast-alert', 'Please select a trip.', 'error');
-      return;
-    }
-    if (!message) {
-      showAlert('#broadcast-alert', 'Please enter an emergency message.', 'error');
-      return;
-    }
-
-    if (!confirm('WARNING: This will send an emergency alert to ALL trip members. Are you sure?')) {
-      return;
-    }
-
-    const btn = document.getElementById('btn-broadcast');
-    setLoading(btn, true);
-    const res = await API.post('emergency', {
-      action: 'broadcast',
-      trip_id: tripId,
-      message: message
-    });
-    setLoading(btn, false);
-    showAlert('#broadcast-alert', res.message, res.success ? 'success' : 'error');
-    if (res.success) {
-      document.getElementById('broadcast-message').value = '';
-    }
-  }
-
   async function loadTripEmergencyContacts() {
-    const tripId = document.getElementById('broadcast-trip').value;
-    if (!tripId) return;
+    const tripId = document.getElementById('ec-trip-select').value;
+    const wrap   = document.getElementById('trip-contacts-list');
+    if (!tripId) {
+      wrap.innerHTML = '<div class="empty-state"><div class="icon">👥</div><p class="text-gray-500 text-sm">Select a trip.</p></div>';
+      return;
+    }
+    wrap.innerHTML = '<div class="text-sm text-gray-500">Loading…</div>';
 
-    const res = await API.get('trips', {
-      action: 'members',
-      trip_id: tripId
-    });
-    const wrap = document.getElementById('trip-contacts-list');
-
-    if (!res.success || !res.data.length) {
-      wrap.innerHTML = '<div class="card empty-state"><div class="icon">👥</div>No members found.</div>';
+    const res = await API.get('emergency', { action: 'get_trip_contacts', trip_id: tripId });
+    if (!res.success) {
+      wrap.innerHTML = `<div class="alert alert-error">${escHtml(res.message)}</div>`;
+      return;
+    }
+    const members = res.data || [];
+    if (!members.length) {
+      wrap.innerHTML = '<div class="empty-state"><div class="icon">👥</div>No members found.</div>';
       return;
     }
 
-    wrap.innerHTML = `<div class="card"><div class="table-wrap"><table>
-      <thead><tr><th>Member</th><th>Role</th><th>Emergency Contact</th></tr></thead>
-      <tbody>${res.data.map(m => `
+    wrap.innerHTML = `<div class="table-wrap"><table>
+      <thead><tr><th>Member</th><th>Role</th><th>Contact Name</th><th>Phone</th><th>Relation</th></tr></thead>
+      <tbody>${members.map(m => `
         <tr>
-          <td class="text-sm text-gray-400">${escHtml(m.email)}</td>
+          <td class="text-sm text-gray-400">${escHtml(m.name || m.email)}</td>
           <td><span class="badge ${m.trip_role === 'leader' ? 'badge-blue' : 'badge-gray'}">${escHtml(m.trip_role)}</span></td>
-          <td class="text-sm text-gray-400">Contact info available in profile</td>
-        </tr>
-      `).join('')}</tbody>
-    </table></div></div>`;
+          <td class="text-sm text-gray-400">${escHtml(m.emergency_name  || '—')}</td>
+          <td class="text-sm text-gray-400">${escHtml(m.emergency_phone || '—')}</td>
+          <td class="text-sm text-gray-400">${escHtml(m.emergency_relation || '—')}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>`;
   }
 
-  loadTrips();
+  <?php if ($canViewTripContacts): ?>loadTrips();<?php endif; ?>
   loadEmergencyContact();
 </script>
 

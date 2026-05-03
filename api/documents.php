@@ -23,10 +23,11 @@ try {
 
             $result = array_map(fn($d) => [
                 'id'          => $d->getId(),
+                'user_id'     => $d->getUserId(),
                 'type'        => $d->getType(),
                 'visibility'  => $d->getVisibility(),
                 'metadata'    => $d->getMetadata(),
-                'uploaded_at' => '',
+                'uploaded_at' => $d->getUploadedAt(),
             ], $docs);
 
             ApiResponse::success($result);
@@ -120,6 +121,61 @@ try {
             $doc->delete();
             ApiResponse::success(null, 'Document deleted.');
 
+
+
+        case 'list_profile':
+            ApiResponse::success(Document::listProfile($user->getId()));
+
+
+        case 'upload_profile':
+            $type = $_POST['type'] ?? 'other';
+            if (!in_array($type, ['passport', 'national_id', 'license', 'other'])) {
+                ApiResponse::error('Invalid document type.');
+            }
+            if (empty($_FILES['file'])) ApiResponse::error('No file uploaded.');
+            if ($_FILES['file']['error'] !== UPLOAD_ERR_OK) ApiResponse::error('Upload error.');
+            if ($_FILES['file']['size'] > 10 * 1024 * 1024) ApiResponse::error('File too large. Max 10 MB.');
+
+            $finfo = new finfo(FILEINFO_MIME_TYPE);
+            $mime  = $finfo->file($_FILES['file']['tmp_name']);
+            if (!in_array($mime, ['application/pdf', 'image/jpeg', 'image/png'])) {
+                ApiResponse::error('Only PDF and images allowed.');
+            }
+
+            $doc = Document::uploadProfile(
+                $user->getId(), $type,
+                $_FILES['file']['name'], $_FILES['file']['tmp_name']
+            );
+            ApiResponse::success($doc, 'Document saved to profile.');
+
+
+        case 'delete_profile':
+            $docId = (int)($_POST['doc_id'] ?? 0);
+            if (!$docId) ApiResponse::error('doc_id required.');
+            $ok = Document::deleteProfileDoc($docId, $user->getId());
+            if (!$ok) ApiResponse::error('Not found or access denied.', 404);
+            ApiResponse::success(null, 'Document deleted.');
+
+
+        case 'verify_profile':
+            if (!in_array($user->getRole(), ['admin', 'leader'])) {
+                ApiResponse::error('Only admins and leaders can verify documents.', 403);
+            }
+            $docId      = (int)($_POST['doc_id'] ?? 0);
+            $doVerify   = ($_POST['verified'] ?? '1') === '1';
+            if (!$docId) ApiResponse::error('doc_id required.');
+            $doVerify ? Document::verifyDoc($docId, $user->getId()) : Document::unverifyDoc($docId);
+            ApiResponse::success(null, $doVerify ? 'Document verified.' : 'Verification removed.');
+
+
+        case 'list_member_docs':
+            // Leader or admin views a specific user's profile docs (for verification)
+            if (!in_array($user->getRole(), ['admin', 'leader'])) {
+                ApiResponse::error('Access denied.', 403);
+            }
+            $targetId = (int)($_GET['user_id'] ?? 0);
+            if (!$targetId) ApiResponse::error('user_id required.');
+            ApiResponse::success(Document::listProfileForUser($targetId));
 
 
         case 'visa_check':

@@ -14,16 +14,19 @@ class TripLeader extends Member
     {
         $db   = Database::getInstance('trips');
         $stmt = $db->prepare(
-            'INSERT INTO trips (title, destination, start_date, end_date, base_currency, budget_limit, created_by)
-             VALUES (?, ?, ?, ?, ?, ?, ?)'
+            'INSERT INTO trips (title, destination, start_date, end_date, base_currency, budget_limit, max_slots, departure_point, departure_time, created_by)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
         );
         $stmt->execute([
             $data['title'],
             $data['destination'],
             $data['start_date'],
             $data['end_date'],
-            $data['base_currency'] ?? 'EGP',
-            $data['budget_limit']  ?? null,
+            $data['base_currency']   ?? 'EGP',
+            $data['budget_limit']    ?? null,
+            $data['max_slots']       ?? null,
+            $data['departure_point'] ?? null,
+            $data['departure_time']  ?? null,
             $this->id,
         ]);
 

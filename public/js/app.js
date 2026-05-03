@@ -101,31 +101,74 @@ document.addEventListener('click', e => {
 });
 
 // Notifications
+let _notifCache = [];
+
 async function loadNotifications() {
-  const res = await API.get('notifications', { action: 'list' });
+  const res = await API.get('notifications', { action: 'list', unread_only: '1' });
   if (!res.success) return;
-  const items = res.data;
+  _notifCache = res.data || [];
   const badge = document.getElementById('notif-count');
   if (badge) {
-    badge.textContent = items.length;
-    badge.style.display = items.length ? 'flex' : 'none';
+    badge.textContent = _notifCache.length;
+    badge.style.display = _notifCache.length ? 'flex' : 'none';
   }
   const list = document.getElementById('notif-list');
   if (!list) return;
-  if (!items.length) {
-    list.innerHTML = '<div class="notif-item text-muted">No new notifications</div>';
+  if (!_notifCache.length) {
+    list.innerHTML = '<div class="notif-item text-muted" style="padding:12px">No new notifications</div>';
     return;
   }
-  list.innerHTML = items.map(n => `
-    <div class="notif-item unread" onclick="markRead(${n.id}, this)">
-      <div>${escHtml(n.message)}</div>
-      <div class="text-sm text-muted mt-1">${fmtDateTime(n.created_at)}</div>
+  list.innerHTML = _notifCache.map(n => `
+    <div class="notif-item" onclick="openNotifModal(${n.id})" style="cursor:pointer;padding:10px 12px;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:7px">
+        <span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${n.is_read ? 'transparent' : 'var(--danger)'};border:${n.is_read ? '1px solid var(--border)' : 'none'}"></span>
+        <strong class="text-sm" style="color:${n.is_read ? 'var(--text-muted)' : 'var(--text)'}">${escHtml(n.title || 'Notification')}</strong>
+      </div>
+      <div class="text-sm" style="color:var(--text-muted);margin-top:3px;padding-left:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px">${escHtml(n.message)}</div>
+      <div class="text-xs" style="color:var(--text-muted);margin-top:2px;padding-left:15px">${fmtDateTime(n.created_at)}</div>
     </div>`).join('');
+}
+
+function openNotifModal(id) {
+  const n = _notifCache.find(x => x.id === id);
+  if (!n) return;
+
+  let modal = document.getElementById('_notif-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = '_notif-modal';
+    modal.className = 'modal-overlay hidden';
+    modal.innerHTML = `
+      <div class="triply-modal">
+        <div class="modal-header">
+          <h3 id="_nm-title" style="display:flex;align-items:center;gap:8px"></h3>
+          <button class="modal-close" onclick="closeModal('_notif-modal')">×</button>
+        </div>
+        <div class="modal-body">
+          <p id="_nm-body" class="text-gray-300" style="white-space:pre-wrap;line-height:1.6"></p>
+          <div id="_nm-time" class="text-sm text-gray-500 mt-3"></div>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+  }
+
+  const dot = n.is_read ? '' : '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--danger);margin-right:4px"></span>';
+  document.getElementById('_nm-title').innerHTML = dot + escHtml(n.title || 'Notification');
+  document.getElementById('_nm-body').textContent = n.message;
+  document.getElementById('_nm-time').textContent = fmtDateTime(n.created_at);
+  openModal('_notif-modal');
+
+  if (!n.is_read) {
+    API.post('notifications', { action: 'read', id }).then(() => {
+      n.is_read = 1;
+      loadNotifications();
+    });
+  }
 }
 
 async function markRead(id, el) {
   await API.post('notifications', { action: 'read', id });
-  el.classList.remove('unread');
+  if (el) el.classList.remove('unread');
   loadNotifications();
 }
 

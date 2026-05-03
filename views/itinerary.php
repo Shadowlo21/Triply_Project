@@ -93,7 +93,7 @@ start_layout('Itinerary');
       action: 'list'
     });
     const sel = document.getElementById('trip-select');
-    (res.data || []).forEach(t => {
+    (res.data || []).filter(t => t.my_status === 'accepted').forEach(t => {
       const opt = document.createElement('option');
       opt.value = t.id;
       opt.textContent = t.title;

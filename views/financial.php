@@ -101,7 +101,7 @@ start_layout('Financial');
       action: 'list'
     });
     const sel = document.getElementById('trip-select');
-    (res.data || []).forEach(t => {
+    (res.data || []).filter(t => t.my_status === 'accepted').forEach(t => {
       const opt = document.createElement('option');
       opt.value = t.id;
       opt.textContent = t.title;
@@ -154,8 +154,8 @@ start_layout('Financial');
           <td><strong class="text-sm text-gray-600">${escHtml(e.title)}</strong></td>
           <td class="text-gray-600">${(e.converted_amount || e.amount).toFixed(2)} ${escHtml(currency)}</td>
           <td><span class="badge badge-blue">${escHtml(e.type)}</span></td>
-          <td class="text-sm text-gray-600">${escHtml(e.paid_by_email)}</td>
-          <td class="text-sm text-gray-600">${(e.splits || []).map(s => escHtml(s.email) + ': ' + (s.amount||0).toFixed(2)).join(', ')}</td>
+          <td class="text-sm text-gray-600">${escHtml(e.paid_by_name)}</td>
+          <td class="text-sm text-gray-600">${(e.splits || []).map(s => escHtml(s.name) + ': ' + (s.amount||0).toFixed(2)).join(', ')}</td>
           <td class="text-sm text-gray-600">${fmtDate(e.created_at)}</td>
         </tr>`).join('')}
       </tbody></table></div></div>`;
@@ -191,8 +191,8 @@ start_layout('Financial');
       <thead><tr><th>From</th><th>To</th><th>Amount</th></tr></thead>
       <tbody>${transactions.map(t => `
         <tr>
-          <td>${escHtml(t.from_email || t.from)}</td>
-          <td>${escHtml(t.to_email || t.to)}</td>
+          <td>${escHtml(t.from_name || String(t.from))}</td>
+          <td>${escHtml(t.to_name   || String(t.to))}</td>
           <td><strong>${(+t.amount).toFixed(2)} ${escHtml(currency)}</strong></td>
         </tr>`).join('')}
       </tbody></table></div></div>`;
@@ -225,7 +225,7 @@ start_layout('Financial');
     const itemsEl = document.getElementById('custom-split-items');
     itemsEl.innerHTML = tripMembersCache.map(m => `
       <div style="display:flex;align-items:center;gap:8px">
-        <span style="flex:1">${escHtml(m.email)}</span>
+        <span style="flex:1">${escHtml(m.name || m.email)}</span>
         <input type="number" step="0.01" min="0" value="0"
                class="form-control custom-amt" data-uid="${m.id}"
                style="width:110px;margin:0" oninput="updateSplitSum()">

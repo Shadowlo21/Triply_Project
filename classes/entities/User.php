@@ -97,9 +97,9 @@ abstract class User
     {
         $db   = Database::getInstance('trips');
         $stmt = $db->prepare(
-            'SELECT t.* FROM trips t
+            "SELECT t.* FROM trips t
              JOIN trip_members tm ON tm.trip_id = t.id
-             WHERE t.id = ? AND tm.user_id = ?'
+             WHERE t.id = ? AND tm.user_id = ? AND tm.status = 'accepted'"
         );
         $stmt->execute([$tripId, $this->id]);
         return $stmt->fetch() ?: null;

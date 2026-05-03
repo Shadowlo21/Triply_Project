@@ -20,7 +20,7 @@ class Member extends User
         if ($stmt->fetch()) return false;
 
         $stmt = $db->prepare(
-            'INSERT INTO trip_members (trip_id, user_id, role) VALUES (?, ?, "member")'
+            "INSERT INTO trip_members (trip_id, user_id, role, status) VALUES (?, ?, 'member', 'accepted')"
         );
         return $stmt->execute([$tripId, $this->id]);
     }
@@ -38,8 +38,8 @@ class Member extends User
         if (!$target) return false;
 
         $tripsDb = Database::getInstance('trips');
-        $stmt    = $tripsDb->prepare(
-            'INSERT OR IGNORE INTO trip_members (trip_id, user_id, role) VALUES (?, ?, "member")'
+        $stmt   = $tripsDb->prepare(
+            "INSERT OR IGNORE INTO trip_members (trip_id, user_id, role, status) VALUES (?, ?, 'member', 'pending')"
         );
         $result = $stmt->execute([$tripId, $target['id']]);
 
@@ -113,7 +113,7 @@ class Member extends User
     {
         $db = Database::getInstance('trips');
         $stmt = $db->prepare(
-            'SELECT 1 FROM trip_members WHERE trip_id = ? AND user_id = ? AND role = "leader"'
+            "SELECT 1 FROM trip_members WHERE trip_id = ? AND user_id = ? AND role = 'leader' AND status = 'accepted'"
         );
         $stmt->execute([$tripId, $this->id]);
         return (bool)$stmt->fetchColumn();

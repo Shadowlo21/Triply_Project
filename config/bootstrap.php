@@ -22,3 +22,6 @@ spl_autoload_register(function (string $class): void {
         }
     }
 });
+
+// Run DB migrations on every boot (idempotent — CREATE TABLE IF NOT EXISTS)
+require_once __DIR__ . '/migrate.php';

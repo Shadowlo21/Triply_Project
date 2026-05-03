@@ -28,15 +28,18 @@ try {
                 $accountsDb   = Database::getInstance('accounts');
                 $placeholders = implode(',', array_fill(0, count($paidByIds), '?'));
                 $userStmt     = $accountsDb->prepare(
-                    "SELECT id, email FROM users WHERE id IN ({$placeholders})"
+                    "SELECT id, data FROM users WHERE id IN ({$placeholders})"
                 );
                 $userStmt->execute($paidByIds);
-                $userEmails = [];
+                $userNames = [];
                 foreach ($userStmt->fetchAll() as $u) {
-                    $userEmails[$u['id']] = $u['email'];
+                    try {
+                        $d = Encryption::decryptJson($u['data'], (int)$u['id']);
+                        $userNames[$u['id']] = $d['name'] ?? '';
+                    } catch (\Throwable $ignored) {}
                 }
                 foreach ($expenses as &$exp) {
-                    $exp['paid_by_email'] = $userEmails[$exp['paid_by']] ?? '';
+                    $exp['paid_by_name'] = $userNames[$exp['paid_by']] ?? '';
                 }
             }
 
@@ -54,15 +57,18 @@ try {
                     $accountsDb    = Database::getInstance('accounts');
                     $placeholders2 = implode(',', array_fill(0, count($splitUserIds), '?'));
                     $splitUserStmt = $accountsDb->prepare(
-                        "SELECT id, email FROM users WHERE id IN ({$placeholders2})"
+                        "SELECT id, data FROM users WHERE id IN ({$placeholders2})"
                     );
                     $splitUserStmt->execute($splitUserIds);
-                    $splitEmails = [];
+                    $splitNames = [];
                     foreach ($splitUserStmt->fetchAll() as $u) {
-                        $splitEmails[$u['id']] = $u['email'];
+                        try {
+                            $d = Encryption::decryptJson($u['data'], (int)$u['id']);
+                            $splitNames[$u['id']] = $d['name'] ?? '';
+                        } catch (\Throwable $ignored) {}
                     }
                     foreach ($splits as &$s) {
-                        $s['email'] = $splitEmails[$s['user_id']] ?? '';
+                        $s['name'] = $splitNames[$s['user_id']] ?? '';
                     }
                 }
 
@@ -172,14 +178,19 @@ try {
                 $accountsDb   = Database::getInstance('accounts');
                 $placeholders = implode(',', array_fill(0, count($allIds), '?'));
                 $stmt         = $accountsDb->prepare(
-                    "SELECT id, email FROM users WHERE id IN ({$placeholders})"
+                    "SELECT id, data FROM users WHERE id IN ({$placeholders})"
                 );
                 $stmt->execute($allIds);
-                $users = array_column($stmt->fetchAll(), 'email', 'id');
-
+                $names = [];
+                foreach ($stmt->fetchAll() as $u) {
+                    try {
+                        $d = Encryption::decryptJson($u['data'], (int)$u['id']);
+                        $names[$u['id']] = $d['name'] ?? '';
+                    } catch (\Throwable $ignored) {}
+                }
                 foreach ($transactions as &$t) {
-                    $t['from_email'] = $users[$t['from']] ?? '';
-                    $t['to_email']   = $users[$t['to']]   ?? '';
+                    $t['from_name'] = $names[$t['from']] ?? '';
+                    $t['to_name']   = $names[$t['to']]   ?? '';
                 }
             }
 

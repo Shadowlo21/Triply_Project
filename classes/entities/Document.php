@@ -9,6 +9,7 @@ class Document
     private string $storedName;
     private string $visibility;
     private ?string $metadata;
+    private string $uploadedAt;
 
     private const UPLOAD_DIR = __DIR__ . '/../../public/uploads/';
 
@@ -21,6 +22,7 @@ class Document
         $this->storedName = $row['stored_name'];
         $this->visibility = $row['visibility'];
         $this->metadata   = $row['metadata'] ?? null;
+        $this->uploadedAt = $row['uploaded_at'] ?? '';
     }
 
     
@@ -65,6 +67,7 @@ class Document
             'stored_name' => $storedName,
             'visibility'  => $visibility,
             'metadata'    => $meta,
+            'uploaded_at' => date('Y-m-d H:i:s'),
         ]);
     }
 
@@ -121,9 +124,97 @@ class Document
     }
 
     
-    public function getId(): int           { return $this->id; }
-    public function getUserId(): int       { return $this->userId; }
-    public function getType(): string      { return $this->type; }
+    public function getId(): int            { return $this->id; }
+    public function getUserId(): int        { return $this->userId; }
+    public function getType(): string       { return $this->type; }
     public function getVisibility(): string { return $this->visibility; }
     public function getStoredName(): string { return $this->storedName; }
+    public function getUploadedAt(): string { return $this->uploadedAt; }
+
+    // ── Profile Documents ────────────────────────────────────────────────────
+
+    public static function uploadProfile(
+        int $userId, string $type, string $originalName, string $tmpPath
+    ): array {
+        $bytes      = file_get_contents($tmpPath);
+        $encrypted  = Encryption::encryptFile($bytes, $userId);
+        $storedName = bin2hex(random_bytes(16)) . '.enc';
+
+        if (!is_dir(self::UPLOAD_DIR)) mkdir(self::UPLOAD_DIR, 0750, true);
+        file_put_contents(self::UPLOAD_DIR . $storedName, $encrypted, LOCK_EX);
+
+        $meta = Encryption::encryptJson(['original_name' => $originalName, 'size' => strlen($bytes)], $userId);
+
+        $db   = Database::getInstance('documents');
+        $db->prepare('INSERT INTO profile_documents (user_id, type, stored_name, metadata) VALUES (?,?,?,?)')
+           ->execute([$userId, $type, $storedName, $meta]);
+
+        return [
+            'id'            => (int)$db->lastInsertId(),
+            'type'          => $type,
+            'is_verified'   => 0,
+            'uploaded_at'   => date('Y-m-d H:i:s'),
+            'original_name' => $originalName,
+        ];
+    }
+
+    public static function listProfile(int $userId): array
+    {
+        $db   = Database::getInstance('documents');
+        $stmt = $db->prepare('SELECT * FROM profile_documents WHERE user_id = ? ORDER BY uploaded_at DESC');
+        $stmt->execute([$userId]);
+        return array_map(function ($r) {
+            $meta = [];
+            if ($r['metadata']) {
+                try { $meta = Encryption::decryptJson($r['metadata'], (int)$r['user_id']); } catch (\Throwable $e) {}
+            }
+            return [
+                'id'            => (int)$r['id'],
+                'type'          => $r['type'],
+                'is_verified'   => (int)$r['is_verified'],
+                'verified_by'   => $r['verified_by'],
+                'uploaded_at'   => $r['uploaded_at'],
+                'original_name' => $meta['original_name'] ?? '',
+            ];
+        }, $stmt->fetchAll());
+    }
+
+    public static function listProfileForUser(int $targetUserId): array
+    {
+        return self::listProfile($targetUserId);
+    }
+
+    public static function deleteProfileDoc(int $docId, int $userId): bool
+    {
+        $db   = Database::getInstance('documents');
+        $stmt = $db->prepare('SELECT stored_name FROM profile_documents WHERE id = ? AND user_id = ?');
+        $stmt->execute([$docId, $userId]);
+        $row  = $stmt->fetch();
+        if (!$row) return false;
+        @unlink(self::UPLOAD_DIR . $row['stored_name']);
+        $db->prepare('DELETE FROM profile_documents WHERE id = ?')->execute([$docId]);
+        return true;
+    }
+
+    public static function hasVerifiedDoc(int $userId, string $type): bool
+    {
+        $stmt = Database::getInstance('documents')
+            ->prepare('SELECT 1 FROM profile_documents WHERE user_id = ? AND type = ? AND is_verified = 1');
+        $stmt->execute([$userId, $type]);
+        return (bool)$stmt->fetchColumn();
+    }
+
+    public static function verifyDoc(int $docId, int $verifiedBy): void
+    {
+        Database::getInstance('documents')
+            ->prepare('UPDATE profile_documents SET is_verified = 1, verified_by = ? WHERE id = ?')
+            ->execute([$verifiedBy, $docId]);
+    }
+
+    public static function unverifyDoc(int $docId): void
+    {
+        Database::getInstance('documents')
+            ->prepare('UPDATE profile_documents SET is_verified = 0, verified_by = NULL WHERE id = ?')
+            ->execute([$docId]);
+    }
 }
