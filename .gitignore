@@ -1,0 +1,9 @@
+.env
+*.db-journal
+*.db-wal
+*.db-shm
+public/uploads/*
+!public/uploads/.gitkeep
+.vscode/
+.idea/
+*.log
