@@ -19,7 +19,6 @@ function checkFileUpload(string $field): void {
     }
 }
 
-// Whitelist-only MIME + extension check (both must match — prevents renamed exe etc.)
 function validateDocFile(string $field): void {
     $allowedMap = [
         'pdf'  => ['application/pdf'],
@@ -28,7 +27,7 @@ function validateDocFile(string $field): void {
         'png'  => ['image/png'],
         'docx' => [
             'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'application/zip', // finfo sometimes returns this for .docx
+            'application/zip', 
         ],
     ];
 

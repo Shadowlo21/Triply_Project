@@ -24,7 +24,7 @@ try {
 
             // Attach creator names (decrypt from accounts DB)
             if ($trips) {
-                $creatorIds  = array_unique(array_column($trips, 'created_by'));
+                $creatorIds  = array_values(array_unique(array_column($trips, 'created_by')));
                 $accountsDb  = Database::getInstance('accounts');
                 $ph          = implode(',', array_fill(0, count($creatorIds), '?'));
                 $usersStmt   = $accountsDb->prepare("SELECT id, data FROM users WHERE id IN ({$ph})");
@@ -57,6 +57,53 @@ try {
             ApiResponse::success($stmt->fetchAll());
 
 
+        case 'join':
+            $tripId = (int)($_POST['trip_id'] ?? 0);
+            if (!$tripId) ApiResponse::error('trip_id required.');
+
+            $trip = Trip::findById($tripId);
+            if (!$trip) ApiResponse::error('Trip not found.', 404);
+
+            $db = Database::getInstance('trips');
+            $existing = $db->prepare('SELECT status FROM trip_members WHERE trip_id = ? AND user_id = ?');
+            $existing->execute([$tripId, $user->getId()]);
+            $existingStatus = $existing->fetchColumn();
+            if ($existingStatus === 'accepted') ApiResponse::error('You are already a member of this trip.');
+
+            if ($trip->getMaxSlots() !== null && $trip->getAcceptedMemberCount() >= $trip->getMaxSlots()) {
+                ApiResponse::error('This trip is full (' . $trip->getMaxSlots() . ' slots).');
+            }
+
+            if (!in_array($user->getRole(), ['admin', 'leader'])) {
+                foreach ($trip->getRequiredDocs() as $docType) {
+                    if (!Document::hasVerifiedDoc($user->getId(), $docType)) {
+                        $label = ['passport' => 'Passport', 'national_id' => 'National ID', 'license' => 'Driver\'s License'][$docType] ?? ucfirst($docType);
+                        ApiResponse::error("This trip requires a verified {$label}. Please upload it in your Profile first.", 403);
+                    }
+                }
+            }
+
+            if ($existingStatus === 'pending') {
+                $db->prepare("UPDATE trip_members SET status = 'accepted' WHERE trip_id = ? AND user_id = ?")
+                   ->execute([$tripId, $user->getId()]);
+            } else {
+                $db->prepare("INSERT INTO trip_members (trip_id, user_id, role, status, can_edit) VALUES (?, ?, 'member', 'accepted', 0)")
+                   ->execute([$tripId, $user->getId()]);
+            }
+
+            $leaderId = (int)$trip->getCreatedBy();
+            if ($leaderId && $leaderId !== $user->getId()) {
+                Notification::send(
+                    $leaderId,
+                    'announcement',
+                    ($user->getName() ?: $user->getEmail()) . ' joined trip "' . $trip->getTitle() . '".',
+                    'New Member Joined'
+                );
+            }
+
+            ApiResponse::success(null, 'You have joined the trip!');
+
+
         case 'accept_invite':
             $tripId = (int)($_POST['trip_id'] ?? 0);
             if (!$tripId) ApiResponse::error('trip_id required.');
@@ -70,8 +117,8 @@ try {
                 }
             }
 
-            // Check required documents
-            if ($trip) {
+            // Check required documents (leaders and admins bypass)
+            if ($trip && !in_array($user->getRole(), ['admin', 'leader'])) {
                 foreach ($trip->getRequiredDocs() as $docType) {
                     if (!Document::hasVerifiedDoc($user->getId(), $docType)) {
                         $label = ['passport' => 'Passport', 'national_id' => 'National ID', 'license' => 'Driver\'s License'][$docType] ?? ucfirst($docType);
@@ -118,9 +165,10 @@ try {
             if (!$tripId) ApiResponse::error('trip_id required.');
 
             $isAdmin      = $user->getRole() === 'admin';
+            $isLeader     = $user->getRole() === 'leader';
             $isTripLeader = $user instanceof Member && $user->isTripLeader($tripId);
-            if (!$isAdmin && !$isTripLeader) {
-                ApiResponse::error('Only the trip leader or an admin can cancel a trip.', 403);
+            if (!$isAdmin && !$isLeader && !$isTripLeader) {
+                ApiResponse::error('Only leaders or an admin can cancel a trip.', 403);
             }
 
             $tripsDb   = Database::getInstance('trips');
@@ -138,7 +186,7 @@ try {
 
             // Build display name e.g. "Shadow(Admin)"
             $name    = $user->getName() ?: $user->getEmail();
-            $roleTag = $isAdmin ? 'Admin' : 'Leader';
+            $roleTag = $isAdmin ? 'Admin' : ($isTripLeader ? 'Trip Leader' : 'Leader');
             $byLine  = "{$name}({$roleTag})";
 
             // Notify all members except the canceller
@@ -207,15 +255,21 @@ try {
                 if (empty($_POST[$f])) ApiResponse::error("Missing field: {$f}");
             }
 
+            $title       = substr(trim(strip_tags($_POST['title'])), 0, 120);
+            $destination = substr(trim(strip_tags($_POST['destination'])), 0, 120);
+            if ($title === '' || $destination === '') {
+                ApiResponse::error('Title and destination must contain plain text.');
+            }
+
             $tripId = $user->createTrip([
-                'title'           => trim($_POST['title']),
-                'destination'     => trim($_POST['destination']),
+                'title'           => $title,
+                'destination'     => $destination,
                 'start_date'      => $_POST['start_date'],
                 'end_date'        => $_POST['end_date'],
                 'base_currency'   => $_POST['base_currency']   ?? 'EGP',
                 'budget_limit'    => !empty($_POST['budget_limit'])    ? (float)$_POST['budget_limit']    : null,
                 'max_slots'       => !empty($_POST['max_slots'])       ? (int)$_POST['max_slots']         : 20,
-                'departure_point' => !empty($_POST['departure_point']) ? trim($_POST['departure_point'])  : null,
+                'departure_point' => !empty($_POST['departure_point']) ? substr(trim(strip_tags($_POST['departure_point'])), 0, 200) : null,
                 'departure_time'  => !empty($_POST['departure_time'])  ? trim($_POST['departure_time'])   : null,
             ]);
 
@@ -270,6 +324,42 @@ try {
             ApiResponse::success(null, $ok ? 'Invited.' : 'User not found or already a member.');
 
 
+        case 'invite_all':
+            $tripId = (int)($_POST['trip_id'] ?? 0);
+            if (!$tripId) ApiResponse::error('trip_id required.');
+
+            $canManage = in_array($user->getRole(), ['admin', 'leader'])
+                || ($user instanceof Member && $user->isTripLeader($tripId));
+            if (!$canManage) ApiResponse::error('Only leaders or an admin can invite all members.', 403);
+
+            $trip = Trip::findById($tripId);
+            if (!$trip) ApiResponse::error('Trip not found.', 404);
+
+            $tripsDb = Database::getInstance('trips');
+            $existing = $tripsDb->prepare('SELECT user_id FROM trip_members WHERE trip_id = ?');
+            $existing->execute([$tripId]);
+            $existingIds = array_map('intval', array_column($existing->fetchAll(), 'user_id'));
+
+            $allUsers = Database::getInstance('accounts')->query('SELECT id FROM users')->fetchAll();
+            $invited  = 0;
+            $insert   = $tripsDb->prepare(
+                "INSERT INTO trip_members (trip_id, user_id, role, status, can_edit) VALUES (?, ?, 'member', 'pending', 0)"
+            );
+            $tripTitle  = $trip->getTitle();
+            $inviterName = $user->getName() ?: $user->getEmail();
+
+            foreach ($allUsers as $u) {
+                $uid = (int)$u['id'];
+                if (in_array($uid, $existingIds, true) || $uid === $user->getId()) continue;
+                try {
+                    $insert->execute([$tripId, $uid]);
+                    Notification::tripInvite($uid, $tripTitle, $inviterName);
+                    $invited++;
+                } catch (\Throwable $ignored) {}
+            }
+            ApiResponse::success(['invited' => $invited], "Invited {$invited} user(s).");
+
+
         case 'set_permission':
             $tripId  = (int)($_POST['trip_id'] ?? 0);
             $userId  = (int)($_POST['user_id'] ?? 0);
@@ -283,27 +373,84 @@ try {
             );
 
 
+        case 'update':
+            $tripId = (int)($_POST['trip_id'] ?? 0);
+            if (!$tripId) ApiResponse::error('trip_id required.');
+
+            $canManage = in_array($user->getRole(), ['admin', 'leader'])
+                || ($user instanceof Member && $user->isTripLeader($tripId));
+            if (!$canManage) ApiResponse::error('Only leaders or an admin can edit trips.', 403);
+
+            $existing = Trip::findById($tripId);
+            if (!$existing) ApiResponse::error('Trip not found.', 404);
+
+            $fields = [];
+            $params = [];
+
+            if (isset($_POST['title'])) {
+                $title = substr(trim(strip_tags($_POST['title'])), 0, 120);
+                if ($title === '') ApiResponse::error('Title cannot be empty.');
+                $fields[] = 'title = ?'; $params[] = $title;
+            }
+            if (isset($_POST['destination'])) {
+                $dest = substr(trim(strip_tags($_POST['destination'])), 0, 120);
+                if ($dest === '') ApiResponse::error('Destination cannot be empty.');
+                $fields[] = 'destination = ?'; $params[] = $dest;
+            }
+            if (!empty($_POST['start_date'])) { $fields[] = 'start_date = ?'; $params[] = $_POST['start_date']; }
+            if (!empty($_POST['end_date']))   { $fields[] = 'end_date = ?';   $params[] = $_POST['end_date']; }
+            if (isset($_POST['base_currency']) && $_POST['base_currency'] !== '') { $fields[] = 'base_currency = ?'; $params[] = $_POST['base_currency']; }
+            if (isset($_POST['budget_limit']))    { $fields[] = 'budget_limit = ?';    $params[] = $_POST['budget_limit'] === '' ? null : (float)$_POST['budget_limit']; }
+            if (isset($_POST['max_slots']))       { $fields[] = 'max_slots = ?';       $params[] = $_POST['max_slots'] === '' ? null : (int)$_POST['max_slots']; }
+            if (isset($_POST['departure_point'])) { $fields[] = 'departure_point = ?'; $params[] = $_POST['departure_point'] === '' ? null : substr(trim(strip_tags($_POST['departure_point'])), 0, 200); }
+            if (isset($_POST['departure_time']))  { $fields[] = 'departure_time = ?';  $params[] = $_POST['departure_time'] === '' ? null : trim($_POST['departure_time']); }
+
+            if (isset($_POST['required_docs'])) {
+                $reqDocs = array_values(array_filter(array_intersect(
+                    is_array($_POST['required_docs']) ? $_POST['required_docs'] : [],
+                    ['passport', 'national_id', 'license']
+                )));
+                $fields[] = 'required_docs = ?';
+                $params[] = empty($reqDocs) ? null : json_encode($reqDocs);
+            }
+
+            if (empty($fields)) ApiResponse::error('No fields to update.');
+
+            $params[] = $tripId;
+            Database::getInstance('trips')
+                ->prepare('UPDATE trips SET ' . implode(', ', $fields) . ' WHERE id = ?')
+                ->execute($params);
+
+            ApiResponse::success(null, 'Trip updated.');
+
+
         case 'set_budget':
             $tripId = (int)($_POST['trip_id'] ?? 0);
             $limit  = (float)($_POST['budget_limit'] ?? 0);
             if (!$tripId || $limit <= 0) ApiResponse::error('trip_id and budget_limit required.');
-            if (!($user instanceof Member) || !$user->isTripLeader($tripId)) {
-                ApiResponse::error('Only the leader of this trip can set budget.', 403);
+            $canManage = in_array($user->getRole(), ['admin', 'leader'])
+                || ($user instanceof Member && $user->isTripLeader($tripId));
+            if (!$canManage) {
+                ApiResponse::error('Only leaders or an admin can set budget.', 403);
             }
-            ApiResponse::success(null,
-                $user->setBudgetLimit($tripId, $limit) ? 'Budget set.' : 'Failed.'
-            );
+            Database::getInstance('trips')
+                ->prepare('UPDATE trips SET budget_limit = ? WHERE id = ?')
+                ->execute([$limit, $tripId]);
+            ApiResponse::success(null, 'Budget set.');
 
 
         case 'close':
             $tripId = (int)($_POST['trip_id'] ?? 0);
             if (!$tripId) ApiResponse::error('trip_id required.');
-            if (!($user instanceof Member) || !$user->isTripLeader($tripId)) {
-                ApiResponse::error('Only the leader of this trip can close it.', 403);
+            $canManage = in_array($user->getRole(), ['admin', 'leader'])
+                || ($user instanceof Member && $user->isTripLeader($tripId));
+            if (!$canManage) {
+                ApiResponse::error('Only leaders or an admin can close a trip.', 403);
             }
-            ApiResponse::success(null,
-                $user->closeTrip($tripId) ? 'Trip settled.' : 'Failed.'
-            );
+            Database::getInstance('trips')
+                ->prepare("UPDATE trips SET status = 'settled' WHERE id = ?")
+                ->execute([$tripId]);
+            ApiResponse::success(null, 'Trip settled.');
 
 
         case 'update_status':
@@ -311,8 +458,9 @@ try {
             if (!$tripId) ApiResponse::error('trip_id required.');
 
             $isAdmin      = $user->getRole() === 'admin';
+            $isLeader     = $user->getRole() === 'leader';
             $isTripLeader = $user instanceof Member && $user->isTripLeader($tripId);
-            if (!$isAdmin && !$isTripLeader) {
+            if (!$isAdmin && !$isLeader && !$isTripLeader) {
                 ApiResponse::error('Only the trip leader or an admin can update status.', 403);
             }
 
@@ -331,9 +479,10 @@ try {
             if (!$tripId) ApiResponse::error('trip_id required.');
 
             $isAdmin      = $user->getRole() === 'admin';
+            $isLeader     = $user->getRole() === 'leader';
             $isTripLeader = $user instanceof Member && $user->isTripLeader($tripId);
-            if (!$isAdmin && !$isTripLeader) {
-                ApiResponse::error('Only the trip leader or an admin can set requirements.', 403);
+            if (!$isAdmin && !$isLeader && !$isTripLeader) {
+                ApiResponse::error('Only leaders or an admin can set requirements.', 403);
             }
 
             $reqDocs = array_values(array_filter(array_intersect(

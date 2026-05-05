@@ -19,12 +19,43 @@ start_layout('Triply - Group Trips Made Effortless', ['shell' => 'public', 'page
       <a class="bg-[#A855F7] text-white font-bold py-4 px-10 rounded-xl hover:scale-105 shadow-[0_0_20px_rgba(168,85,247,0.3)] transition-all no-underline" href="/?page=register">
         Get Started
       </a>
-      <a class="border-2 border-[#6C3DD3] text-white font-bold py-4 px-10 rounded-xl hover:bg-white/5 transition-all no-underline" href="/?page=login">
+      <a class="border-2 border-[#6C3DD3] text-white font-bold py-4 px-10 rounded-xl hover:bg-white/5 transition-all no-underline cursor-pointer" onclick="openDemoModal(event)">
         Watch Demo
       </a>
     </div>
   </div>
 </section>
+
+<div id="demo-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;padding:20px" onclick="closeDemoModal(event)">
+  <div style="position:relative;width:100%;max-width:960px" onclick="event.stopPropagation()">
+    <button onclick="closeDemoModal()" style="position:absolute;top:-40px;right:0;background:transparent;border:none;color:#fff;font-size:32px;cursor:pointer;line-height:1" aria-label="Close">×</button>
+    <video id="demo-video" controls style="width:100%;border-radius:12px;background:#000" preload="none">
+      <source src="/public/assets/DogSayHello.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</div>
+
+<script>
+  function openDemoModal(e) {
+    if (e) e.preventDefault();
+    const m = document.getElementById('demo-modal');
+    m.style.display = 'flex';
+    const v = document.getElementById('demo-video');
+    v.currentTime = 0;
+    v.play().catch(() => {});
+  }
+  function closeDemoModal(e) {
+    if (e && e.target.id !== 'demo-modal' && e.type !== 'click') return;
+    const m = document.getElementById('demo-modal');
+    m.style.display = 'none';
+    const v = document.getElementById('demo-video');
+    v.pause();
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && document.getElementById('demo-modal').style.display === 'flex') closeDemoModal();
+  });
+</script>
 
 <!-- Features Section -->
 <section class="py-32 bg-surface-container-lowest">

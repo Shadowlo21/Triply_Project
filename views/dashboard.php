@@ -56,7 +56,7 @@ start_layout('Dashboard');
       action: 'list'
     });
     if (!tripsRes.success) return;
-    const trips = tripsRes.data || [];
+    const trips = (tripsRes.data || []).filter(t => t.my_status === 'accepted');
 
     document.getElementById('stat-trips').textContent = trips.length;
 

@@ -120,6 +120,11 @@ start_layout('Trips');
       <div id="invite-alert"></div>
       <div class="form-group"><label>Email</label><input type="email" id="invite-email" class="form-control"></div>
       <button class="btn btn-primary btn-block" onclick="sendInvite()">Send Invite</button>
+      <div style="display:flex;align-items:center;gap:8px;margin:16px 0;color:var(--text-muted)">
+        <hr style="flex:1;border-color:var(--border)"><span class="text-sm">or</span><hr style="flex:1;border-color:var(--border)">
+      </div>
+      <button class="btn btn-secondary btn-block" onclick="inviteAll()">📢 Invite All Users</button>
+      <p class="text-sm text-gray-500 mt-2">Sends a pending invite to every registered user not already in this trip.</p>
     </div>
   </div>
 </div>
@@ -135,6 +140,51 @@ start_layout('Trips');
       <div id="budget-alert"></div>
       <div class="form-group"><label>Budget Limit</label><input type="number" id="budget-amount" class="form-control" min="0" step="0.01"></div>
       <button class="btn btn-primary btn-block" onclick="saveBudget()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Trip modal -->
+<div class="modal-overlay hidden" id="modal-edit-trip">
+  <div class="triply-modal">
+    <div class="modal-header">
+      <h3>Edit Trip</h3>
+      <button class="modal-close" onclick="closeModal('modal-edit-trip')">×</button>
+    </div>
+    <div class="modal-body">
+      <div id="edit-alert"></div>
+      <form id="form-edit-trip">
+        <div class="form-group"><label>Title</label><input type="text" name="title" class="form-control" required></div>
+        <div class="form-group"><label>Destination</label><input type="text" name="destination" class="form-control" required></div>
+        <div class="grid-2">
+          <div class="form-group"><label>Start Date</label><input type="date" name="start_date" class="form-control" required></div>
+          <div class="form-group"><label>End Date</label><input type="date" name="end_date" class="form-control" required></div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group"><label>Pickup / Departure Point</label><input type="text" name="departure_point" class="form-control"></div>
+          <div class="form-group"><label>Departure Time</label><input type="time" name="departure_time" class="form-control"></div>
+        </div>
+        <div class="grid-3">
+          <div class="form-group">
+            <label>Currency</label>
+            <select name="base_currency" class="form-control">
+              <option value="EGP">EGP</option><option value="USD">USD</option>
+              <option value="EUR">EUR</option><option value="GBP">GBP</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Budget Limit</label><input type="number" name="budget_limit" class="form-control" min="0" step="0.01"></div>
+          <div class="form-group"><label>Max Slots</label><input type="number" name="max_slots" class="form-control" min="1" step="1"></div>
+        </div>
+        <div class="form-group">
+          <label>Required Documents to Join</label>
+          <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:4px">
+            <label style="display:flex;align-items:center;gap:6px;font-weight:normal"><input type="checkbox" name="edit_required_docs[]" value="passport"> Passport</label>
+            <label style="display:flex;align-items:center;gap:6px;font-weight:normal"><input type="checkbox" name="edit_required_docs[]" value="national_id"> National ID</label>
+            <label style="display:flex;align-items:center;gap:6px;font-weight:normal"><input type="checkbox" name="edit_required_docs[]" value="license"> Driver's License</label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="btn-edit-trip">Save Changes</button>
+      </form>
     </div>
   </div>
 </div>
@@ -241,25 +291,33 @@ start_layout('Trips');
     const btns = document.getElementById('detail-actions');
     btns.innerHTML = '';
 
-    if (!t.my_status && mySystemRole === 'admin') {
+    const canManage = mySystemRole === 'admin' || mySystemRole === 'leader' || t.my_role === 'leader';
+
+    if (!t.my_status && canManage) {
+      btns.innerHTML += `<button class="btn btn-secondary btn-sm" onclick="openEditTripModal(${id})">✎ Edit</button>`;
       btns.innerHTML += `<button class="btn btn-secondary btn-sm" onclick="openModal('modal-invite')">Invite Member</button>`;
       btns.innerHTML += `<button class="btn btn-secondary btn-sm" onclick="openModal('modal-budget')">Set Budget</button>`;
       btns.innerHTML += `<button class="btn btn-secondary btn-sm" onclick="openReqDocsModal(${id})">Requirements</button>`;
       btns.innerHTML += `<button class="btn btn-danger btn-sm" onclick="cancelTrip(${id})">Cancel Trip</button>`;
     } else if (!t.my_status) {
-      btns.innerHTML = '<span class="text-sm text-gray-500">You are not a member of this trip.</span>';
+      const isFull = t.max_slots && t.member_count >= t.max_slots;
+      btns.innerHTML = isFull
+        ? '<span class="text-sm text-danger">This trip is full.</span>'
+        : `<button class="btn btn-primary btn-sm" onclick="joinTrip(${id})">Join Trip</button>`;
     } else if (t.my_status === 'pending') {
       btns.innerHTML = `
         <button class="btn btn-primary btn-sm" onclick="acceptInvite(${id})">Join Trip</button>
         <button class="btn btn-danger  btn-sm" onclick="declineInvite(${id})">Decline</button>`;
     } else {
-      const isLeader = t.my_role === 'leader';
-      const isAdmin  = mySystemRole === 'admin';
-      if (isLeader || isAdmin) {
+      if (canManage) {
+        btns.innerHTML += `<button class="btn btn-secondary btn-sm" onclick="openEditTripModal(${id})">✎ Edit</button>`;
         btns.innerHTML += `<button class="btn btn-secondary btn-sm" onclick="openModal('modal-invite')">Invite Member</button>`;
         btns.innerHTML += `<button class="btn btn-secondary btn-sm" onclick="openModal('modal-budget')">Set Budget</button>`;
         btns.innerHTML += `<button class="btn btn-secondary btn-sm" onclick="openReqDocsModal(${id})">Requirements</button>`;
         btns.innerHTML += `<button class="btn btn-danger btn-sm" onclick="cancelTrip(${id})">Cancel Trip</button>`;
+        if (t.my_role !== 'leader') {
+          btns.innerHTML += `<button class="btn btn-warning btn-sm" onclick="leaveTrip(${id})">Leave Trip</button>`;
+        }
       } else {
         btns.innerHTML += `<button class="btn btn-danger btn-sm" onclick="leaveTrip(${id})">Leave Trip</button>`;
       }
@@ -291,6 +349,12 @@ start_layout('Trips');
 
   async function acceptInvite(tripId) {
     const res = await API.post('trips', { action: 'accept_invite', trip_id: tripId });
+    showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
+    if (res.success) { loadTrips(); document.getElementById('trip-detail').style.display = 'none'; }
+  }
+
+  async function joinTrip(tripId) {
+    const res = await API.post('trips', { action: 'join', trip_id: tripId });
     showAlert('#alert-box', res.message, res.success ? 'success' : 'error');
     if (res.success) { loadTrips(); document.getElementById('trip-detail').style.display = 'none'; }
   }
@@ -333,6 +397,14 @@ start_layout('Trips');
     }
   }
 
+  async function inviteAll() {
+    if (!currentTripId) return;
+    if (!confirm('Send a pending invite to ALL registered users not already in this trip?')) return;
+    const res = await API.post('trips', { action: 'invite_all', trip_id: currentTripId });
+    showAlert('#invite-alert', res.message, res.success ? 'success' : 'error');
+    if (res.success) showTrip(currentTripId);
+  }
+
   async function saveBudget() {
     const amt = document.getElementById('budget-amount').value;
     if (!amt || !currentTripId) return;
@@ -340,6 +412,56 @@ start_layout('Trips');
     showAlert('#budget-alert', res.message, res.success ? 'success' : 'error');
     if (res.success) closeModal('modal-budget');
   }
+
+  function openEditTripModal(tripId) {
+    currentTripId = tripId;
+    const t = tripsData[tripId];
+    if (!t) return;
+    const f = document.getElementById('form-edit-trip');
+    f.title.value           = t.title || '';
+    f.destination.value     = t.destination || '';
+    f.start_date.value      = (t.start_date || '').slice(0, 10);
+    f.end_date.value        = (t.end_date || '').slice(0, 10);
+    f.departure_point.value = t.departure_point || '';
+    f.departure_time.value  = t.departure_time || '';
+    f.base_currency.value   = t.base_currency || 'EGP';
+    f.budget_limit.value    = t.budget_limit || '';
+    f.max_slots.value       = t.max_slots || '';
+    const current = t.required_docs ? JSON.parse(t.required_docs) : [];
+    f.querySelectorAll('input[name="edit_required_docs[]"]').forEach(c => { c.checked = current.includes(c.value); });
+    openModal('modal-edit-trip');
+  }
+
+  document.getElementById('form-edit-trip').addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!currentTripId) return;
+    const btn = document.getElementById('btn-edit-trip');
+    setLoading(btn, true);
+    const fd = new FormData(e.target);
+    const res = await API.post('trips', {
+      action:          'update',
+      trip_id:         currentTripId,
+      title:           fd.get('title'),
+      destination:     fd.get('destination'),
+      start_date:      fd.get('start_date'),
+      end_date:        fd.get('end_date'),
+      departure_point: fd.get('departure_point'),
+      departure_time:  fd.get('departure_time'),
+      base_currency:   fd.get('base_currency'),
+      budget_limit:    fd.get('budget_limit'),
+      max_slots:       fd.get('max_slots'),
+      required_docs:   fd.getAll('edit_required_docs[]'),
+    });
+    setLoading(btn, false);
+    if (res.success) {
+      closeModal('modal-edit-trip');
+      showAlert('#alert-box', 'Trip updated.', 'success');
+      await loadTrips();
+      showTrip(currentTripId);
+    } else {
+      showAlert('#edit-alert', res.message, 'error');
+    }
+  });
 
   function openReqDocsModal(tripId) {
     currentTripId = tripId;
@@ -384,7 +506,7 @@ start_layout('Trips');
         max_slots:       fd.get('max_slots'),
         departure_point: fd.get('departure_point'),
         departure_time:  fd.get('departure_time'),
-        'required_docs[]': fd.getAll('required_docs[]'),
+        required_docs:   fd.getAll('required_docs[]'),
       });
       setLoading(btn, false);
       if (res.success) {

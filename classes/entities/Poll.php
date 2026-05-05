@@ -117,23 +117,30 @@ class Poll
                 }
             }
         }
-        $allVoterIds = array_unique($allVoterIds);
+        $allVoterIds = array_values(array_unique($allVoterIds));
 
-        $emails = [];
+        $names = [];
         if (!empty($allVoterIds)) {
             $ph      = implode(',', array_fill(0, count($allVoterIds), '?'));
             $uStmt   = Database::getInstance('accounts')->prepare(
-                "SELECT id, email FROM users WHERE id IN ({$ph})"
+                "SELECT id, email, data FROM users WHERE id IN ({$ph})"
             );
             $uStmt->execute($allVoterIds);
             foreach ($uStmt->fetchAll() as $u) {
-                $emails[$u['id']] = $u['email'];
+                $name = '';
+                if (!empty($u['data'])) {
+                    try {
+                        $d = Encryption::decryptJson($u['data'], (int)$u['id']);
+                        $name = $d['name'] ?? '';
+                    } catch (\Throwable $ignored) {}
+                }
+                $names[$u['id']] = $name !== '' ? $name : $u['email'];
             }
         }
 
         foreach ($rows as &$row) {
             $voterIds = $row['voter_ids'] ? array_map('intval', explode(',', $row['voter_ids'])) : [];
-            $row['voters'] = array_values(array_filter(array_map(fn($id) => $emails[$id] ?? null, $voterIds)));
+            $row['voters'] = array_values(array_filter(array_map(fn($id) => $names[$id] ?? null, $voterIds)));
             unset($row['voter_ids']);
         }
 

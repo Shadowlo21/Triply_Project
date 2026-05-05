@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(& \"C:\\\\php\\\\php.exe\" -r \"echo extension_loaded\\('mbstring'\\) ? 'mbstring OK' : 'mbstring MISSING'; echo PHP_EOL;\")"
+    ]
+  }
+}
