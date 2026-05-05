@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(& \"C:\\\\php\\\\php.exe\" -r \"echo extension_loaded\\('mbstring'\\) ? 'mbstring OK' : 'mbstring MISSING'; echo PHP_EOL;\")"
+      "PowerShell(& \"C:\\\\php\\\\php.exe\" -r \"echo extension_loaded\\('mbstring'\\) ? 'mbstring OK' : 'mbstring MISSING'; echo PHP_EOL;\")",
+      "PowerShell(Get-Process -Name \"php\",\"ngrok\" -ErrorAction SilentlyContinue | ForEach-Object { Write-Host \"Stopping $\\($_.Name\\) PID $\\($_.Id\\)\"; $_ | Stop-Process -Force }; Start-Sleep 1; $still = Get-Process -Name \"php\",\"ngrok\" -ErrorAction SilentlyContinue; if \\($still\\) { \"Still running: $\\($still.Name -join ', '\\)\" } else { \"All stopped.\" })"
     ]
   }
 }
