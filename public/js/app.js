@@ -13,6 +13,11 @@ const API = {
 
 // Shared Triply helpers (required)
 const Triply = {
+  csrfToken() {
+    const m = document.querySelector('meta[name="csrf-token"]');
+    return m ? m.getAttribute('content') : '';
+  },
+
   async fetch(endpoint, { method = 'GET', params = {}, data = {}, body = null } = {}) {
     try {
       let url = `/api/${endpoint}.php`;
@@ -31,7 +36,13 @@ const Triply = {
         fetchBody = fd;
       }
 
-      const res = await fetch(url, { method, body: fetchBody });
+      const headers = {};
+      if (method.toUpperCase() !== 'GET') {
+        const token = this.csrfToken();
+        if (token) headers['X-CSRF-Token'] = token;
+      }
+
+      const res = await fetch(url, { method, body: fetchBody, headers });
       const json = await res.json().catch(() => null);
       return json || { success: false, message: 'Invalid server response.' };
     } catch (e) {

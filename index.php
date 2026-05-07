@@ -2,7 +2,7 @@
 
 session_start();
 require_once __DIR__ . '/config/bootstrap.php';
-require_once __DIR__ . '/classes/boundary/Auth.php';
+require_once __DIR__ . '/classes/controllers/Auth.php';
 
 $isAuthed = (bool)Auth::current();
 $page = $_GET['page'] ?? ($isAuthed ? 'dashboard' : 'landing');

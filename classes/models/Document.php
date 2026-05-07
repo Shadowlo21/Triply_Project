@@ -11,7 +11,7 @@ class Document
     private ?string $metadata;
     private string $uploadedAt;
 
-    private const UPLOAD_DIR = __DIR__ . '/../../public/uploads/';
+    private const UPLOAD_DIR = __DIR__ . '/../../storage/uploads/';
 
     public function __construct(array $row)
     {
@@ -23,6 +23,23 @@ class Document
         $this->visibility = $row['visibility'];
         $this->metadata   = $row['metadata'] ?? null;
         $this->uploadedAt = $row['uploaded_at'] ?? '';
+    }
+
+    private static function dirFor(int $userId, string $kind, string $type): string
+    {
+        $safeKind = preg_replace('/[^a-z_]/', '', strtolower($kind)) ?: 'misc';
+        $safeType = preg_replace('/[^a-z0-9_]/', '', strtolower($type)) ?: 'other';
+        $dir = self::UPLOAD_DIR . $userId . '/' . $safeKind . '/' . $safeType . '/';
+        if (!is_dir($dir)) mkdir($dir, 0750, true);
+        return $dir;
+    }
+
+    public static function resolvePath(int $userId, string $kind, string $type, string $storedName): string
+    {
+        $newPath = self::dirFor($userId, $kind, $type) . $storedName;
+        if (is_file($newPath)) return $newPath;
+        $legacy = self::UPLOAD_DIR . $storedName;
+        return is_file($legacy) ? $legacy : $newPath;
     }
 
     
@@ -37,15 +54,10 @@ class Document
         string $visibility = 'private'
     ): self {
         $bytes      = file_get_contents($tmpPath);
-        $encrypted  = Encryption::encryptFile($bytes, $userId); 
+        $encrypted  = Encryption::encryptFile($bytes, $userId);
         $storedName = bin2hex(random_bytes(16)) . '.enc';
 
-        if (!is_dir(self::UPLOAD_DIR)) {
-            mkdir(self::UPLOAD_DIR, 0750, true);
-        }
-
-        
-        file_put_contents(self::UPLOAD_DIR . $storedName, $encrypted, LOCK_EX);
+        file_put_contents(self::dirFor($userId, 'trip', $type) . $storedName, $encrypted, LOCK_EX);
 
         $meta = Encryption::encryptJson([
             'original_name' => $originalName,
@@ -87,7 +99,8 @@ class Document
     
     public function getDecryptedBytes(): string
     {
-        $raw = file_get_contents(self::UPLOAD_DIR . $this->storedName); 
+        $path = self::resolvePath($this->userId, 'trip', $this->type, $this->storedName);
+        $raw  = file_get_contents($path);
         return Encryption::decryptFile($raw, $this->userId);
     }
 
@@ -118,6 +131,7 @@ class Document
 
     public function delete(): bool
     {
+        @unlink(self::resolvePath($this->userId, 'trip', $this->type, $this->storedName));
         @unlink(self::UPLOAD_DIR . $this->storedName);
         $db   = Database::getInstance('documents');
         $stmt = $db->prepare('DELETE FROM documents WHERE id = ?');
@@ -141,8 +155,7 @@ class Document
         $encrypted  = Encryption::encryptFile($bytes, $userId);
         $storedName = bin2hex(random_bytes(16)) . '.enc';
 
-        if (!is_dir(self::UPLOAD_DIR)) mkdir(self::UPLOAD_DIR, 0750, true);
-        file_put_contents(self::UPLOAD_DIR . $storedName, $encrypted, LOCK_EX);
+        file_put_contents(self::dirFor($userId, 'profile', $type) . $storedName, $encrypted, LOCK_EX);
 
         $meta = Encryption::encryptJson(['original_name' => $originalName, 'size' => strlen($bytes)], $userId);
 
@@ -200,10 +213,11 @@ class Document
     public static function deleteProfileDoc(int $docId, int $userId): bool
     {
         $db   = Database::getInstance('documents');
-        $stmt = $db->prepare('SELECT stored_name FROM profile_documents WHERE id = ? AND user_id = ?');
+        $stmt = $db->prepare('SELECT stored_name, type FROM profile_documents WHERE id = ? AND user_id = ?');
         $stmt->execute([$docId, $userId]);
         $row  = $stmt->fetch();
         if (!$row) return false;
+        @unlink(self::resolvePath($userId, 'profile', $row['type'], $row['stored_name']));
         @unlink(self::UPLOAD_DIR . $row['stored_name']);
         $db->prepare('DELETE FROM profile_documents WHERE id = ?')->execute([$docId]);
         return true;

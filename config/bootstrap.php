@@ -1,6 +1,5 @@
 <?php
 
-// Load .env if it exists (local dev). On Render/production env vars come from the dashboard.
 $envFile = __DIR__ . '/../.env';
 if (is_file($envFile)) {
     $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
@@ -17,9 +16,8 @@ foreach ($_SERVER as $k => $v) {
 
 spl_autoload_register(function (string $class): void {
     $dirs = [
-        __DIR__ . '/../classes/entities/',
-        __DIR__ . '/../classes/control/',
-        __DIR__ . '/../classes/boundary/',
+        __DIR__ . '/../classes/models/',
+        __DIR__ . '/../classes/controllers/',
         __DIR__ . '/../config/',
     ];
     foreach ($dirs as $dir) {
@@ -31,5 +29,4 @@ spl_autoload_register(function (string $class): void {
     }
 });
 
-// Run DB migrations on every boot (idempotent — CREATE TABLE IF NOT EXISTS)
 require_once __DIR__ . '/migrate.php';

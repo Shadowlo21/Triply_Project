@@ -61,8 +61,9 @@ abstract class User
         if (!$row) return null;
 
         $user = match ($row['role']) {
-            'leader', 'admin' => new TripLeader($row['id'], $row['email'], $row['role']),
-            default            => new Member($row['id'], $row['email'], $row['role']),
+            'admin'  => new Admin($row['id'], $row['email'], $row['role']),
+            'leader' => new TripLeader($row['id'], $row['email'], $row['role']),
+            default  => new Member($row['id'], $row['email'], $row['role']),
         };
 
         $user->decryptData($row['data']);

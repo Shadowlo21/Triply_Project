@@ -22,7 +22,6 @@ try {
             $stmt->execute([$user->getId()]);
             $trips = $stmt->fetchAll();
 
-            // Attach creator names (decrypt from accounts DB)
             if ($trips) {
                 $creatorIds  = array_values(array_unique(array_column($trips, 'created_by')));
                 $accountsDb  = Database::getInstance('accounts');
@@ -110,14 +109,12 @@ try {
 
             $trip = Trip::findById($tripId);
 
-            // Check max slots
             if ($trip && $trip->getMaxSlots() !== null) {
                 if ($trip->getAcceptedMemberCount() >= $trip->getMaxSlots()) {
                     ApiResponse::error('This trip is full (' . $trip->getMaxSlots() . ' slots).');
                 }
             }
 
-            // Check required documents (leaders and admins bypass)
             if ($trip && !in_array($user->getRole(), ['admin', 'leader'])) {
                 foreach ($trip->getRequiredDocs() as $docType) {
                     if (!Document::hasVerifiedDoc($user->getId(), $docType)) {
@@ -177,19 +174,16 @@ try {
             $tripTitle = $titleStmt->fetchColumn();
             if (!$tripTitle) ApiResponse::error('Trip not found.', 404);
 
-            // Collect all accepted members before deletion
             $memStmt = $tripsDb->prepare(
                 "SELECT user_id FROM trip_members WHERE trip_id = ? AND status = 'accepted'"
             );
             $memStmt->execute([$tripId]);
             $memberIds = array_column($memStmt->fetchAll(), 'user_id');
 
-            // Build display name e.g. "Shadow(Admin)"
             $name    = $user->getName() ?: $user->getEmail();
             $roleTag = $isAdmin ? 'Admin' : ($isTripLeader ? 'Trip Leader' : 'Leader');
             $byLine  = "{$name}({$roleTag})";
 
-            // Notify all members except the canceller
             foreach ($memberIds as $mid) {
                 if ((int)$mid !== $user->getId()) {
                     Notification::send(
@@ -201,28 +195,22 @@ try {
                 }
             }
 
-            // Clean up financial DB
             $finDb = Database::getInstance('financial');
             $finDb->prepare('DELETE FROM expenses WHERE trip_id = ?')->execute([$tripId]);
             $finDb->prepare('DELETE FROM settlements WHERE trip_id = ?')->execute([$tripId]);
 
-            // Clean up social DB
             Database::getInstance('social')
                 ->prepare('DELETE FROM polls WHERE trip_id = ?')
                 ->execute([$tripId]);
 
-            // Clean up documents (files + DB rows)
             $docsDb   = Database::getInstance('documents');
-            $docsStmt = $docsDb->prepare('SELECT stored_name FROM documents WHERE trip_id = ?');
+            $docsStmt = $docsDb->prepare('SELECT user_id, type, stored_name FROM documents WHERE trip_id = ?');
             $docsStmt->execute([$tripId]);
-            $uploadDir = __DIR__ . '/../public/uploads/';
             foreach ($docsStmt->fetchAll() as $doc) {
-                @unlink($uploadDir . $doc['stored_name']);
+                @unlink(Document::resolvePath((int)$doc['user_id'], 'trip', $doc['type'], $doc['stored_name']));
             }
             $docsDb->prepare('DELETE FROM documents WHERE trip_id = ?')->execute([$tripId]);
 
-            // Delete the trip — CASCADE handles trip_members, activities, attendance,
-            // itinerary_versions, comments, shared_items within trips.db
             $tripsDb->prepare('DELETE FROM trips WHERE id = ?')->execute([$tripId]);
 
             ApiResponse::success(null, "Trip \"{$tripTitle}\" has been cancelled.");
@@ -273,7 +261,6 @@ try {
                 'departure_time'  => !empty($_POST['departure_time'])  ? trim($_POST['departure_time'])   : null,
             ]);
 
-            // Optional required docs
             $reqDocs = array_filter(array_intersect(
                 $_POST['required_docs'] ?? [],
                 ['passport', 'national_id', 'license']
@@ -290,7 +277,6 @@ try {
         case 'members':
             $tripId = (int)($_GET['trip_id'] ?? 0);
             if (!$tripId) ApiResponse::error('trip_id required.');
-            // Admins can always see members; others must be in the trip (any status)
             if ($user->getRole() !== 'admin') {
                 $chk = Database::getInstance('trips')
                     ->prepare('SELECT 1 FROM trip_members WHERE trip_id = ? AND user_id = ?');
@@ -336,6 +322,27 @@ try {
             if (!$trip) ApiResponse::error('Trip not found.', 404);
 
             $tripsDb = Database::getInstance('trips');
+            $coolStmt = $tripsDb->prepare('SELECT last_invite_all_at FROM trips WHERE id = ?');
+            $coolStmt->execute([$tripId]);
+            $lastAt = $coolStmt->fetchColumn();
+            if ($lastAt) {
+                $elapsed = time() - strtotime($lastAt);
+                if ($elapsed < 3600) {
+                    $waitMin = (int)ceil((3600 - $elapsed) / 60);
+                    ApiResponse::error("Invite-all was used recently on this trip. Try again in {$waitMin} minute(s).", 429);
+                }
+            }
+
+            $accountsDb = Database::getInstance('accounts');
+            $accountsDb->exec("DELETE FROM rate_events WHERE datetime(event_at) < datetime('now', '-1 day')");
+            $userScope = 'invite_all:user:' . $user->getId();
+            $cnt = $accountsDb->prepare(
+                "SELECT COUNT(*) FROM rate_events WHERE scope = ? AND datetime(event_at) >= datetime('now', '-1 day')"
+            );
+            $cnt->execute([$userScope]);
+            if ((int)$cnt->fetchColumn() >= 10) {
+                ApiResponse::error('Daily invite-all limit reached (10 / 24h). Try again tomorrow.', 429);
+            }
             $existing = $tripsDb->prepare('SELECT user_id FROM trip_members WHERE trip_id = ?');
             $existing->execute([$tripId]);
             $existingIds = array_map('intval', array_column($existing->fetchAll(), 'user_id'));
@@ -357,6 +364,11 @@ try {
                     $invited++;
                 } catch (\Throwable $ignored) {}
             }
+
+            $tripsDb->prepare("UPDATE trips SET last_invite_all_at = datetime('now') WHERE id = ?")
+                ->execute([$tripId]);
+            $accountsDb->prepare('INSERT INTO rate_events (scope) VALUES (?)')->execute([$userScope]);
+
             ApiResponse::success(['invited' => $invited], "Invited {$invited} user(s).");
 
 
@@ -365,8 +377,10 @@ try {
             $userId  = (int)($_POST['user_id'] ?? 0);
             $canEdit = (int)($_POST['can_edit'] ?? 0);
             if (!$tripId || !$userId) ApiResponse::error('trip_id and user_id required.');
-            if (!($user instanceof Member) || !$user->isTripLeader($tripId)) {
-                ApiResponse::error('Only the leader of this trip can change permissions.', 403);
+            $canManage = $user->getRole() === 'admin'
+                || ($user instanceof Member && $user->isTripLeader($tripId));
+            if (!$canManage) {
+                ApiResponse::error('Only the trip leader or an admin can change permissions.', 403);
             }
             ApiResponse::success(null,
                 $user->editPermission($tripId, $userId, (bool)$canEdit) ? 'Permission updated.' : 'Failed.'

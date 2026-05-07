@@ -62,7 +62,6 @@ try {
             $targetRole  = $targetStmt->fetchColumn();
             if (!$targetRole) ApiResponse::error('User not found.', 404);
 
-            // Only admin@admin.com can change the role of another admin
             if ($targetRole === 'admin' && $user->getEmail() !== 'admin@admin.com') {
                 ApiResponse::error('Only the owner can change another admin\'s role.', 403);
             }
@@ -81,7 +80,6 @@ try {
             $target = $row->fetch();
             if (!$target) ApiResponse::error('User not found.', 404);
 
-            // Only admin@admin.com can delete another admin
             if ($target['role'] === 'admin' && $user->getEmail() !== 'admin@admin.com') {
                 ApiResponse::error('Only the owner can delete another admin.', 403);
             }

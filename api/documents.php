@@ -158,7 +158,6 @@ try {
             $docRow = $row->fetch();
             if (!$docRow) ApiResponse::error('Document not found.', 404);
 
-            // Only owner, admins, or leaders may download
             $isOwner  = (int)$docRow['user_id'] === $user->getId();
             $isAdmin  = $user->getRole() === 'admin';
             $isLeader = $user->getRole() === 'leader';
@@ -166,10 +165,9 @@ try {
                 ApiResponse::error('Access denied.', 403);
             }
 
-            // Decrypt using the document owner's key
-            $ownerId    = (int)$docRow['user_id'];
-            $uploadDir  = __DIR__ . '/../public/uploads/';
-            $raw        = file_get_contents($uploadDir . $docRow['stored_name']);
+            $ownerId  = (int)$docRow['user_id'];
+            $filePath = Document::resolvePath($ownerId, 'profile', $docRow['type'], $docRow['stored_name']);
+            $raw      = @file_get_contents($filePath);
             if ($raw === false) ApiResponse::error('File not found on disk.', 404);
 
             $bytes = Encryption::decryptFile($raw, $ownerId);

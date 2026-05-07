@@ -207,7 +207,7 @@ start_layout('Profile');
     setLoading(btn, true);
     const fd = new FormData(e.target);
     fd.append('action', 'upload_profile');
-    const res = await fetch('/api/documents.php', { method: 'POST', body: fd }).then(r => r.json());
+    const res = await API.upload('documents', fd);
     setLoading(btn, false);
     if (res.success) {
       closeModal('modal-upload-profile-doc');

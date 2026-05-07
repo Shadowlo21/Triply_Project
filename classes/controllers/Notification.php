@@ -119,7 +119,6 @@ class Notification
     public static function getAll(int $userId): array
     {
         $db   = Database::getInstance('trips');
-        // auto-purge anything older than 7 days for this user
         $db->prepare(
             "DELETE FROM notifications WHERE user_id = ? AND created_at < datetime('now', '-7 days')"
         )->execute([$userId]);

@@ -2,7 +2,6 @@
 
 function runMigrations(): void
 {
-    // profile_documents table in documents.db
     Database::getInstance('documents')->exec("
         CREATE TABLE IF NOT EXISTS profile_documents (
             id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,7 +16,6 @@ function runMigrations(): void
             uploaded_at TEXT    NOT NULL DEFAULT (datetime('now'))
         )
     ");
-    // Migrate old is_verified column → status (if table existed before)
     try {
         Database::getInstance('documents')->exec(
             "ALTER TABLE profile_documents ADD COLUMN status TEXT NOT NULL DEFAULT 'pending'"
@@ -34,12 +32,55 @@ function runMigrations(): void
         );
     } catch (\Throwable $ignored) {}
 
-    // required_docs column on trips
     try {
         Database::getInstance('trips')->exec(
             "ALTER TABLE trips ADD COLUMN required_docs TEXT DEFAULT NULL"
         );
     } catch (\Throwable $ignored) {}
+
+    Database::getInstance('accounts')->exec("
+        CREATE TABLE IF NOT EXISTS login_attempts (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            identifier  TEXT NOT NULL,
+            attempt_at  TEXT NOT NULL DEFAULT (datetime('now'))
+        )
+    ");
+    Database::getInstance('accounts')->exec(
+        "CREATE INDEX IF NOT EXISTS idx_login_attempts_id_at ON login_attempts(identifier, attempt_at)"
+    );
+
+    Database::getInstance('accounts')->exec("
+        CREATE TABLE IF NOT EXISTS rate_events (
+            id         INTEGER PRIMARY KEY AUTOINCREMENT,
+            scope      TEXT NOT NULL,
+            event_at   TEXT NOT NULL DEFAULT (datetime('now'))
+        )
+    ");
+    Database::getInstance('accounts')->exec(
+        "CREATE INDEX IF NOT EXISTS idx_rate_events_scope_at ON rate_events(scope, event_at)"
+    );
+
+    try {
+        Database::getInstance('trips')->exec(
+            "ALTER TABLE trips ADD COLUMN last_invite_all_at TEXT DEFAULT NULL"
+        );
+    } catch (\Throwable $ignored) {}
+
+    try {
+        Database::getInstance('accounts')->exec(
+            "ALTER TABLE sessions ADD COLUMN csrf_token TEXT DEFAULT NULL"
+        );
+    } catch (\Throwable $ignored) {}
+
+    Database::getInstance('accounts')->exec("
+        CREATE TABLE IF NOT EXISTS health_info (
+            id           INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id      INTEGER NOT NULL UNIQUE,
+            data         TEXT,
+            last_updated TEXT NOT NULL DEFAULT (datetime('now')),
+            is_sensitive INTEGER NOT NULL DEFAULT 1
+        )
+    ");
 }
 
 runMigrations();

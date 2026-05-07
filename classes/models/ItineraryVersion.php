@@ -1,10 +1,10 @@
 <?php
 
-class ItineraryVersion
+class ItineraryVersion implements IVersionable
 {
     private int    $id;
     private int    $tripId;
-    private string $snapshot;   
+    private string $snapshot;
     private int    $changedBy;
     private string $changedAt;
     private ?string $note;
@@ -128,4 +128,18 @@ class ItineraryVersion
     public function getTripId(): int    { return $this->tripId; }
     public function getChangedAt(): string { return $this->changedAt; }
     public function getNote(): ?string  { return $this->note; }
+
+    public function saveSnapshot(int $itineraryId, int $changedBy): void
+    {
+        self::snapshot($itineraryId, $changedBy);
+    }
+
+    public function restoreSnapshot(int $versionId): array
+    {
+        $v = self::findById($versionId);
+        if (!$v) return [];
+        return $v->decode();
+    }
 }
+
+class_alias('ItineraryVersion', 'ChangeLog');

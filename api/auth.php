@@ -6,8 +6,6 @@ $action = $_POST['action'] ?? $_GET['action'] ?? '';
 
 try {
     switch ($action) {
-
-        
         case 'register':
             $required = ['email','password','name','phone','nationality'];
             foreach ($required as $f) {
@@ -31,7 +29,6 @@ try {
 
             ApiResponse::success(['user_id' => $userId], 'Registered successfully.');
 
-        
         case 'login':
             if (empty($_POST['email']) || empty($_POST['password'])) {
                 ApiResponse::error('Email and password required.');
@@ -51,7 +48,6 @@ try {
             Auth::logout();
             ApiResponse::success(null, 'Logged out.');
 
-        
         case 'me':
             $user = Auth::require();
             ApiResponse::success([
