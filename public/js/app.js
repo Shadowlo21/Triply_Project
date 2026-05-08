@@ -126,17 +126,17 @@ async function loadNotifications() {
   const list = document.getElementById('notif-list');
   if (!list) return;
   if (!_notifCache.length) {
-    list.innerHTML = '<div class="notif-item text-muted" style="padding:12px">No new notifications</div>';
+    list.innerHTML = '<div class="notif-item text-sm text-gray-500" style="padding:12px">No new notifications</div>';
     return;
   }
   list.innerHTML = _notifCache.map(n => `
     <div class="notif-item" onclick="openNotifModal(${n.id})" style="cursor:pointer;padding:10px 12px;border-bottom:1px solid var(--border)">
       <div style="display:flex;align-items:center;gap:7px">
         <span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${n.is_read ? 'transparent' : 'var(--danger)'};border:${n.is_read ? '1px solid var(--border)' : 'none'}"></span>
-        <strong class="text-sm" style="color:${n.is_read ? 'var(--text-muted)' : 'var(--text)'}">${escHtml(n.title || 'Notification')}</strong>
+        <strong class="text-sm" style="color:${n.is_read ? 'var(--text-sm text-gray-500)' : 'var(--text)'}">${escHtml(n.title || 'Notification')}</strong>
       </div>
-      <div class="text-sm" style="color:var(--text-muted);margin-top:3px;padding-left:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px">${escHtml(n.message)}</div>
-      <div class="text-xs" style="color:var(--text-muted);margin-top:2px;padding-left:15px">${fmtDateTime(n.created_at)}</div>
+      <div class="text-sm text-gray-500" style="margin-top:3px;padding-left:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px">${escHtml(n.message)}</div>
+      <div class="text-xs text-gray-500" style="margin-top:2px;padding-left:15px">${fmtDateTime(n.created_at)}</div>
     </div>`).join('');
 }
 
