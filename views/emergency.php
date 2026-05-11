@@ -6,7 +6,7 @@ if (!$currentUser) {
   header('Location: /?page=login');
   exit;
 }
-$canViewTripContacts = $currentUser->getRole() !== 'member';
+$canViewTripContacts = !in_array($currentUser->getRole(), ['member', 'admin'], true);
 require_once __DIR__ . '/layout.php';
 start_layout('Emergency');
 ?>

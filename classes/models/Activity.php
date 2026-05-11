@@ -66,18 +66,6 @@ class Activity
     
     
     
-    public static function bufferMinutes(string $mode): int
-    {
-        return match($mode) {
-            'walk'   => 30,
-            'car'    => 20,
-            'bus'    => 45,
-            'train'  => 60,
-            'flight' => 180,
-            default  => 20,
-        };
-    }
-
     public function addAttendee(int $userId, string $status = 'in'): bool
     {
         $db   = Database::getInstance('trips');

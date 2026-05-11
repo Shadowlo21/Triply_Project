@@ -1,10 +1,4 @@
 <?php
-
-/**
- * Design Pattern: Singleton
- * Ensures only one database connection per database file exists throughout the application.
- * Provides centralized DB access via static getInstance() method.
- */
 class Database
 {
 

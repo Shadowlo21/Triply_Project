@@ -2,10 +2,13 @@
 
 session_start();
 require_once __DIR__ . '/config/bootstrap.php';
-require_once __DIR__ . '/classes/controllers/Auth.php';
+require_once __DIR__ . '/classes/services/Auth.php';
 
 $isAuthed = (bool)Auth::current();
-$page = $_GET['page'] ?? ($isAuthed ? 'dashboard' : 'landing');
+$defaultPage = $isAuthed
+    ? (Auth::current()->getRole() === 'admin' ? 'admin' : 'dashboard')
+    : 'landing';
+$page = $_GET['page'] ?? $defaultPage;
 $allowed = ['landing', 'dashboard', 'login', 'register', 'trips', 'itinerary', 'financial', 'documents', 'social', 'admin', 'profile', 'notifications', 'emergency', 'logout'];
 
 if (!in_array($page, $allowed)) {
@@ -32,5 +35,13 @@ if ($page === 'landing') {
         header('Location: /?page=login');
         exit;
     }
+
+    $user = Auth::current();
+    $adminBlocked = ['dashboard', 'social', 'financial', 'documents', 'itinerary'];
+    if ($user->getRole() === 'admin' && in_array($page, $adminBlocked, true)) {
+        header('Location: /?page=admin');
+        exit;
+    }
+
     require __DIR__ . "/views/{$page}.php";
 }

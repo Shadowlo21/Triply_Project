@@ -1,10 +1,4 @@
 <?php
-
-/**
- * Design Pattern: Strategy
- * Provides multiple expense-splitting strategies: equal, custom, and percentage-based.
- * Allows runtime selection of splitting algorithm via splitEqual(), splitCustom(), splitByPercentage().
- */
 class Expense
 {
     private int    $id;

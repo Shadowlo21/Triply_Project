@@ -60,42 +60,6 @@ class Notification
 
 
 
-    public static function sendDailyBriefings(): void
-    {
-        $tripsDb  = Database::getInstance('trips');
-        $tomorrow = date('Y-m-d', strtotime('+1 day'));
-
-        $stmt = $tripsDb->prepare(
-            'SELECT a.*, t.title AS trip_title, tm.user_id
-             FROM activities a
-             JOIN trips t ON t.id = a.trip_id
-             JOIN trip_members tm ON tm.trip_id = t.id
-             WHERE DATE(a.datetime) = ? AND a.status = "confirmed"'
-        );
-        $stmt->execute([$tomorrow]);
-        $rows = $stmt->fetchAll();
-
-
-        $byUser = [];
-        foreach ($rows as $row) {
-            $byUser[$row['user_id']][$row['trip_id']][] = $row;
-        }
-
-        foreach ($byUser as $userId => $trips) {
-            foreach ($trips as $tripId => $activities) {
-                $lines = array_map(
-                    fn($a) => "• {$a['datetime']} — {$a['title']} @ {$a['location']}",
-                    $activities
-                );
-                $msg = "Tomorrow's schedule for \"{$activities[0]['trip_title']}\":\n" . implode("\n", $lines);
-                self::send($userId, 'daily_briefing', $msg, 'Daily Briefing');
-            }
-        }
-    }
-
-
-
-
     public static function tripInvite(int $userId, string $tripTitle, string $inviterName): void
     {
         self::send($userId, 'invite', "{$inviterName} invited you to join trip \"{$tripTitle}\"", 'Trip Invitation');

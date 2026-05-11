@@ -1,15 +1,5 @@
 <?php
 
-/**
- * Trip Report Generator
- * Generates a comprehensive PDF report of a trip including:
- * - Trip details (dates, destination, budget)
- * - Member list
- * - Activity itinerary
- * - Financial summary
- * - Expense breakdown
- */
-
 require_once __DIR__ . '/config/bootstrap.php';
 
 $user = Auth::current();
