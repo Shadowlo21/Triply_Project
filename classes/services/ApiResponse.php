@@ -19,14 +19,4 @@ class ApiResponse
     {
         self::json(['success' => false, 'message' => $message], $status);
     }
-
-    public static function unauthorized(): void
-    {
-        self::error('Unauthorized', 401);
-    }
-
-    public static function forbidden(): void
-    {
-        self::error('Forbidden', 403);
-    }
 }

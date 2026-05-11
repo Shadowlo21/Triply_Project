@@ -38,15 +38,6 @@ class Trip
         return $row ? new self($row) : null;
     }
 
-    public function addMember(int $userId, string $role = 'member'): bool
-    {
-        $db   = Database::getInstance('trips');
-        $stmt = $db->prepare(
-            'INSERT OR IGNORE INTO trip_members (trip_id, user_id, role) VALUES (?, ?, ?)'
-        );
-        return $stmt->execute([$this->id, $userId, $role]);
-    }
-
     public function getMembers(): array
     {
         $tripsDb = Database::getInstance('trips');

@@ -71,16 +71,6 @@ function runMigrations(): void
             "ALTER TABLE sessions ADD COLUMN csrf_token TEXT DEFAULT NULL"
         );
     } catch (\Throwable $ignored) {}
-
-    Database::getInstance('accounts')->exec("
-        CREATE TABLE IF NOT EXISTS health_info (
-            id           INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id      INTEGER NOT NULL UNIQUE,
-            data         TEXT,
-            last_updated TEXT NOT NULL DEFAULT (datetime('now')),
-            is_sensitive INTEGER NOT NULL DEFAULT 1
-        )
-    ");
 }
 
 runMigrations();

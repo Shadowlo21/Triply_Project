@@ -179,16 +179,6 @@ class Auth
         return $user;
     }
 
-    public static function requireRole(string $role): User
-    {
-        $user = self::require();
-        if ($user->getRole() !== $role && $user->getRole() !== 'admin') {
-            http_response_code(403);
-            exit('Forbidden');
-        }
-        return $user;
-    }
-
     public static function revokeAll(int $userId): void
     {
         Database::getInstance('accounts')

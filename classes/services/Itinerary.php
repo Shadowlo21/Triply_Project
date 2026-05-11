@@ -45,98 +45,11 @@ class Itinerary
     
     
     
-    public function optimizeRoute(): array
-    {
-        $db   = Database::getInstance('trips');
-        $stmt = $db->prepare(
-            'SELECT * FROM activities
-             WHERE trip_id = ? AND status = "confirmed" AND lat IS NOT NULL AND lng IS NOT NULL
-             ORDER BY datetime ASC'
-        );
-        $stmt->execute([$this->tripId]);
-        $activities = $stmt->fetchAll();
-
-        if (count($activities) <= 1) return $activities;
-
-        $ordered   = [array_shift($activities)];
-        $remaining = $activities;
-
-        while (!empty($remaining)) {
-            $last    = end($ordered);
-            $nearest = null;
-            $minDist = PHP_FLOAT_MAX;
-
-            foreach ($remaining as $key => $act) {
-                $dist = $this->haversine(
-                    (float)$last['lat'], (float)$last['lng'],
-                    (float)$act['lat'],  (float)$act['lng']
-                );
-                if ($dist < $minDist) {
-                    $minDist = $dist;
-                    $nearest = $key;
-                }
-            }
-
-            $ordered[] = $remaining[$nearest];
-            unset($remaining[$nearest]);
-        }
-
-        return $ordered;
-    }
-
-    
-    
-    
     public function saveVersion(int $editorId, ?string $note = null): ItineraryVersion
     {
         return ItineraryVersion::snapshot($this->tripId, $editorId, $note);
     }
 
-    
-    
-    
-    
-    
-    public function applyTransportBuffers(): int
-    {
-        $db   = Database::getInstance('trips');
-        $stmt = $db->prepare(
-            'SELECT * FROM activities
-             WHERE trip_id = ? AND status != "cancelled"
-             ORDER BY datetime ASC'
-        );
-        $stmt->execute([$this->tripId]);
-        $rows = $stmt->fetchAll();
-
-        if (count($rows) < 2) return 0;
-
-        $adjusted = 0;
-        $update   = $db->prepare('UPDATE activities SET datetime = ? WHERE id = ?');
-
-        for ($i = 1; $i < count($rows); $i++) {
-            $prev      = $rows[$i - 1];
-            $curr      = $rows[$i];
-            $prevEnd   = strtotime($prev['datetime']) + ((int)$prev['duration_min'] * 60);
-            $buffer    = Activity::bufferMinutes($curr['transport_mode']) * 60;
-            $earliest  = $prevEnd + $buffer;
-            $currStart = strtotime($curr['datetime']);
-
-            if ($currStart < $earliest) {
-                $newDatetime = date('Y-m-d H:i:s', $earliest);
-                $update->execute([$newDatetime, $curr['id']]);
-                $rows[$i]['datetime'] = $newDatetime;
-                $adjusted++;
-            }
-        }
-
-        return $adjusted;
-    }
-
-    
-    
-    
-    
-    
     public function getCurrentItinerary(): array
     {
         $tripsDb  = Database::getInstance('trips');
@@ -172,17 +85,6 @@ class Itinerary
 
     
     
-    
-    private function haversine(float $lat1, float $lng1, float $lat2, float $lng2): float
-    {
-        $R    = 6371;
-        $dLat = deg2rad($lat2 - $lat1);
-        $dLng = deg2rad($lng2 - $lng1);
-        $a    = sin($dLat / 2) ** 2
-              + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
-        return $R * 2 * atan2(sqrt($a), sqrt(1 - $a));
-    }
-
     
     
     

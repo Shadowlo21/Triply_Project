@@ -82,13 +82,17 @@ function start_layout(string $title, array $opts = []): void
                       <p class="text-[10px] uppercase tracking-widest text-purple-400 font-bold">Elite Concierge</p>
                     </div>
                   </div>
+                  <?php $isAdmin = $_user && $_user->getRole() === 'admin'; ?>
                   <nav class="flex-1 space-y-1 px-2">
+                    <?php if (!$isAdmin): ?>
                     <a class="triply-navlink text-gray-500 hover:text-white px-4 py-3 flex items-center gap-3 hover:bg-white/5 hover:translate-x-1 transition-all duration-200 ease-in-out" href="/?page=dashboard">
                       <i class="fa-solid fa-gauge-high"></i><span>Dashboard</span>
                     </a>
+                    <?php endif; ?>
                     <a class="triply-navlink text-gray-500 hover:text-white px-4 py-3 flex items-center gap-3 hover:bg-white/5 hover:translate-x-1 transition-all duration-200 ease-in-out" href="/?page=trips">
                       <i class="fa-solid fa-route"></i><span>Trips</span>
                     </a>
+                    <?php if (!$isAdmin): ?>
                     <a class="triply-navlink text-gray-500 hover:text-white px-4 py-3 flex items-center gap-3 hover:bg-white/5 hover:translate-x-1 transition-all duration-200 ease-in-out" href="/?page=social">
                       <i class="fa-solid fa-people-group"></i><span>Social</span>
                     </a>
@@ -101,13 +105,14 @@ function start_layout(string $title, array $opts = []): void
                     <a class="triply-navlink text-gray-500 hover:text-white px-4 py-3 flex items-center gap-3 hover:bg-white/5 hover:translate-x-1 transition-all duration-200 ease-in-out" href="/?page=itinerary">
                       <i class="fa-solid fa-calendar-days"></i><span>Itinerary</span>
                     </a>
+                    <?php endif; ?>
                     <a class="triply-navlink text-gray-500 hover:text-white px-4 py-3 flex items-center gap-3 hover:bg-white/5 hover:translate-x-1 transition-all duration-200 ease-in-out" href="/?page=notifications">
                       <i class="fa-solid fa-bell"></i><span>Notifications</span>
                     </a>
                     <a class="triply-navlink text-gray-500 hover:text-white px-4 py-3 flex items-center gap-3 hover:bg-white/5 hover:translate-x-1 transition-all duration-200 ease-in-out" href="/?page=emergency">
                       <i class="fa-solid fa-triangle-exclamation"></i><span>Emergency</span>
                     </a>
-                    <?php if ($_user && $_user->getRole() === 'admin'): ?>
+                    <?php if ($isAdmin): ?>
                       <a class="triply-navlink text-gray-500 hover:text-white px-4 py-3 flex items-center gap-3 hover:bg-white/5 hover:translate-x-1 transition-all duration-200 ease-in-out" href="/?page=admin">
                         <i class="fa-solid fa-shield-halved"></i><span>Admin</span>
                       </a>
