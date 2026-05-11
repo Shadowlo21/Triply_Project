@@ -12,7 +12,7 @@ start_layout('Trips');
 
 <div id="alert-box"></div>
 
-<?php if ($myRole !== 'member'): ?>
+<?php if ($myRole === 'leader'): ?>
 <div class="flex-between mb-4">
   <div></div>
   <button class="btn btn-primary" onclick="openModal('modal-create-trip')">+ New Trip</button>
@@ -37,7 +37,7 @@ start_layout('Trips');
 </div>
 
 <!-- Create modal (leaders + admins only) -->
-<?php if ($myRole !== 'member'): ?>
+<?php if ($myRole === 'leader'): ?>
 <div class="modal-overlay hidden" id="modal-create-trip">
   <div class="triply-modal">
     <div class="modal-header">

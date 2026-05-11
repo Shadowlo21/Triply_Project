@@ -215,8 +215,8 @@ class TripsController
                     ApiResponse::success($trip);
 
                 case 'create':
-                    if ($user->getRole() === 'member') {
-                        ApiResponse::error('Only leaders and admins can create trips.', 403);
+                    if ($user->getRole() !== 'leader') {
+                        ApiResponse::error('Only leaders can create trips.', 403);
                     }
                     if (!($user instanceof TripLeader)) {
                         $leader = new TripLeader($user->getId(), $user->getEmail(), $user->getRole());

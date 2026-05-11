@@ -134,7 +134,7 @@ function start_layout(string $title, array $opts = []): void
                         <i class="fa-solid fa-right-from-bracket"></i>
                       </button>
                     </div>
-                    <?php if ($_user && $_user->getRole() !== 'member'): ?>
+                    <?php if ($_user && $_user->getRole() === 'leader'): ?>
                     <button class="w-full py-3 bg-[var(--color-primary)] text-white font-bold rounded-xl flex items-center justify-center gap-2 hover:scale-105 transition-transform active:scale-95 shadow-[0_0_20px_rgba(168,85,247,0.3)]" onclick="location.href='/?page=trips'">
                       <i class="fa-solid fa-plus"></i> New Trip
                     </button>
